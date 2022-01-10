@@ -11,6 +11,7 @@ BUILDLOGS_REDIS:
     host: 127.0.0.1
     password: {{ lookup("password", password_dir + "/redis_pass length=16 chars=ascii_letters,digits") }}
     port: 6379
+CREATE_NAMESPACE_ON_PUSH: true
 DB_CONNECTION_ARGS: {}
 DB_URI: postgresql://quay_{{ lookup("password", password_dir + "/postgresql_user length=4 chars=ascii_letters") }}:{{ lookup("password", password_dir + "/postgresql_pass length=16 chars=ascii_letters,digits") }}@127.0.0.1/quay_{{ lookup("password", password_dir + "/postgresql_db length=4 chars=ascii_letters") }}
 DATABASE_SECRET_KEY: '{{ lookup("password", password_dir + "/db_secret_key length=77 chars=digits") }}'
