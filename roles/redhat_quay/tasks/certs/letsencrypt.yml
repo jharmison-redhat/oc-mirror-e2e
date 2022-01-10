@@ -1,0 +1,115 @@
+---
+- name: Generate LetsEncrypt private account key
+  become: true
+  community.crypto.openssl_privatekey:
+    path: '{{ cert_directory }}/account.key'
+    owner: '{{ cert_owner|default(omit) }}'
+    group: '{{ cert_group|default(omit) }}'
+    setype: '{{ cert_setype|default("container_file_t") }}'
+    mode: '{{ cert_mode|default(omit) }}'
+
+- name: Make sure account exists and agree to ToS
+  become: true
+  community.crypto.acme_account:
+    acme_directory: https://acme-v02.api.letsencrypt.org/directory
+    acme_version: 2
+    account_key_src: '{{ cert_directory }}/account.key'
+    state: present
+    terms_agreed: yes
+    contact:
+    - mailto:{{ registry_admin.email|default("admin@" + registry_hostname) }}
+
+- name: Generate LetsEncrypt private key
+  become: true
+  community.crypto.openssl_privatekey:
+    path: '{{ cert_directory }}/ssl.key'
+    owner: '{{ cert_owner|default(omit) }}'
+    group: '{{ cert_group|default(omit) }}'
+    setype: '{{ cert_setype|default("container_file_t") }}'
+    mode: '{{ cert_mode|default(omit) }}'
+
+- name: Generate LetsEncrypt certificate signing request
+  become: true
+  community.crypto.openssl_csr:
+    path: '{{ cert_directory }}/ssl.csr'
+    privatekey_path: '{{ cert_directory }}/ssl.key'
+    common_name: '{{ registry_hostname }}'
+    subject_alt_name: 'DNS:{{ registry_hostname }}'
+    owner: '{{ cert_owner|default(omit) }}'
+    group: '{{ cert_group|default(omit) }}'
+    setype: '{{ cert_setype|default("container_file_t") }}'
+    mode: '{{ cert_mode|default(omit) }}'
+
+- name: Generate LetsEncrypt challenge from CSR
+  become: true
+  community.crypto.acme_certificate:
+    acme_directory: https://acme-v02.api.letsencrypt.org/directory
+    acme_version: 2
+    account_key_src: '{{ cert_directory }}/account.key'
+    csr: '{{ cert_directory }}/ssl.csr'
+    dest: '{{ cert_directory }}/ssl.cert.single'
+    fullchain_dest: '{{ cert_directory }}/ssl.cert.fullchain'
+  register: certificate_challenge
+
+- name: Prepare the challenge answer directory
+  become: true
+  file:
+    path: /var/www/html/{{ certificate_challenge['challenge_data'][registry_hostname]['http-01']['resource']|dirname }}
+    state: directory
+  when:
+  - certificate_challenge.changed
+  - registry_hostname in certificate_challenge['challenge_data']
+
+- name: Prepare the challenge answer
+  become: true
+  copy:
+    dest: /var/www/html/{{ certificate_challenge['challenge_data'][registry_hostname]['http-01']['resource'] }}
+    content: "{{ certificate_challenge['challenge_data'][registry_hostname]['http-01']['resource_value'] }}"
+    setype: container_file_t
+  when:
+  - certificate_challenge.changed
+  - registry_hostname in certificate_challenge['challenge_data']
+
+- name: Manage the challenge container
+  become: true
+  containers.podman.podman_container:
+    name: acme-challenge
+    image: docker.io/library/nginx:latest
+    volume:
+    - /var/www/html:/usr/share/nginx/html:ro,z
+    publish:
+    - 80:80
+  when:
+  - certificate_challenge.changed
+  - registry_hostname in certificate_challenge['challenge_data']
+
+- name: Let the challenge be validated and retrieve the cert and intermediate certificate
+  become: true
+  community.crypto.acme_certificate:
+    acme_directory: https://acme-v02.api.letsencrypt.org/directory
+    acme_version: 2
+    account_key_src: '{{ cert_directory }}/account.key'
+    csr: '{{ cert_directory }}/ssl.csr'
+    dest: '{{ cert_directory }}/ssl.cert.single'
+    fullchain_dest: '{{ cert_directory }}/ssl.cert.fullchain'
+    data: '{{ certificate_challenge }}'
+  when:
+  - certificate_challenge.changed
+  - registry_hostname in certificate_challenge['challenge_data']
+
+- name: Migrate the fullchain into place
+  become: true
+  copy:
+    remote_src: yes
+    src: '{{ cert_directory }}/ssl.cert.fullchain'
+    dest: '{{ cert_directory }}/ssl.cert'
+    owner: '{{ cert_owner|default(omit) }}'
+    group: '{{ cert_group|default(omit) }}'
+    setype: '{{ cert_setype|default("container_file_t") }}'
+    mode: '{{ cert_mode|default(omit) }}'
+
+- name: Tear down challenge container
+  become: true
+  containers.podman.podman_container:
+    name: acme-challenge
+    state: absent

@@ -1,0 +1,31 @@
+---
+registry_admin:
+  username: quay
+  password: password
+  email: quay@example.com
+
+password_dir: '{{ playbook_dir }}/.passwords'
+
+registry_s3_region: us-east-2
+registry_s3_bucket: quay
+
+registry_storage_type: S3Storage
+registry_storage_details:
+  host: s3.{{ registry_s3_region }}.amazonaws.com
+  s3_bucket: '{{ registry_s3_bucket }}'
+registry_storage_path: /datastorage/registry
+
+deploy_clair: true
+
+do_redhat_login: true
+
+cert_style: letsencrypt
+registry_certificate: ""
+registry_certificate_key: ""
+
+quay_version: "3.6.2"
+
+quay_image: registry.redhat.io/quay/quay-rhel8:v{{ quay_version }}
+clair_image: registry.redhat.io/quay/clair-rhel8:v{{ quay_version }}
+redis_image: registry.redhat.io/rhel8/redis-5:1
+postgres_image: registry.redhat.io/rhel8/postgresql-10:1

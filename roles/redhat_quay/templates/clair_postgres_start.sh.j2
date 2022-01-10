@@ -1,0 +1,4 @@
+#!/bin/sh
+
+echo "Enabling uuid-ossp for Clair"
+echo 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp"' | psql -d clair_{{ lookup("password", password_dir + "/clair_postgresql_db length=4 chars=ascii_letters") }} -U postgres

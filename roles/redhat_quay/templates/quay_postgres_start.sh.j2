@@ -1,0 +1,4 @@
+#!/bin/sh
+
+echo "Enabling pg_trgm for Quay"
+echo 'CREATE EXTENSION IF NOT EXISTS pg_trgm' | psql -d quay_{{ lookup("password", password_dir + "/postgresql_db length=4 chars=ascii_letters") }} -U postgres

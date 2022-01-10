@@ -1,0 +1,30 @@
+http_listen_addr: :8081
+introspection_addr: :8089
+log_level: debug
+indexer:
+  connstring: host=localhost port=5433 dbname=clair_{{ lookup("password", password_dir + "/clair_postgresql_db length=4 chars=ascii_letters") }} user=clair_{{ lookup("password", password_dir + "/clair_postgresql_user length=4 chars=ascii_letters") }} password={{ lookup("password", password_dir + "/clair_postgresql_pass length=16 chars=ascii_letters,digits,punctuation") }} sslmode=disable
+  scanlock_retry: 10
+  layer_scan_concurrency: 5
+  migrations: true
+matcher:
+  connstring: host=localhost port=5433 dbname=clair_{{ lookup("password", password_dir + "/clair_postgresql_db length=4 chars=ascii_letters") }} user=clair_{{ lookup("password", password_dir + "/clair_postgresql_user length=4 chars=ascii_letters") }} password={{ lookup("password", password_dir + "/clair_postgresql_pass length=16 chars=ascii_letters,digits,punctuation") }} sslmode=disable
+  max_conn_pool: 100
+  run: ""
+  migrations: true
+  indexer_addr: clair-indexer
+notifier:
+  connstring: host=localhost port=5433 dbname=clair_{{ lookup("password", password_dir + "/clair_postgresql_db length=4 chars=ascii_letters") }} user=clair_{{ lookup("password", password_dir + "/clair_postgresql_user length=4 chars=ascii_letters") }} password={{ lookup("password", password_dir + "/clair_postgresql_pass length=16 chars=ascii_letters,digits,punctuation") }} sslmode=disable
+  delivery_interval: 1m
+  poll_interval: 5m
+  migrations: true
+auth:
+  psk: nil
+# tracing and metrics
+trace:
+  name: "jaeger"
+  probability: 1
+  jaeger:
+    agent_endpoint: "localhost:6831"
+    service_name: "clair"
+metrics:
+  name: "prometheus"

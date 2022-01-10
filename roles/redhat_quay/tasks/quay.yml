@@ -1,0 +1,72 @@
+---
+- name: Ensure volume directories exist for Quay
+  become: true
+  file:
+    path: /home/quay/{{ item.dir }}
+    state: directory
+    owner: '{{ item.uid }}'
+    group: quay
+    mode: '0770'
+    setype: container_file_t
+  loop:
+  - dir: postgres
+    uid: '{{ pg_uid }}'
+  - dir: config
+    uid: '{{ quay_uid }}'
+  - dir: config/extra_ca_certs
+    uid: '{{ quay_uid }}'
+
+- name: Install certs
+  include_tasks: certs/{{ cert_style }}.yml
+  vars:
+    cert_directory: /home/quay/config
+    cert_owner: '{{ quay_uid }}'
+    cert_group: quay
+    cert_mode: '0666'
+
+- name: Template prep script
+  become: true
+  template:
+    src: quay_postgres_start.sh.j2
+    dest: /home/quay/quay_postgres_start.sh
+    mode: '0775'
+    owner: quay
+    group: quay
+    setype: container_file_t
+
+- name: Template Quay configuration
+  become: true
+  template:
+    src: quay_config.j2
+    dest: /home/quay/config/config.yaml
+    owner: '{{ quay_uid }}'
+    group: quay
+    setype: container_file_t
+    mode: '0666'
+
+- name: Drop Quay healthcheck scripts
+  become: true
+  copy:
+    src: '{{ role_path }}/files/{{ item }}'
+    dest: /home/quay/{{ item }}
+    owner: '{{ quay_uid }}'
+    group: quay
+    setype: container_file_t
+    mode: '0775'
+  loop:
+  - healthcheck.py
+  - healthcheck.sh
+
+- name: Template Quay container units
+  become: true
+  template:
+    src: container.service.j2
+    dest: /home/quay/.config/systemd/user/container-{{ container.key }}.service
+    owner: quay
+    group: quay
+    setype: systemd_unit_file_t
+  register: container_units
+  loop: '{{ quay_containers|dict2items }}'
+  loop_control:
+    loop_var: container
+    label: '{{ container.key }}'

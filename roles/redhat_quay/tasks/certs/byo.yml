@@ -1,0 +1,33 @@
+---
+- name: Ensure that the required variables are provided
+  fail:
+    msg: When using the BYO certificate style, please ensure that you define the variables "registry_certificate" and "registry_certificate_key" with the appropriate PEM content
+  when: registry_certificate == "" or registry_certificate_key == ""
+
+- name: Migrate certificates into place
+  become: true
+  copy:
+    content: '{{ item.content }}'
+    dest: '{{ cert_directory }}/ssl.{{ item.type }}'
+    owner: '{{ cert_owner|default(omit) }}'
+    group: '{{ cert_group|default(omit) }}'
+    setype: '{{ cert_setype|default("container_file_t") }}'
+    mode: '{{ cert_mode|default(omit) }}'
+  loop:
+  - content: '{{ registry_certificate }}'
+    type: cert
+  - content: '{{ registry_certificate_key }}'
+    type: key
+
+- name: Copy certificate to the CA anchors folder
+  become: true
+  copy:
+    remote_src: yes
+    src: '{{ cert_directory }}/ssl.cert'
+    dest: /etc/pki/ca-trust/source/anchors/registry.crt
+  register: cert_in_anchors
+
+- name: Trust certificate
+  become: true
+  command: update-ca-trust
+  when: cert_in_anchors.changed

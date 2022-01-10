@@ -1,0 +1,55 @@
+- name: Ensure volume directories exist for Quay
+  become: true
+  file:
+    path: /home/quay/{{ item.dir }}
+    state: directory
+    owner: '{{ item.uid }}'
+    group: quay
+    setype: container_file_t
+  loop:
+  - dir: clair-postgres
+    uid: '{{ pg_uid }}'
+  - dir: clair-config
+    uid: '{{ quay_uid }}'
+
+- name: Template prep script
+  become: true
+  template:
+    src: clair_postgres_start.sh.j2
+    dest: /home/quay/clair_postgres_start.sh
+    mode: '0775'
+    owner: quay
+    group: quay
+    setype: container_file_t
+
+- name: Template Clair configuration
+  become: true
+  template:
+    src: clair_config.yml.j2
+    dest: /home/quay/clair-config/config.yml
+    owner: quay
+    group: quay
+    setype: container_file_t
+
+- name: Template Clair Postgres configuration
+  become: true
+  template:
+    src: clair_postgres_config.conf.j2
+    dest: /home/quay/clair_postgres_config.conf
+    owner: quay
+    group: quay
+    setype: container_file_t
+
+- name: Template Clair container units
+  become: true
+  template:
+    src: container.service.j2
+    dest: /home/quay/.config/systemd/user/container-{{ container.key }}.service
+    owner: quay
+    group: quay
+    setype: systemd_unit_file_t
+  register: clair_container_units
+  loop: '{{ clair_containers|dict2items }}'
+  loop_control:
+    loop_var: container
+    label: '{{ container.key }}'

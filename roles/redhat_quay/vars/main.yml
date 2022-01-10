@@ -1,0 +1,99 @@
+---
+quay_containers:
+  quay-postgres:
+    image: '{{ postgres_image }}'
+    env:
+      POSTGRESQL_USER: 'quay_{{ lookup("password", password_dir + "/postgresql_user length=4 chars=ascii_letters") }}'
+      POSTGRESQL_PASSWORD: '{{ lookup("password", password_dir + "/postgresql_pass length=16 chars=ascii_letters,digits") }}'
+      POSTGRESQL_DATABASE: 'quay_{{ lookup("password", password_dir + "/postgresql_db length=4 chars=ascii_letters") }}'
+      POSTGRESQL_ADMIN_PASSWORD: '{{ lookup("password", password_dir + "/postgresql_admin_pass length=16 chars=ascii_letters,digits") }}'
+    volumes:
+      - /home/quay/postgres:/var/lib/pgsql/data:Z
+      - /home/quay/quay_postgres_start.sh:/usr/share/container-scripts/postgresql/start/quay_postgres_start.sh:Z
+    labels:
+      io.containers.autoupdate: image
+    extra_args: >-
+      --healthcheck-command 'CMD-SHELL pg_isready -U postgres'
+  redis:
+    image: '{{ redis_image }}'
+    env:
+      REDIS_PASSWORD: '{{ lookup("password", password_dir + "/redis_pass length=16 chars=ascii_letters,digits") }}'
+    labels:
+      io.containers.autoupdate: image
+  quay:
+    image: '{{ quay_image }}'
+    volumes:
+      - /home/quay/config:/conf/stack:Z
+      - /home/quay/healthcheck.py:/usr/local/bin/healthcheck.py:Z
+      - /home/quay/healthcheck.sh:/usr/local/bin/healthcheck.sh:Z
+    depends_on:
+      - quay-postgres
+      - redis
+    labels:
+      io.containers.autoupdate: image
+    extra_args: >-
+      --healthcheck-command 'CMD-SHELL /bin/sh -c /usr/local/bin/healthcheck.sh'
+      --healthcheck-retries 10
+
+clair_containers:
+  clair-postgres:
+    image: '{{ postgres_image }}'
+    env:
+      POSTGRESQL_USER: 'clair_{{ lookup("password", password_dir + "/clair_postgresql_user length=4 chars=ascii_letters") }}'
+      POSTGRESQL_PASSWORD: '{{ lookup("password", password_dir + "/clair_postgresql_pass length=16 chars=ascii_letters,digits") }}'
+      POSTGRESQL_DATABASE: 'clair_{{ lookup("password", password_dir + "/clair_postgresql_db length=4 chars=ascii_letters") }}'
+      POSTGRESQL_ADMIN_PASSWORD: '{{ lookup("password", password_dir + "/clair_postgresql_admin_pass length=16 chars=ascii_letters,digits") }}'
+      PGPORT: '5433'
+    volumes:
+      - /home/quay/clair-postgres:/var/lib/pgsql/data:Z
+      - /home/quay/clair_postgres_config.conf:/opt/app-root/src/postgresql-cfg/port.conf:z
+      - /home/quay/clair_postgres_start.sh:/usr/share/container-scripts/postgresql/start/clair_postgres_start.sh:Z
+    labels:
+      io.containers.autoupdate: image
+    extra_args: >-
+      --healthcheck-command 'CMD-SHELL pg_isready -U postgres'
+  clair:
+    image: '{{ clair_image }}'
+    env:
+      CLAIR_CONF: /clair/config.yml
+      CLAIR_MODE: combo
+    volumes:
+      - /home/quay/clair-config:/clair:Z
+    depends_on:
+      - clair-postgres
+    labels:
+      io.containers.autoupdate: image
+
+container_unit_execstart: >-
+  /usr/bin/podman container run
+  --cidfile=%t/%n.ctr-id
+  --cgroups=no-conmon
+  --rm
+  --pod-id-file %t/pod-quay-pod.pod-id
+  --sdnotify=conmon
+  --replace
+  --name {{ container.key }}
+  --detach=True
+  {% for env in container.value.env|default({})|dict2items %}
+    --env {{ env.key }}={{ env.value }}
+  {% endfor %}
+  {% for label in container.value.labels|default({})|dict2items %}
+    --label {{ label.key }}={{ label.value }}
+  {% endfor %}
+  --label podman_systemd_unit=container-{{ container.key }}.service
+  {% for volume in container.value.volumes|default([]) %}
+    --volume {{ volume }}
+  {% endfor %}
+  --log-driver=journald
+  {{ container.value.extra_args|default("") }}
+  {{ container.value.image }}
+  {{ container.value.command|default("") }}
+
+empty_results:
+  results:
+  - changed: false
+
+implemented_cert_styles:
+  - letsencrypt
+  - byo
+  - selfsigned

@@ -1,0 +1,135 @@
+---
+- name: Perform preparation for installing registry
+  import_tasks: setup.yml
+
+- name: Template Quay pod unit
+  become: true
+  template:
+    src: pod.service.j2
+    dest: /home/quay/.config/systemd/user/pod-quay-pod.service
+    owner: quay
+    group: quay
+    setype: systemd_unit_file_t
+  register: pod_unit
+
+- name: Login to registry.redhat.io
+  become: true
+  become_user: quay
+  containers.podman.podman_login:
+    username: '{{ redhat_username }}'
+    password: '{{ redhat_password }}'
+    registry: registry.redhat.io
+  environment:
+    XDG_RUNTIME_DIR: '{{ xdg_runtime_dir }}'
+  when: do_redhat_login|bool
+
+- name: Set up Quay containers
+  import_tasks: quay.yml
+
+- name: Set up Clair containers
+  include_tasks: clair.yml
+  when: deploy_clair|bool
+
+- name: Reload Quay systemd
+  become: true
+  become_user: quay
+  systemd:
+    daemon_reload: true
+    scope: user
+  environment:
+    XDG_RUNTIME_DIR: '{{ xdg_runtime_dir }}'
+  when: >-
+    pod_unit.changed or
+    true in container_units|json_query('results[*].changed') or
+    true in clair_container_units|default(empty_results)|json_query('results[*].changed')
+
+- name: Ensure Quay is started
+  become: true
+  become_user: quay
+  systemd:
+    name: pod-quay-pod.service
+    state: started
+    scope: user
+  environment:
+    XDG_RUNTIME_DIR: '{{ xdg_runtime_dir }}'
+  register: pod_started
+
+- name: Restart Quay
+  become: true
+  become_user: quay
+  systemd:
+    name: pod-quay-pod.service
+    state: restarted
+    scope: user
+  environment:
+    XDG_RUNTIME_DIR: '{{ xdg_runtime_dir }}'
+  when:
+  - not pod_started.changed
+  - >-
+    pod_unit.changed or
+    true in container_units|json_query('results[*].changed') or
+    true in clair_container_units|default(empty_results)|json_query('results[*].changed')
+
+- name: Enable updates for Quay
+  become: true
+  become_user: quay
+  systemd:
+    name: podman-auto-update.timer
+    enabled: true
+    scope: user
+  environment:
+    XDG_RUNTIME_DIR: '{{ xdg_runtime_dir }}'
+
+- name: Start updates for Quay
+  become: true
+  become_user: quay
+  systemd:
+    name: podman-auto-update.timer
+    state: started
+    scope: user
+  environment:
+    XDG_RUNTIME_DIR: '{{ xdg_runtime_dir }}'
+
+- name: Wait for Quay to come online
+  become: true
+  become_user: quay
+  shell: |-
+    function quay_healthy {
+      echo -n '.'
+      podman healthcheck run quay 2>/dev/null | grep -qF healthy
+    }
+    function quay_stable {
+      quay_healthy || return 1
+      sleep 10
+      quay_healthy || return 1
+    }
+    interval=10
+    duration=300
+    echo -n "Waiting for Quay..."
+    while ! quay_stable; do
+      (( duration -= interval ))
+      [ $duration -le 0 ] && exit 1 ||:
+      sleep $interval
+    done
+    echo
+  changed_when: false
+
+- name: List current users
+  become: true
+  become_user: quay
+  shell: podman exec quay python -Wi -c 'from endpoints.api.superuser_models_pre_oci import pre_oci_model; import json; print(json.dumps(pre_oci_model.get_active_users(disabled=False)))' 2>/dev/null
+  changed_when: false
+  register: quay_current_users
+
+- name: Create the superuser
+  become: true
+  become_user: quay
+  shell: podman exec quay python -Wi -c 'from endpoints.api.superuser_models_pre_oci import pre_oci_model; print(pre_oci_model.create_install_user("{{ registry_admin.username }}", "{{ registry_admin.password }}", "{{ registry_admin.email }}")[0])' 2>/dev/null
+  when: expected_user not in quay_current_users.stdout|from_json
+  vars:
+    expected_user:
+    - '{{ registry_admin.username }}'
+    - '{{ registry_admin.email }}'
+    - true
+    - true
+    - false

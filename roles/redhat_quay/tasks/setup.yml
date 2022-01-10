@@ -1,0 +1,83 @@
+---
+- name: Ensure that requested cert style exists
+  assert:
+    that:
+    - cert_style in implemented_cert_styles
+    fail_msg: The certificate style you have selected, {{ cert_style }}, is not implemented yet.
+
+- name: Ensure host is configured as a container host
+  become: true
+  dnf:
+    name: '@container-tools'
+    state: installed
+
+- name: Ensure that local password directory exists
+  file:
+    path: '{{ password_dir }}'
+    state: directory
+  delegate_to: localhost
+
+- name: Enable unprivileged binding to port 443 and up
+  become: true
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_unprivileged_port_start
+    value: '443'
+    sysctl_set: yes
+    reload: yes
+
+- name: Create a local user to run Quay
+  become: true
+  user:
+    name: quay
+
+- name: Enable linger for Quay user
+  become: true
+  command: loginctl enable-linger quay
+  args:
+    creates: /var/lib/systemd/linger/quay
+
+- name: Ensure systemd user unit directory exists
+  become: true
+  file:
+    path: /home/quay/.config/systemd/user
+    owner: quay
+    group: quay
+    state: directory
+
+- name: Retrieve subuid mapping for Quay user
+  command: cat /etc/subuid
+  register: subuid_file
+  changed_when: false
+
+- name: Save Postgres and Quay user id mappings
+  set_fact:
+    pg_uid: >-
+      {% for line in subuid_file.stdout_lines %}
+      {% if line.startswith("quay:") %}
+      {{ (line.split(":")[1]|int)+25 }}
+      {% endif %}
+      {% endfor %}
+    quay_uid: >-
+      {% for line in subuid_file.stdout_lines %}
+      {% if line.startswith("quay:") %}
+      {{ (line.split(":")[1]|int)+1000 }}
+      {% endif %}
+      {% endfor %}
+
+- name: Retrieve Quay pod UID
+  getent:
+    database: passwd
+    key: quay
+
+- name: Save XDG_RUNTIME_DIR for Quay
+  set_fact:
+    xdg_runtime_dir: /run/user/{{ getent_passwd["quay"][1]|default("noop") }}
+
+- name: Ensure user run directory exists for Quay
+  become: true
+  file:
+    path: '{{ xdg_runtime_dir }}'
+    state: directory
+    mode: "0700"
+    owner: quay
+    group: quay

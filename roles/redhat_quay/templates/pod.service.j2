@@ -1,0 +1,28 @@
+[Unit]
+Description=Podman pod-quay-pod.service
+Wants=network-online.target
+After=network-online.target
+RequiresMountsFor=
+Requires=container-quay.service container-quay-postgres.service container-redis.service
+{%- if deploy_clair|bool %}
+ container-clair.service container-clair-postgres.service
+{% endif %}
+
+Before=container-quay.service container-quay-postgres.service container-redis.service
+{%- if deploy_clair|bool %}
+ container-clair.service container-clair-postgres.service
+{% endif %}
+
+[Service]
+Environment=PODMAN_SYSTEMD_UNIT=%n
+Restart=on-failure
+TimeoutStopSec=70
+ExecStartPre=/bin/rm -f %t/pod-quay-pod.pid %t/pod-quay-pod.pod-id
+ExecStartPre=/usr/bin/podman pod create --infra-conmon-pidfile %t/pod-quay-pod.pid --pod-id-file %t/pod-quay-pod.pod-id --name quay-pod --publish 443:8443 --replace
+ExecStart=/usr/bin/podman pod start --pod-id-file %t/pod-quay-pod.pod-id
+ExecStop=/usr/bin/podman pod stop --ignore --pod-id-file %t/pod-quay-pod.pod-id -t 10
+ExecStopPost=/usr/bin/podman pod rm --ignore -f --pod-id-file %t/pod-quay-pod.pod-id
+PIDFile=%t/pod-quay-pod.pid
+Type=forking
+[Install]
+WantedBy=multi-user.target default.target

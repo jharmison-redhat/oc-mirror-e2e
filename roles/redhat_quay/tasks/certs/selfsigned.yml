@@ -1,0 +1,51 @@
+---
+- name: Generate self-signed private key
+  become: true
+  community.crypto.openssl_privatekey:
+    path: '{{ cert_directory }}/ssl.key'
+    owner: '{{ cert_owner|default(omit) }}'
+    group: '{{ cert_group|default(omit) }}'
+    setype: '{{ cert_setype|default("container_file_t") }}'
+    mode: '{{ cert_mode|default(omit) }}'
+
+- name: Generate self-signed certificate signing request
+  become: true
+  community.crypto.openssl_csr:
+    path: '{{ cert_directory }}/ssl.csr'
+    privatekey_path: '{{ cert_directory }}/ssl.key'
+    common_name: '{{ registry_hostname }}'
+    subject_alt_name: 'DNS:{{ registry_hostname }}'
+    email_address: '{{ registry_admin.email|default("admin@" + registry_hostname) }}'
+    country_name: '{{ cert_country|default("US") }}'
+    organization_name: '{{ cert_org|default(registry_hostname.split(".", 1)[1]) }}'
+    owner: '{{ cert_owner|default(omit) }}'
+    group: '{{ cert_group|default(omit) }}'
+    setype: '{{ cert_setype|default("container_file_t") }}'
+    mode: '{{ cert_mode|default(omit) }}'
+
+- name: Generate self-signed certificate
+  become: true
+  community.crypto.x509_certificate:
+    path: '{{ cert_directory }}/ssl.cert'
+    csr_path: '{{ cert_directory }}/ssl.csr'
+    privatekey_path: '{{ cert_directory }}/ssl.key'
+    provider: selfsigned
+    owner: '{{ cert_owner|default(omit) }}'
+    group: '{{ cert_group|default(omit) }}'
+    setype: '{{ cert_setype|default("container_file_t") }}'
+    mode: '{{ cert_mode|default(omit) }}'
+    return_content: yes
+  register: selfsigned_certificate
+
+- name: Copy certificate to the CA anchors folder
+  become: true
+  copy:
+    remote_src: yes
+    src: '{{ cert_directory }}/ssl.cert'
+    dest: /etc/pki/ca-trust/source/anchors/registry.crt
+  register: cert_in_anchors
+
+- name: Trust certificate
+  become: true
+  command: update-ca-trust
+  when: cert_in_anchors.changed
