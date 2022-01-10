@@ -38,8 +38,8 @@ terraform.rc
 .tflint.d
 
 # Ansible content
-output/*
-!output/.gitkeep
+execution-environment/output/*
+!execution-environment/output/.gitkeep
 group_vars/all.yml
 
 # Other development artifacts

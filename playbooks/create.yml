@@ -1,27 +1,35 @@
 ---
 - name: Provision the infrastructure
   hosts: controller
+  vars_files:
+  - defaults.yml
   roles:
     # The provisioner role consumes the terraform adjacent to the playbook
     # and exports the created ec2_instances to inventory, while also registering
     # the other outputs from the terraform module for use later in the playbook
   - role: provisioner
     vars:
-      cert_directory: '{{ playbook_dir }}/output'
+      cert_directory: '{{ output_directory }}'
 
 - name: Wait for connectivity to all terraformed hosts
   hosts: terraformed
+  vars_files:
+  - defaults.yml
   gather_facts: false
   roles:
   - role: cloud_init_finished
 
 - name: Update all connected terraformed hosts
   hosts: connected
+  vars_files:
+  - defaults.yml
   roles:
   - role: updated
 
 - name: Configure Red Hat Quay
   hosts: registry
+  vars_files:
+  - defaults.yml
   vars:
     registry_bucket: '{{ hostvars.controller.terraform.outputs.registry_bucket.value }}'
   roles:
@@ -33,13 +41,15 @@
         s3_bucket: '{{ registry_bucket.bucket }}'
         s3_access_key: '{{ registry_bucket.access_key }}'
         s3_secret_key: '{{ registry_bucket.secret_key }}'
-      password_dir: '{{ playbook_dir }}/output'
+      password_dir: '{{ output_directory }}'
       cert_style: byo
-      registry_certificate: '{{ lookup("file", playbook_dir+"/output/registry.crt") }}'
-      registry_certificate_key: '{{ lookup("file", playbook_dir+"/output/registry.key") }}'
+      registry_certificate: '{{ lookup("file", output_directory+"/registry.crt") }}'
+      registry_certificate_key: '{{ lookup("file", output_directory+"/registry.key") }}'
 
 - name: Configure Squid
   hosts: proxy
+  vars_files:
+  - defaults.yml
   become: true
   vars:
     ca_cert_and_key: '{{ hostvars.controller.ca.stdout }}'
@@ -51,11 +61,13 @@
 
 - name: Validate bastion configuration
   hosts: bastion
+  vars_files:
+  - defaults.yml
   become: true
   pre_tasks:
   - name: Ensure proxy CA certificate is present in anchors
     copy:
-      src: '{{ playbook_dir }}/output/squid.crt'
+      src: '{{ output_directory }}/squid.crt'
       dest: /etc/pki/ca-trust/source/anchors/
     register: squid_ca
   - name: Ensure registry certificate is present in anchors

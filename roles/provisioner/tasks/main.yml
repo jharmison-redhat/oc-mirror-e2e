@@ -14,8 +14,6 @@
 - name: Apply a deployment with terraform
   community.general.terraform:
     project_path: '{{ playbook_dir }}/files/terraform'
-    force_init: true
-    overwrite_init: false
     check_destroy: true
     state: present
     variables:

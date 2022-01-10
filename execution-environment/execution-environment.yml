@@ -1,0 +1,11 @@
+---
+version: 1
+build_arg_defaults:
+  EE_BASE_IMAGE: quay.io/ansible/ansible-runner:stable-2.11-latest
+additional_build_steps:
+  prepend: |
+    RUN dnf config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
+dependencies:
+  system: bindep.txt
+  python: requirements.txt
+  galaxy: requirements.yml
