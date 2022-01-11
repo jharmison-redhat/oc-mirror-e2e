@@ -40,7 +40,7 @@ terraform.rc
 # Ansible content
 execution-environment/output/*
 !execution-environment/output/.gitkeep
-group_vars/all.yml
+example/group_vars/all.yml
 
 # Other development artifacts
 tags
