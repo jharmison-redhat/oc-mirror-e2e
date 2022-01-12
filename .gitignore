@@ -42,6 +42,9 @@ execution-environment/output/*
 !execution-environment/output/.gitkeep
 example/group_vars/all.yml
 
+# Compiled collection
+jharmison_redhat-oc_mirror_e2e-*.tar.gz
+
 # Other development artifacts
 tags
 tags.lock
