@@ -8,8 +8,6 @@
     # and exports the created ec2_instances to inventory, while also registering
     # the other outputs from the terraform module for use later in the playbook
   - role: provisioner
-    vars:
-      cert_directory: '{{ output_directory }}'
 
 - name: Wait for connectivity to all terraformed hosts
   hosts: terraformed
@@ -41,10 +39,10 @@
         s3_bucket: '{{ registry_bucket.bucket }}'
         s3_access_key: '{{ registry_bucket.access_key }}'
         s3_secret_key: '{{ registry_bucket.secret_key }}'
-      password_dir: '{{ output_directory }}'
+      password_dir: '{{ output_dir }}'
       cert_style: byo
-      registry_certificate: '{{ lookup("file", output_directory+"/registry.crt") }}'
-      registry_certificate_key: '{{ lookup("file", output_directory+"/registry.key") }}'
+      registry_certificate: '{{ lookup("file", output_dir+"/registry.crt") }}'
+      registry_certificate_key: '{{ lookup("file", output_dir+"/registry.key") }}'
 
 - name: Configure Squid
   hosts: proxy
@@ -67,7 +65,7 @@
   pre_tasks:
   - name: Ensure proxy CA certificate is present in anchors
     copy:
-      src: '{{ output_directory }}/squid.crt'
+      src: '{{ output_dir }}/squid.crt'
       dest: /etc/pki/ca-trust/source/anchors/
     register: squid_ca
   - name: Ensure registry certificate is present in anchors

@@ -1,0 +1,5 @@
+terraform {
+  backend "local" {
+    path = "{{ output_dir }}/terraform.tfstate"
+  }
+}
