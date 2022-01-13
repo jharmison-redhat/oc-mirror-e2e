@@ -45,6 +45,12 @@ example/group_vars/all.yml
 # Compiled collection
 jharmison_redhat-oc_mirror_e2e-*.tar.gz
 
+# EE compilation
+execution-environment/context
+
+# Virtual environment
+.venv
+
 # Other development artifacts
 tags
 tags.lock
