@@ -31,7 +31,18 @@ ee-publish: ee
 
 run: ee
 	cd example ; \
-	podman run --rm -it --privileged --security-opt=label=disable -e RUNNER_PLAYBOOK=jharmison_redhat.oc_mirror_e2e.create -v "$${PWD}:/runner" -v ./output:/output oc-mirror-e2e:$(VERSION)
+	podman run --rm -it --privileged --security-opt=label=disable \
+		-e RUNNER_PLAYBOOK=jharmison_redhat.oc_mirror_e2e.create \
+		-e AWS_CONFIG_FILE=/aws/config \
+		-e AWS_SHARED_CREDENTIALS_FILE=/aws/credentials \
+		-e AWS_ACCESS_KEY_ID \
+		-e AWS_SECRET_ACCESS_KEY \
+		-e AWS_SESSION_TOKEN \
+		-e AWS_PROFILE \
+		-v "$${PWD}:/runner" \
+		-v ./output:/output \
+		-v ~/.aws:/aws \
+		oc-mirror-e2e:$(VERSION)
 
 clean:
 	rm -f jharmison_redhat-oc_mirror_e2e-*.tar.gz galaxy.yml
