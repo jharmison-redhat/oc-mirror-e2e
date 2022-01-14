@@ -2,7 +2,7 @@ VERSION = 0.1.1
 GALAXY_TOKEN := $(shell cat .galaxy-token)
 PUSH_IMAGE = registry.jharmison.com/ansible/oc-mirror-e2e
 
-.PHONY: all prereqs collection publish ee run
+.PHONY: all prereqs collection publish ee run clean
 
 all: run
 
@@ -30,3 +30,6 @@ ee: collection
 run: ee
 	cd example ; \
 	podman run --rm -it -e RUNNER_PLAYBOOK=jharmison_redhat.oc_mirror_e2e.create -v "$${PWD}:/runner" oc-mirror-e2e:$(VERSION)
+
+clean:
+	rm -f jharmison_redhat-oc_mirror_e2e-*.tar.gz galaxy.yml
