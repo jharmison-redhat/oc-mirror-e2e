@@ -24,6 +24,8 @@ ee: collection
 	podman build . -f Containerfile.builder -t extended-builder-image ; \
 	podman build . -f Containerfile.base -t extended-base-image ; \
 	ansible-builder build -t oc-mirror-e2e:$(VERSION)
+
+ee-publish: ee
 	podman push oc-mirror-e2e:$(VERSION) $(PUSH_IMAGE):$(VERSION)
 	podman push oc-mirror-e2e:$(VERSION) $(PUSH_IMAGE):latest
 
