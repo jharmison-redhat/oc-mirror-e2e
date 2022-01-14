@@ -29,6 +29,14 @@
       cluster_domain: '{{ cluster_domain }}'
       public_key: '{{ keypair.public_key }}'
       region: '{{ aws_region }}'
+  environment: '{{ aws_env|from_yaml }}'
+  vars:
+    aws_env: |-
+      {% for var, val in ansible_env.items() %}
+      {% if var.startswith("AWS_") %}
+      {{ var }}: {{ val }}
+      {% endif %}
+      {% endfor %}
   register: terraform
 
 - name: Add the newly provisioned hosts to the inventory
