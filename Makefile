@@ -31,7 +31,7 @@ ee-publish: ee
 
 run: ee
 	cd example ; \
-	podman run --rm -it -e RUNNER_PLAYBOOK=jharmison_redhat.oc_mirror_e2e.create -v "$${PWD}:/runner" oc-mirror-e2e:$(VERSION)
+	podman run --rm -it --privileged --security-opt=label=disable -e RUNNER_PLAYBOOK=jharmison_redhat.oc_mirror_e2e.create -v "$${PWD}:/runner" -v ./output:/output oc-mirror-e2e:$(VERSION)
 
 clean:
 	rm -f jharmison_redhat-oc_mirror_e2e-*.tar.gz galaxy.yml

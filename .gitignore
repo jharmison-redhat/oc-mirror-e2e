@@ -40,6 +40,8 @@ terraform.rc
 # Ansible content
 example/group_vars/all.yml
 example/artifacts
+example/output/*
+!example/output/.gitkeep
 
 # Compiled collection
 galaxy.yml
