@@ -1,14 +1,22 @@
-VERSION=0.1.0
+VERSION = 0.1.0
+GALAXY_TOKEN := $(shell cat .galaxy-token)
 
-.PHONY: all collection
+.PHONY: all collection publish ee
 
-all: collection
+all: ee
 
 prereqs:
-	@pip install -r requirements.txt
+	pip install -r requirements.txt
 
 collection: jharmison_redhat-oc_mirror_e2e-$(VERSION).tar.gz
 
 jharmison_redhat-oc_mirror_e2e-$(VERSION).tar.gz:
-	@yasha --VERSION=$(VERSION) galaxy.yml.j2
-	@ansible-galaxy collection build .
+	yasha --VERSION=$(VERSION) galaxy.yml.j2
+	ansible-galaxy collection build -v .
+
+publish: collection
+	-ansible-galaxy collection publish -v --token $(GALAXY_TOKEN) jharmison_redhat-oc_mirror_e2e-$(VERSION).tar.gz
+
+ee: publish
+	cd execution-environment ; \
+	ansible-builder build -t oc-mirror-e2e:$(VERSION)
