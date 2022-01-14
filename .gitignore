@@ -42,6 +42,8 @@ example/group_vars/all.yml
 example/artifacts
 example/output/*
 !example/output/.gitkeep
+example/env/*
+!example/env/.gitkeep
 
 # Compiled collection
 galaxy.yml
