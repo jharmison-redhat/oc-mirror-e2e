@@ -45,6 +45,7 @@ example/group_vars/all.yml
 # Compiled collection
 galaxy.yml
 jharmison_redhat-oc_mirror_e2e-*.tar.gz
+.galaxy-token
 
 # EE compilation
 execution-environment/context

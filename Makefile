@@ -19,4 +19,6 @@ publish: collection
 
 ee: publish
 	cd execution-environment ; \
+	podman build . -f Containerfile.builder -t extended-builder-image ; \
+	podman build . -f Containerfile.base -t extended-base-image ; \
 	ansible-builder build -t oc-mirror-e2e:$(VERSION)
