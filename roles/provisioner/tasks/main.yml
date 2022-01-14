@@ -20,6 +20,7 @@
   community.general.terraform:
     project_path: '{{ role_path }}/files/terraform'
     check_destroy: true
+    force_init: true
     state: present
     backend_config_files:
     - '{{ output_dir }}/backend-config.hcl'
