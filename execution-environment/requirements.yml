@@ -1,5 +1,5 @@
 ---
 collections:
   - name: jharmison_redhat.oc_mirror_e2e
-    source: ./jharmison_redhat.oc_mirror_e2e-latest.tar.gz
+    source: /extras/jharmison_redhat-oc_mirror_e2e-latest.tar.gz
     type: file
