@@ -4,6 +4,4 @@ build_arg_defaults:
   EE_BASE_IMAGE: localhost/extended-base-image:latest
   EE_BUILDER_IMAGE: localhost/extended-builder-image:latest
 dependencies:
-  system: bindep.txt
-  python: requirements.txt
   galaxy: requirements.yml

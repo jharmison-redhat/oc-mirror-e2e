@@ -4,21 +4,22 @@ PUSH_IMAGE = registry.jharmison.com/ansible/oc-mirror-e2e
 
 .PHONY: all prereqs collection publish ee run
 
-all: ee
+all: run
 
 prereqs:
-	pip install -r requirements.txt
+	pip install -r requirements-devel.txt
 
 collection: jharmison_redhat-oc_mirror_e2e-$(VERSION).tar.gz
 
 jharmison_redhat-oc_mirror_e2e-$(VERSION).tar.gz:
 	yasha --VERSION=$(VERSION) galaxy.yml.j2
-	ansible-galaxy collection build -v .
+	ansible-galaxy collection build -v --force .
 
 publish: collection
 	-ansible-galaxy collection publish -v --token $(GALAXY_TOKEN) jharmison_redhat-oc_mirror_e2e-$(VERSION).tar.gz
 
-ee: publish
+ee: collection
+	cp jharmison_redhat-oc_mirror_e2e-$(VERSION).tar.gz execution-environment/jharmison_redhat-oc_mirror_e2e-latest.tar.gz
 	cd execution-environment ; \
 	podman build . -f Containerfile.builder -t extended-builder-image ; \
 	podman build . -f Containerfile.base -t extended-base-image ; \
