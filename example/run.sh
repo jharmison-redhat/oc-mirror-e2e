@@ -29,7 +29,7 @@ podman_args+=(
 
 # The playbook we're running
 podman_args+=(
-    -e RUNNER_PLAYBOOK=jharmison_redhat.oc_mirror_e2e.create
+    -e "RUNNER_PLAYBOOK=jharmison_redhat.oc_mirror_e2e.${1:-create}"
 )
 
 # Runner will pull our inventory, config, and env
