@@ -2,7 +2,7 @@
 - name: Provision the infrastructure
   hosts: controller
   vars_files:
-  - defaults.yml
+  - '{{ playbook_dir }}/vars/defaults.yml'
   roles:
     # The provisioner role consumes the terraform adjacent to the playbook
     # and exports the created ec2_instances to inventory, while also registering
@@ -12,7 +12,7 @@
 - name: Wait for connectivity to all terraformed hosts
   hosts: terraformed
   vars_files:
-  - defaults.yml
+  - '{{ playbook_dir }}/vars/defaults.yml'
   gather_facts: false
   roles:
   - role: cloud_init_finished
@@ -20,14 +20,14 @@
 - name: Update all connected terraformed hosts
   hosts: connected
   vars_files:
-  - defaults.yml
+  - '{{ playbook_dir }}/vars/defaults.yml'
   roles:
   - role: updated
 
 - name: Configure Red Hat Quay
   hosts: registry
   vars_files:
-  - defaults.yml
+  - '{{ playbook_dir }}/vars/defaults.yml'
   vars:
     registry_bucket: '{{ hostvars.controller.terraform.outputs.registry_bucket.value }}'
   roles:
@@ -47,7 +47,7 @@
 - name: Configure Squid
   hosts: proxy
   vars_files:
-  - defaults.yml
+  - '{{ playbook_dir }}/vars/defaults.yml'
   become: true
   vars:
     ca_cert_and_key: '{{ hostvars.controller.ca.stdout }}'
@@ -60,7 +60,7 @@
 - name: Validate bastion configuration
   hosts: bastion
   vars_files:
-  - defaults.yml
+  - '{{ playbook_dir }}/vars/defaults.yml'
   become: true
   pre_tasks:
   - name: Ensure proxy CA certificate is present in anchors

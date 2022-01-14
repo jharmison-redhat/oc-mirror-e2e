@@ -1,5 +1,6 @@
-VERSION = 0.1.0
+VERSION = 0.1.1
 GALAXY_TOKEN := $(shell cat .galaxy-token)
+PUSH_IMAGE = registry.jharmison.com/ansible/oc-mirror-e2e
 
 .PHONY: all collection publish ee
 
@@ -22,3 +23,9 @@ ee: publish
 	podman build . -f Containerfile.builder -t extended-builder-image ; \
 	podman build . -f Containerfile.base -t extended-base-image ; \
 	ansible-builder build -t oc-mirror-e2e:$(VERSION)
+	podman push oc-mirror-e2e:$(VERSION) $(PUSH_IMAGE):$(VERSION)
+	podman push oc-mirror-e2e:$(VERSION) $(PUSH_IMAGE):latest
+
+run: ee
+	cd example ; \
+	podman run --rm -it -e RUNNER_PLAYBOOK=jharmison_redhat.oc_mirror_e2e.create -v "$${PWD}:/runner" oc-mirror-e2e:$(VERSION)
