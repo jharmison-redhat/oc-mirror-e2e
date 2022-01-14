@@ -18,7 +18,7 @@
 
 - name: Apply a deployment with terraform
   community.general.terraform:
-    project_path: '{{ playbook_dir }}/files/terraform'
+    project_path: '{{ role_path }}/files/terraform'
     check_destroy: true
     state: present
     backend_config_files:
