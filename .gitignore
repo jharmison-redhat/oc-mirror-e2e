@@ -38,9 +38,8 @@ terraform.rc
 .tflint.d
 
 # Ansible content
-execution-environment/output/*
-!execution-environment/output/.gitkeep
 example/group_vars/all.yml
+example/artifacts
 
 # Compiled collection
 galaxy.yml

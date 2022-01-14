@@ -2,7 +2,7 @@ VERSION = 0.1.1
 GALAXY_TOKEN := $(shell cat .galaxy-token)
 PUSH_IMAGE = registry.jharmison.com/ansible/oc-mirror-e2e
 
-.PHONY: all collection publish ee
+.PHONY: all prereqs collection publish ee run
 
 all: ee
 
