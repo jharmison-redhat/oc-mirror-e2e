@@ -13,7 +13,7 @@ collection: jharmison_redhat-oc_mirror_e2e-$(VERSION).tar.gz
 
 jharmison_redhat-oc_mirror_e2e-$(VERSION).tar.gz:
 	yasha --VERSION=$(VERSION) galaxy.yml.j2
-	ansible-galaxy collection build -v --force .
+	ansible-galaxy collection build -v .
 
 publish: collection
 	-ansible-galaxy collection publish -v --token $(GALAXY_TOKEN) jharmison_redhat-oc_mirror_e2e-$(VERSION).tar.gz
