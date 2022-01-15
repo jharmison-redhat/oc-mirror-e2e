@@ -1,5 +1,7 @@
 #!/bin/bash
 
+read -sp "WARNING! This script does not save your Terraform state. Are you sure you want to destroy the terraformed infrastructure, without recovering state? Press Enter to continue, or Ctrl+C to cancel." throwaway
+
 set -x
 
 cluster=disco
@@ -69,4 +71,4 @@ for policy in $(aws iam list-attached-user-policies --user-name "${cluster}.${do
     aws iam detach-user-policy --user-name "${cluster}.${domain}-registry"  --policy-arn "$policy"
     aws iam delete-policy --policy-arn "$policy"
 done
-aws iam delete-user --user-name "${cluster}.${domain}-registry" 
+aws iam delete-user --user-name "${cluster}.${domain}-registry"
