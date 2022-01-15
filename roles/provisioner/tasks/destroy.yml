@@ -1,0 +1,21 @@
+---
+- name: Destroy a terraform deployment
+  community.general.terraform:
+    project_path: '{{ output_dir }}/terraform'
+    force_init: true
+    state: absent
+    backend_config_files:
+    - '{{ output_dir }}/terraform/backend-config.hcl'
+    variables:
+      cluster_name: '{{ cluster_name }}'
+      cluster_domain: '{{ cluster_domain }}'
+      public_key: '{{ lookup("file", output_dir + "/" + cluster_name + "_ed25519") }}'
+      region: '{{ aws_region }}'
+  environment: '{{ aws_env|from_yaml }}'
+  vars:
+    aws_env: |-
+      {% for var, val in ansible_env.items() %}
+      {% if var.startswith("AWS_") %}
+      {{ var }}: {{ val }}
+      {% endif %}
+      {% endfor %}
