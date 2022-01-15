@@ -1,1 +1,5 @@
 terraform [platform:redhat]
+gcc [platform:redhat]
+libffi-devel [platform:redhat]
+python3-devel [platform:redhat]
+openssl-devel [platform:redhat]
