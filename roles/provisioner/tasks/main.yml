@@ -11,19 +11,25 @@
     comment: '{{ registry_admin.email }}'
   register: keypair
 
+- name: Copy the terraform to the output
+  copy:
+    src: '{{ role_path }}/files/terraform'
+    dest: '{{ output_dir }}/'
+    remote_src: yes
+
 - name: Generate the backend config
   template:
     src: backend-config.hcl.j2
-    dest: '{{ output_dir }}/backend-config.hcl'
+    dest: '{{ output_dir }}/terraform/backend-config.hcl'
 
 - name: Apply a deployment with terraform
   community.general.terraform:
-    project_path: '{{ role_path }}/files/terraform'
+    project_path: '{{ output_dir }}/terraform'
     check_destroy: true
     force_init: true
     state: present
     backend_config_files:
-    - '{{ output_dir }}/backend-config.hcl'
+    - '{{ output_dir }}/terraform/backend-config.hcl'
     variables:
       cluster_name: '{{ cluster_name }}'
       cluster_domain: '{{ cluster_domain }}'
