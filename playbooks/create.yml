@@ -39,7 +39,7 @@
         s3_bucket: '{{ registry_bucket.bucket }}'
         s3_access_key: '{{ registry_bucket.access_key }}'
         s3_secret_key: '{{ registry_bucket.secret_key }}'
-      password_dir: '{{ output_dir }}'
+      password_dir: '{{ output_dir }}/quay_passwords'
       cert_style: byo
       registry_certificate: '{{ lookup("file", output_dir+"/registry.crt") }}'
       registry_certificate_key: '{{ lookup("file", output_dir+"/registry.key") }}'
