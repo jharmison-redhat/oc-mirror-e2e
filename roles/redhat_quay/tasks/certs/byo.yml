@@ -18,6 +18,8 @@
     type: cert
   - content: '{{ registry_certificate_key }}'
     type: key
+  loop_control:
+    label: '{{ item.type }}'
 
 - name: Copy certificate to the CA anchors folder
   become: true
