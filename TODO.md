@@ -6,7 +6,7 @@ MVP
 
 - [ ] Finish `openshift-install` from bastion
 - [ ] Implement mirror-to-disk sneakernet flow
-- [ ] Manipulate instance disk size based on mirror flow (disk or registry)
+- [x] Manipulate instance disk size based on mirror flow (disk or registry)
 
 Important for finished product
 ------------------------------
