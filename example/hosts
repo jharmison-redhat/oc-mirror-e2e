@@ -1,2 +1,2 @@
 [all]
-controller ansible_connection=local
+controller ansible_connection=local ansible_python_interpreter=/usr/bin/python3
