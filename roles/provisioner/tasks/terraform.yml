@@ -4,7 +4,7 @@
     project_path: '{{ output_dir }}/terraform'
     check_destroy: '{{ true if tf_task_state == "present" else false }}'
     force_init: true
-    state: '{{ tf_task_state|default("present") }}'
+    state: '{{ tf_task_state }}'
     backend_config_files:
     - '{{ output_dir }}/terraform/backend-config.hcl'
     variables:

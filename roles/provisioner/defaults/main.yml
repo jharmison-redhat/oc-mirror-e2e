@@ -1,3 +1,5 @@
 ---
 output_dir: '{{ playbook_dir }}/output'
 forgettable_host: '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o IdentitiesOnly=yes'
+
+tf_task_state: present
