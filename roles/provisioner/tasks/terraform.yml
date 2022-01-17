@@ -1,15 +1,16 @@
 ---
-- name: Destroy a terraform deployment
+- name: Set the terraform deployment to {{ tf_task_state }}
   community.general.terraform:
     project_path: '{{ output_dir }}/terraform'
+    check_destroy: '{{ true if tf_task_state == "present" else false }}'
     force_init: true
-    state: absent
+    state: '{{ tf_task_state|default("present") }}'
     backend_config_files:
     - '{{ output_dir }}/terraform/backend-config.hcl'
     variables:
       cluster_name: '{{ cluster_name }}'
       cluster_domain: '{{ cluster_domain }}'
-      public_key: '{{ lookup("file", output_dir + "/" + cluster_name + "_ed25519") }}'
+      public_key: '{{ public_key }}'
       region: '{{ aws_region }}'
   environment: '{{ aws_env|from_yaml }}'
   vars:
@@ -19,3 +20,4 @@
       {{ var }}: {{ val }}
       {% endif %}
       {% endfor %}
+  register: terraform

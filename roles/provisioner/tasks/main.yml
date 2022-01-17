@@ -22,28 +22,10 @@
     src: backend-config.hcl.j2
     dest: '{{ output_dir }}/terraform/backend-config.hcl'
 
-- name: Apply a deployment with terraform
-  community.general.terraform:
-    project_path: '{{ output_dir }}/terraform'
-    check_destroy: true
-    force_init: true
-    state: present
-    backend_config_files:
-    - '{{ output_dir }}/terraform/backend-config.hcl'
-    variables:
-      cluster_name: '{{ cluster_name }}'
-      cluster_domain: '{{ cluster_domain }}'
-      public_key: '{{ keypair.public_key }}'
-      region: '{{ aws_region }}'
-  environment: '{{ aws_env|from_yaml }}'
+- name: Apply the terraform deployment
+  include_tasks: terraform.yml
   vars:
-    aws_env: |-
-      {% for var, val in ansible_env.items() %}
-      {% if var.startswith("AWS_") %}
-      {{ var }}: {{ val }}
-      {% endif %}
-      {% endfor %}
-  register: terraform
+      public_key: '{{ keypair.public_key }}'
 
 - name: Add the newly provisioned hosts to the inventory
   add_host:

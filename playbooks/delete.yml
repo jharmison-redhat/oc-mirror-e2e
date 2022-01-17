@@ -7,4 +7,7 @@
   - name: Destroy the terraform deployment
     include_role:
       name: provisioner
-      tasks_from: destroy
+      tasks_from: terraform
+    vars:
+      tf_task_state: absent
+      public_key: '{{ lookup("file", output_dir + "/" + cluster_name + "_ed25519.pub", errors="ignore")|default("") }}'
