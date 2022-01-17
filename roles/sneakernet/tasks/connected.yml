@@ -151,16 +151,31 @@
     force: yes
   register: repo_download
 
+- name: Build oc-mirror toolset image
+  containers.podman.podman_image:
+    name: localhost/go-toolset:latest
+    path: '{{ oc_mirror_clone_location }}'
+    build: {}
+  register: builder_build
+
 - name: Check for existing binary
   stat:
     path: '{{ oc_mirror_binary_location }}'
   register: oc_mirror
 
 - name: Compile oc-mirror
-  shell: hack/build.sh --clean
-  args:
-    chdir: '{{ oc_mirror_clone_location }}'
+  containers.podman.podman_container:
+    name: oc-mirror-build
+    image: localhost/go-toolset:latest
+    privileged: true
+    interactive: true
+    tty: true
+    rm: true
+    detach: false
+    volume:
+    - '{{ oc_mirror_clone_location }}:/build:z'
   when: >-
+    builder_build.changed or
     repo_download.after != repo_download.before or
     (not oc_mirror.stat.exists)
 
