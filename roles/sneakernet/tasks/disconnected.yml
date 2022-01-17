@@ -1,8 +1,11 @@
 ---
-- name: Ensure that the user's ~/bin directory exists
+- name: Ensure that the directories exist
   file:
-    path: '{{ ansible_env["HOME"] }}/bin'
+    path: '{{ item }}'
     state: directory
+  loop:
+  - '{{ ansible_env["HOME"] }}/bin'
+  - '{{ mirror_directory }}'
 
 - name: Drop all sneakernet binaries into user's ~/bin
   copy:
@@ -17,5 +20,5 @@
 
 - name: Drop all oc-mirror data
   copy:
-    src: '{{ mirror_data_recovery_dir }}'
-    dest: '{{ ansible_env["HOME"] }}/'
+    src: '{{ mirror_data_recovery_dir }}/'
+    dest: '{{ mirror_directory }}'
