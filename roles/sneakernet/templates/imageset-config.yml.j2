@@ -1,0 +1,17 @@
+apiVersion: mirror.openshift.io/v1alpha1
+kind: ImageSetConfiguration
+storageConfig:
+  registry:
+    imageURL: {{ registry_hostname }}/ocmirror/metadata:latest
+mirror:
+  ocp:
+    channels:
+      - name: stable-{{ openshift_version }}
+  operators:
+    - catalog: registry.redhat.io/redhat/redhat-operator-index:v{{ openshift_version }}
+      headsOnly: false
+      packages:
+        - name: compliance-operator
+          startingVersion: '{{ compliance_operator_version }}'
+  additionalimages:
+    - name: registry.redhat.io/ubi8/ubi:latest

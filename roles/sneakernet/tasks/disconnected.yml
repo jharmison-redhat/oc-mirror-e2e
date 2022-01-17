@@ -1,0 +1,21 @@
+---
+- name: Ensure that the user's ~/bin directory exists
+  file:
+    path: '{{ ansible_env["HOME"] }}/bin'
+    state: directory
+
+- name: Drop all sneakernet binaries into user's ~/bin
+  copy:
+    src: '{{ bin_recovery_dir }}/{{ item }}'
+    dest: '{{ ansible_env["HOME"] }}/bin/'
+    mode: '0755'
+  loop:
+  - openshift-install
+  - oc
+  - helm
+  - oc-mirror
+
+- name: Drop all oc-mirror data
+  copy:
+    src: '{{ mirror_data_recovery_dir }}'
+    dest: '{{ ansible_env["HOME"] }}/'

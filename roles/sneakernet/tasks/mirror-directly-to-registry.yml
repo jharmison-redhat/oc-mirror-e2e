@@ -1,0 +1,47 @@
+---
+- name: Ensure mirror data directory exists
+  file:
+    path: '{{ mirror_directory }}'
+    state: directory
+
+- name: Drop oc-mirror configuration
+  template:
+    src: imageset-config.yml.j2
+    dest: '{{ ansible_env["HOME"] }}/imageset-config.yml'
+  register: oc_mirror_config
+
+- name: Ensure pull secret location exists
+  file:
+    path: '{{ ansible_env["HOME"] }}/.docker'
+    state: directory
+
+- name: Drop pull secret for oc-mirror
+  copy:
+    content: '{{ combined_pull_secret }}'
+    dest: '{{ ansible_env["HOME"] }}/.docker/config.json'
+
+- name: Mirror content into registry
+  command: '{{ oc_mirror_binary_location }} --config {{ ansible_env["HOME"] }}/imageset-config.yml --dir={{ mirror_directory }} docker://{{ registry_hostname }}'
+  when: oc_mirror_config.changed or force_mirror_update|bool
+
+- name: Identify results directory
+  find:
+    paths: '{{ mirror_directory }}'
+    file_type: directory
+    patterns: "results-*"
+  register: results
+
+- name: Identify results ICSPs and CatalogSources
+  find:
+    paths: '{{ (results.files|last).path }}'
+    file_type: file
+    patterns: '*.yaml'
+  register: sources
+
+- name: Recover ICSPs and CatalogSources
+  fetch:
+    src: '{{ item.path }}'
+    dest: '{{ mirror_data_recovery_dir }}/'
+    flat: yes
+    mode: '0644'
+  loop: '{{ sources.files }}'

@@ -1,0 +1,28 @@
+---
+oc_mirror_source:
+  repo: https://github.com/openshift/oc-mirror.git
+  version: 3660f79441d753560f33549a725d0339186649e0
+
+compliance_operator_version: '0.1.44'
+
+oc_mirror_clone_location: '{{ ansible_env["HOME"] }}/oc-mirror'
+oc_mirror_binary_location: '{{ oc_mirror_clone_location }}/bin/oc-mirror'
+
+client_directory: '{{ ansible_env["HOME"] }}/clients'
+
+mirror_directory: '{{ ansible_env["HOME"] }}/mirror-content'
+
+force_mirror_update: false
+
+bin_recovery_dir: '{{ playbook_dir }}/tmp/clients'
+mirror_data_recovery_dir: '{{ playbook_dir }}/tmp/mirror-data'
+
+mirror_directly_to_registry: true
+
+local_registry_pull_secret: |-
+  auths:
+    {{ hostvars.controller.terraform.outputs.registry_instance.value.hostname }}:
+      auth: {{ (registry_admin.username + ":" + registry_admin.password)|b64encode }}
+      email: {{ registry_admin.email }}
+
+combined_pull_secret: '{{ cloud_redhat_com_pull_secret|combine(local_registry_pull_secret|from_yaml, recursive=True)|to_json }}'

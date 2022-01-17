@@ -75,3 +75,21 @@
       username: '{{ registry_admin.username }}'
       password: '{{ registry_admin.password }}'
       registry: '{{ hostvars.registry.ansible_host }}'
+
+- name: Download clients and mirror installation on connected host
+  hosts: registry
+  vars_files:
+  - '{{ playbook_dir }}/vars/defaults.yml'
+  tasks:
+  - include_role:
+      name: sneakernet
+      tasks_from: connected
+
+- name: Sneakernet clients and oc-mirror data onto disconnected host
+  hosts: bastion
+  vars_files:
+  - '{{ playbook_dir }}/vars/defaults.yml'
+  tasks:
+  - include_role:
+      name: sneakernet
+      tasks_from: disconnected

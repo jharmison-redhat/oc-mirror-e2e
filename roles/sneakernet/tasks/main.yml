@@ -1,0 +1,9 @@
+---
+- name: Indicate that main.yml is inappropriate
+  fail:
+    msg: >-
+      Don't try to use the sneakernet role blindly. You should import it using
+      tasks_from for `connected` or `disconnected` task lists, to indicate which
+      phase of the sneakernet process you're intending to use it for. See more
+      information about tasks_from in the documentation:
+      https://docs.ansible.com/ansible/latest/collections/ansible/builtin/include_role_module.html#parameter-tasks_from
