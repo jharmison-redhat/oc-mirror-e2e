@@ -16,6 +16,15 @@ make prereqs
 
 This will get you installations of Ansible, Ansible-builder, and Yasha. You will need these to use the other targets in the makefile.
 
+If you want to run the content iteratively to validate that your changes are working, you'll need to create the inventory variables:
+
+```sh
+cp example/group_vars/all.yml.example example/group_vars/all.yml
+${EDITOR:-vi} example/group_vars/all.yml
+```
+
+Inside this file are comments for how to go about filling out the variables. Once you've updated everything, save the variables file and you're ready to role. It's already `.gitignore`'d
+
 ## Use
 
 ### Collection building
