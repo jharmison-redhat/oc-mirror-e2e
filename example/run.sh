@@ -39,4 +39,4 @@ runtime_args+=(
     -v "$PWD:/runner"
 )
 
-podman run "${runtime_args[@]}" "oc-mirror-e2e:${EE_VERSION:-latest}"
+${RUNTIME} run "${runtime_args[@]}" "oc-mirror-e2e:${EE_VERSION:-latest}"
