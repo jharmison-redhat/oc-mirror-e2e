@@ -167,6 +167,7 @@
   containers.podman.podman_container:
     name: oc-mirror-build
     image: localhost/go-toolset:latest
+    command: clean tidy build
     privileged: true
     interactive: true
     tty: true
