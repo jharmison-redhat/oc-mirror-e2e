@@ -133,11 +133,3 @@ postgres_image: registry.redhat.io/rhel8/postgresql-10:1
 ```
 
 _The container images to use. Note that registry.redhat.io requires login._
-
-TODO
-----
-
-- enable disconnected execution with (e.g. containers.podman.podman_load)
-- dogtag certs aka ipa-getcert
-- modularize backend to enable local storage instead of s3 if you want it, without understanding quay_config
-- add disconnected clair loading (current recommendation is turn it off, but should be able to load the db as [documented](https://access.redhat.com/documentation/en-us/red_hat_quay/3.6/html/manage_red_hat_quay/clair-intro2#clair-disconnected)
