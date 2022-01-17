@@ -25,4 +25,4 @@ redhat_password: some super secure password
 
 # This is recovered from console.redhat.com for OpenShift installation:
 # https://console.redhat.com/openshift/install/aws/installer-provisioned
-console_redhat_com_pull_secret: '{"auths":{"cloud.openshift.com":{"auth":"b3B=","email":"foo@example.com"},"quay.io":{"auth":"b3B=","email":"foo@example.com"},"registry.connect.redhat.com":{"auth":"NTI=","email":"foo@example.com"},"registry.redhat.io":{"auth":"NTI=","email":"foo@example.com"}}}'
+console_redhat_com_pull_secret: {"auths":{"cloud.openshift.com":{"auth":"b3B=","email":"foo@example.com"},"quay.io":{"auth":"b3B=","email":"foo@example.com"},"registry.connect.redhat.com":{"auth":"NTI=","email":"foo@example.com"},"registry.redhat.io":{"auth":"NTI=","email":"foo@example.com"}}}
