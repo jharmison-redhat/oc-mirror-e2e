@@ -75,14 +75,15 @@ Whether to run oc-mirror even if there has been no change
 ---
 
 ```yaml
+registry_hostname: '{{ hostvars.controller.terraform.outputs.registry_instance.value.hostname }}'
 local_registry_pull_secret: |-
   auths:
-    {{ hostvars.controller.terraform.outputs.registry_instance.value.hostname }}:
+    {{ registry_hostname }}:
       auth: {{ (registry_admin.username + ":" + registry_admin.password)|b64encode }}
       email: {{ registry_admin.email }}
 ```
 
-This is built to connect to the registry provisioned by the adjacent roles, but in certain circumstances might be overridden
+These variables is built to connect to the registry provisioned by the adjacent roles, but in certain circumstances might be overridden. They are used for registry auth as well as configuration of oc-mirror metadata.
 
 ---
 

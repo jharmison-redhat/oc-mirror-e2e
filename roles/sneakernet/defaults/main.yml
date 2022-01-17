@@ -27,9 +27,11 @@ force_mirror_update: false
 
 compliance_operator_version: '0.1.44'
 
+registry_hostname: '{{ hostvars.controller.terraform.outputs.registry_instance.value.hostname }}'
+
 local_registry_pull_secret: |-
   auths:
-    {{ hostvars.controller.terraform.outputs.registry_instance.value.hostname }}:
+    {{ registry_hostname }}:
       auth: {{ (registry_admin.username + ":" + registry_admin.password)|b64encode }}
       email: {{ registry_admin.email }}
 
