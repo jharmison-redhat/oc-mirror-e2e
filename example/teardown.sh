@@ -1,6 +1,7 @@
 #!/bin/bash
 
 read -sp "WARNING! This script does not save your Terraform state. Are you sure you want to destroy the terraformed infrastructure, without recovering state? Press Enter to continue, or Ctrl+C to cancel." throwaway
+echo
 
 set -x
 
