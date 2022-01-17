@@ -12,7 +12,6 @@
       cluster_domain: '{{ cluster_domain }}'
       public_key: '{{ public_key }}'
       region: '{{ aws_region }}'
-      registry_disk_gb: 500
   environment: '{{ aws_env|from_yaml }}'
   vars:
     aws_env: |-
