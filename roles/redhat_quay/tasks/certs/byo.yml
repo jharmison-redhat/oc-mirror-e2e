@@ -7,8 +7,8 @@
 - name: Migrate certificates into place
   become: true
   copy:
-    content: '{{ item.content }}'
-    dest: '{{ cert_directory }}/ssl.{{ item.type }}'
+    content: '{{ cert.content }}'
+    dest: '{{ cert_directory }}/ssl.{{ cert.type }}'
     owner: '{{ cert_owner|default(omit) }}'
     group: '{{ cert_group|default(omit) }}'
     setype: '{{ cert_setype|default("container_file_t") }}'
@@ -19,7 +19,8 @@
   - content: '{{ registry_certificate_key }}'
     type: key
   loop_control:
-    label: '{{ item.type }}'
+    loop_var: cert
+    label: '{{ cert.type }}'
 
 - name: Copy certificate to the CA anchors folder
   become: true
