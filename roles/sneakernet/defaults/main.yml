@@ -35,4 +35,4 @@ local_registry_pull_secret: |-
       auth: {{ (registry_admin.username + ":" + registry_admin.password)|b64encode }}
       email: {{ registry_admin.email }}
 
-combined_pull_secret: '{{ cloud_redhat_com_pull_secret|combine(local_registry_pull_secret|from_yaml, recursive=True)|to_json }}'
+combined_pull_secret: '{{ console_redhat_com_pull_secret|combine(local_registry_pull_secret|from_yaml, recursive=True)|to_json }}'

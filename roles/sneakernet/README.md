@@ -88,7 +88,7 @@ These variables is built to connect to the registry provisioned by the adjacent 
 ---
 
 ```yaml
-combined_pull_secret: '{{ cloud_redhat_com_pull_secret|combine(local_registry_pull_secret|from_yaml, recursive=True)|to_json }}'
+combined_pull_secret: '{{ console_redhat_com_pull_secret|combine(local_registry_pull_secret|from_yaml, recursive=True)|to_json }}'
 ```
 
 You should probably just not change this. This combined the cloud.redhat.com pull secret for OpenShift installation with the local registry secret for a single authfile.
