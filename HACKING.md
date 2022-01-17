@@ -92,6 +92,10 @@ To remove built copies of the collection, rendered `galaxy.yml` metadata files, 
 make clean
 ```
 
+Note that this cleanup doesn't touch the Terraform state created by the `community.general.terraform` module - only artifacts of the collection building and ansible-runner artifacts. You should, therefore, be able to run `terraform destroy` from the `example/output/terraform` directory manually, or run `make destroy clean` to tear down the terraform-provisioned infrastructure using Ansible before running the clean target.
+
+Also, in the event that something goes wrong with your terraform state for local hacking, you may also find the script at [example/teardown.sh](example/teardown.sh) useful, as it will tear down all of the Terraform-managed resources using [awscli](https://pypi.org/project/awscli/) without needing Terraform state.
+
 ### Makefile variables
 
 | Variable | Description | Default |
