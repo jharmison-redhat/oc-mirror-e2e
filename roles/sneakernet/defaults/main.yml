@@ -3,21 +3,29 @@ oc_mirror_source:
   repo: https://github.com/openshift/oc-mirror.git
   version: 3660f79441d753560f33549a725d0339186649e0
 
-compliance_operator_version: '0.1.44'
+mirror_directly_to_registry: true
 
+# Connected path variables
+# where to clone to
 oc_mirror_clone_location: '{{ ansible_env["HOME"] }}/oc-mirror'
+# where the binary will be built
 oc_mirror_binary_location: '{{ oc_mirror_clone_location }}/bin/oc-mirror'
-
+# This is where clients will be downloaded to
 client_directory: '{{ ansible_env["HOME"] }}/clients'
 
+# Shared path variables
+# This is where the mirror content will be generated (connected) or hauled (disconnected)
 mirror_directory: '{{ ansible_env["HOME"] }}/mirror-content'
+
+# Controller path variables
+# Where all binaries will be hauled during sneakernet
+bin_recovery_dir: '{{ playbook_dir }}/tmp/clients'
+# Where all mirror data will be hauled during sneakernet
+mirror_data_recovery_dir: '{{ playbook_dir }}/tmp/mirror-data'
 
 force_mirror_update: false
 
-bin_recovery_dir: '{{ playbook_dir }}/tmp/clients'
-mirror_data_recovery_dir: '{{ playbook_dir }}/tmp/mirror-data'
-
-mirror_directly_to_registry: true
+compliance_operator_version: '0.1.44'
 
 local_registry_pull_secret: |-
   auths:
