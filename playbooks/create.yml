@@ -62,7 +62,7 @@
   vars_files:
   - '{{ playbook_dir }}/vars/defaults.yml'
   become: true
- roles:
+  roles:
   - role: trusts_proxy
   - role: updated
   tasks:
