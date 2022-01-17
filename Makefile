@@ -34,9 +34,9 @@ ee-publish: ee
 
 run: ee
 	EE_VERSION=$(VERSION) RUNTIME=$(RUNTIME) example/run.sh
-	
+
 destroy: ee
 	EE_VERSION=$(VERSION) RUNTIME=$(RUNTIME) example/run.sh delete
 
 clean:
-	rm -f jharmison_redhat-oc_mirror_e2e-*.tar.gz galaxy.yml
+	rm -rf jharmison_redhat-oc_mirror_e2e-*.tar.gz galaxy.yml example/artifacts/*
