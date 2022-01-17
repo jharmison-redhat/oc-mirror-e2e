@@ -1,3 +1,3 @@
-ansible
-ansible-builder
-yasha
+ansible >=5.2.0, <6.0.0
+ansible-builder >=1.0.1, <2.0.0
+yasha >=5.0, <6.0
