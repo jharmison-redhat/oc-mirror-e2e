@@ -27,10 +27,10 @@ runtime_args+=(
 # To be able to pass tags into the runner instance, we need this
 echo '' > env/cmdline
 if [ -n "${ANSIBLE_TAGS}" ]; then
-    printf "--tags ${ANSIBLE_TAGS} " >> env/cmdline
+    printf -- "--tags ${ANSIBLE_TAGS} " >> env/cmdline
 fi
 if [ -n "${ANSIBLE_SKIP_TAGS}" ]; then
-    printf "--skip-tags ${ANSIBLE_SKIP_TAGS} " >> env/cmdline
+    printf -- "--skip-tags ${ANSIBLE_SKIP_TAGS} " >> env/cmdline
 fi
 
 # We need to save output, this is the default for the collection
