@@ -2,7 +2,7 @@ apiVersion: mirror.openshift.io/v1alpha1
 kind: ImageSetConfiguration
 storageConfig:
   registry:
-    imageURL: {{ registry_hostname }}/oc-mirror/imageset-metadata:latest
+    imageURL: {{ oc_mirror_metadata_image }}
 mirror:
   ocp:
     channels:
