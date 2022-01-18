@@ -1,5 +1,5 @@
 module "testbed" {
-  source = "git://github.com/jharmison-redhat/disconnected-openshift-testbed.git?ref=0.1.2"
+  source = "git://github.com/jharmison-redhat/disconnected-openshift-testbed.git?ref=0.1.3"
 
   public_key       = var.public_key
   cluster_name     = var.cluster_name
