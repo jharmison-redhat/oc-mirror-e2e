@@ -30,7 +30,7 @@
   tags:
   - updated
 
-- name: Configure Red Hat Quay
+- name: Configure container registry
   hosts: registry
   vars_files:
   - '{{ playbook_dir }}/vars/defaults.yml'
@@ -38,7 +38,9 @@
     registry_bucket: '{{ hostvars.controller.terraform.outputs.registry_bucket.value }}'
   roles:
   - role: trusts_proxy
-  - role: redhat_quay
+  tasks:
+  - include_role:
+      name: '{{ registry_type }}'
     vars:
       registry_hostname: '{{ ansible_host }}'
       registry_storage_details:
@@ -46,7 +48,7 @@
         s3_bucket: '{{ registry_bucket.bucket }}'
         s3_access_key: '{{ registry_bucket.access_key }}'
         s3_secret_key: '{{ registry_bucket.secret_key }}'
-      password_dir: '{{ output_dir }}/quay_passwords'
+      password_dir: '{{ output_dir }}/quay_passwords' # only used for Quay
       cert_style: byo
       registry_certificate: '{{ lookup("file", output_dir+"/registry.crt") }}'
       registry_certificate_key: '{{ lookup("file", output_dir+"/registry.key") }}'
@@ -76,16 +78,7 @@
   roles:
   - role: trusts_proxy
   - role: updated
-  tasks:
-  - name: Install container-tools
-    dnf:
-      name: '@container-tools'
-      state: installed
-  - name: Login to quay registry to validate connection
-    containers.podman.podman_login:
-      username: '{{ registry_admin.username }}'
-      password: '{{ registry_admin.password }}'
-      registry: '{{ hostvars.registry.ansible_host }}'
+  - role: validated_bastion
   tags:
   - bastion
 

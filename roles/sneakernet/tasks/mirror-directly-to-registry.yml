@@ -34,7 +34,7 @@
   changed_when: false
 
 - name: Mirror content into registry
-  command: '{{ oc_mirror_binary_location }} --config {{ ansible_env["HOME"] }}/imageset-config.yml --dir={{ mirror_directory }} docker://{{ registry_hostname }}'
+  command: '{{ oc_mirror_binary_location }} --config {{ ansible_env["HOME"] }}/imageset-config.yml --dir={{ mirror_directory }} docker://{{ registry_hostname }}/{{ toplevel_namespace }}'
   when: oc_mirror_config.changed or force_mirror_update|bool
 
 - name: Identify results directory
