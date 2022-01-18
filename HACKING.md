@@ -38,7 +38,7 @@ make
 To build a specific version of a collection:
 
 ```sh
-VERSION=0.2.0 make
+make VERSION=0.2.0
 ```
 
 #### NOTE
@@ -64,7 +64,7 @@ make ee
 To use something other than `podman` to build the EE:
 
 ```sh
-RUNTIME=docker make ee
+make ee RUNTIME=docker
 ```
 
 #### NOTE
