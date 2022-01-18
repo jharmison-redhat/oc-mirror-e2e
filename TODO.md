@@ -6,7 +6,7 @@ MVP
 
 - [ ] Finish `openshift-install` from bastion
 - [ ] Implement mirror-to-disk sneakernet flow
-- [x] Manipulate instance disk size based on mirror flow (disk or registry)
+  - [x] Manipulate instance disk size based on mirror flow (disk or registry)
 
 Important for finished product
 ------------------------------
@@ -17,7 +17,14 @@ Important for finished product
 - [ ] CD to publish collection and EE
 - [ ] Add generic Docker registry
 - [ ] Build out an easy-to-execute test matrix interface
-  - [ ] Enable shared tasks between test matrix runs (e.g. compile oc-mirror once, run with different scenarios)
+  - Quay / Docker distribution
+  - Metadata storage backends
+  - OCP versions
+  - Catalogs (should have some candidates from different sources)
+  - Custom CA / Trusted / Self-signed/untrusted
+- [ ] Enable shared tasks between test matrix runs (e.g. compile oc-mirror once, run with different scenarios)
+  - Expect that compiled oc-mirror comes from earlier stage, only compile if necessary?
+  - Better interface for specifying which oc-mirror to compile might be nice as well
 
 Important for improving usability
 ---------------------------------
