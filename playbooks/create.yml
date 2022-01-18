@@ -93,13 +93,16 @@
   tags:
   - sneakernet
 
-- name: Sneakernet clients and oc-mirror data onto disconnected host
+- name: Install OpenShift
   hosts: bastion
   vars_files:
   - '{{ playbook_dir }}/vars/defaults.yml'
-  tasks:
+  pre_tasks:
   - include_role:
       name: sneakernet
       tasks_from: disconnected
+  roles:
+  - role: installer
   tags:
   - sneakernet
+  - installer

@@ -1,0 +1,29 @@
+---
+- name: Ensure aws credentials directory exists
+  file:
+    path: '{{ ansible_env["HOME"] }}/.aws'
+    state: directory
+
+- name: Template aws credentials
+  template:
+    src: credentials.j2
+    dest: '{{ ansible_env["HOME"] }}/.aws/credentials'
+
+- name: Recover iscp yaml
+  slurp:
+    src: '{{ mirror_directory }}/imageContentSourcePolicy.yaml'
+  register: icsps
+
+- name: Save off icsp mirrors
+  set_fact:
+    icsp_mirrors: |-
+      {% for icsp in icsps['content']|b64decode|split('---') %}
+      {% if icsp|from_yaml != None %}
+      {{ (icsp|from_yaml).spec.repositoryDigestMirrors|to_yaml }}
+      {% endif -%}
+      {% endfor -%}
+
+- name: Template install-config.yaml
+  template:
+    src: install-config.yaml.j2
+    dest: '{{ ansible_env["HOME"] }}/install-config.yaml'

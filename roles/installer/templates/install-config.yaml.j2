@@ -1,0 +1,48 @@
+apiVersion: v1
+baseDomain: {{ cluster_domain }}
+{% if additional_trust_bundle != "" %}
+additionalTrustBundle: |
+{{ additional_trust_bundle|indent(width=2, indentfirst=True) }}
+{% endif %}
+compute:
+- architecture: amd64
+  hyperthreading: Enabled
+  name: worker
+  platform: {}
+  replicas: 3
+controlPlane:
+  architecture: amd64
+  hyperthreading: Enabled
+  name: master
+  platform: {}
+  replicas: 3
+metadata:
+  creationTimestamp: null
+  name: {{ cluster_name }}
+networking:
+  clusterNetwork:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  networkType: OpenShiftSDN
+  serviceNetwork:
+  - 172.30.0.0/16
+  machineNetwork:
+{% for subnet in cluster_subnets %}
+  - cidr: {{ subnet.cidr_block }}
+{% endfor %}
+platform:
+  aws:
+    region: {{ aws_region }}
+    zones:
+{% for subnet in cluster_subnets %}
+    - {{ subnet.availability_zone }}
+{% endfor %}
+    subnets:
+{% for subnet in cluster_subnets %}
+    - {{ subnet.id }}
+{% endfor %}
+sshKey: {{ cluster_ssh_key }}
+publish: Internal
+pullSecret: '{{ local_registry_pull_secret }}'
+imageContentSources:
+{{ icsp_mirrors }}
