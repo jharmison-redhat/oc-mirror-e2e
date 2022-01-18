@@ -25,7 +25,7 @@ runtime_args+=(
 )
 
 # To be able to pass tags into the runner instance, we need this
-echo '' > env/cmdline
+printf '' > env/cmdline
 if [ -n "${ANSIBLE_TAGS}" ]; then
     printf -- "--tags ${ANSIBLE_TAGS} " >> env/cmdline
 fi
