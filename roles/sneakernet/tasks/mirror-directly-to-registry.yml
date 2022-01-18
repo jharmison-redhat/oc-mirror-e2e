@@ -20,15 +20,18 @@
     content: '{{ combined_pull_secret }}'
     dest: '{{ ansible_env["HOME"] }}/.docker/config.json'
 
+# FIXME: Hacky workaround for https://github.com/openshift/oc-mirror/issues/273
 - name: Ensure oc-mirror metadata image exists
-  containers.podman.podman_image:
-    name: registry.redhat.io/ubi8/ubi:latest
+  shell: |
+    podman pull --authfile {{ auth_file }} {{ source_image }} &>/dev/null
+    podman push --authfile {{ auth_file }} --remove-signatures {{ source_image }} {{ dest_image }} &>/dev/null
+  loop: '{{ range(0,3)|list }}'
+  vars:
+    source_image: registry.redhat.io/ubi8/ubi:latest
+    dest_image: '{{ oc_mirror_metadata_image.split(":", 2)[0] }}:fake'
     auth_file: '{{ ansible_env["HOME"] }}/.docker/config.json'
-    pull: yes
-    push: yes
-    push_args:
-      dest: '{{ oc_mirror_metadata_image.split(":", 2)[0] }}:fake'
-      remove_signatures: yes
+  failed_when: false
+  changed_when: false
 
 - name: Mirror content into registry
   command: '{{ oc_mirror_binary_location }} --config {{ ansible_env["HOME"] }}/imageset-config.yml --dir={{ mirror_directory }} docker://{{ registry_hostname }}'
