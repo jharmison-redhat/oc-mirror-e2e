@@ -24,6 +24,15 @@ runtime_args+=(
    -v "$HOME/.aws:/aws"
 )
 
+# To be able to pass tags into the runner instance, we need this
+echo '' > env/cmdline
+if [ -n "${ANSIBLE_TAGS}" ]; then
+    printf "--tags ${ANSIBLE_TAGS} " >> env/cmdline
+fi
+if [ -n "${ANSIBLE_SKIP_TAGS}" ]; then
+    printf "--skip-tags ${ANSIBLE_SKIP_TAGS} " >> env/cmdline
+fi
+
 # We need to save output, this is the default for the collection
 runtime_args+=(
     -v "$PWD/output:/output"

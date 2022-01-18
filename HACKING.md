@@ -113,3 +113,5 @@ Also, in the event that something goes wrong with your terraform state for local
 | `GALAXY_TOKEN` | The API token from Ansible Galaxy for publishing a collection | Read at runtime from `.galaxy-token` |
 | `PUSH_IMAGE` | The container image name that the EE will be pushed to for publishing | registry.jharmison.com/ansible/oc-mirror-e2e |
 | `RUNTIME` | The OCI container runtime to use for operations that need one | `podman` |
+| `ANSIBLE_TAGS` | The tags to pass to the playbook call | "" |
+| `ANSIBLE_SKIP_TAGS` | The tags to skip in the playbook call | "" |

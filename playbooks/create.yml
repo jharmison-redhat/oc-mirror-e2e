@@ -8,6 +8,8 @@
     # and exports the created ec2_instances to inventory, while also registering
     # the other outputs from the terraform module for use later in the playbook
   - role: provisioner
+  tags:
+  - always
 
 - name: Wait for connectivity to all terraformed hosts
   hosts: terraformed
@@ -16,6 +18,8 @@
   gather_facts: false
   roles:
   - role: cloud_init_finished
+  tags:
+  - always
 
 - name: Update all connected terraformed hosts
   hosts: connected
@@ -23,6 +27,8 @@
   - '{{ playbook_dir }}/vars/defaults.yml'
   roles:
   - role: updated
+  tags:
+  - updated
 
 - name: Configure Red Hat Quay
   hosts: registry
@@ -44,6 +50,8 @@
       cert_style: byo
       registry_certificate: '{{ lookup("file", output_dir+"/registry.crt") }}'
       registry_certificate_key: '{{ lookup("file", output_dir+"/registry.key") }}'
+  tags:
+  - registry
 
 - name: Configure Squid
   hosts: proxy
@@ -57,6 +65,8 @@
     - .rhui3.{{ aws_region }}.aws.ce.redhat.com
   roles:
   - role: proxy
+  tags:
+  - proxy
 
 - name: Validate bastion configuration
   hosts: bastion
@@ -76,6 +86,8 @@
       username: '{{ registry_admin.username }}'
       password: '{{ registry_admin.password }}'
       registry: '{{ hostvars.registry.ansible_host }}'
+  tags:
+  - bastion
 
 - name: Download clients and mirror installation on connected host
   hosts: registry
@@ -85,6 +97,8 @@
   - include_role:
       name: sneakernet
       tasks_from: connected
+  tags:
+  - sneakernet
 
 - name: Sneakernet clients and oc-mirror data onto disconnected host
   hosts: bastion
@@ -94,3 +108,5 @@
   - include_role:
       name: sneakernet
       tasks_from: disconnected
+  tags:
+  - sneakernet

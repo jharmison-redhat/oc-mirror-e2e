@@ -2,6 +2,8 @@ VERSION = 0.1.1
 GALAXY_TOKEN := $(shell cat .galaxy-token)
 PUSH_IMAGE = registry.jharmison.com/ansible/oc-mirror-e2e
 RUNTIME = podman
+ANSIBLE_TAGS = ""
+ANSIBLE_SKIP_TAGS = ""
 
 .PHONY: all prereqs collection publish ee run clean
 
@@ -33,10 +35,10 @@ ee-publish: ee
 	$(RUNTIME) push $(PUSH_IMAGE):latest
 
 run: ee
-	EE_VERSION=$(VERSION) RUNTIME=$(RUNTIME) example/run.sh
+	ANSIBLE_TAGS=$(ANSIBLE_TAGS) ANSIBLE_SKIP_TAGS=$(ANSIBLE_SKIP_TAGS) EE_VERSION=$(VERSION) RUNTIME=$(RUNTIME) example/run.sh
 
 destroy: ee
-	EE_VERSION=$(VERSION) RUNTIME=$(RUNTIME) example/run.sh delete
+	ANSIBLE_TAGS=$(ANSIBLE_TAGS) ANSIBLE_SKIP_TAGS=$(ANSIBLE_SKIP_TAGS) EE_VERSION=$(VERSION) RUNTIME=$(RUNTIME) example/run.sh delete
 
 clean:
 	rm -rf jharmison_redhat-oc_mirror_e2e-*.tar.gz galaxy.yml example/artifacts/*
