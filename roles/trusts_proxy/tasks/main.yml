@@ -1,10 +1,12 @@
 - name: Ensure proxy CA certificate is present in anchors
+  become: true
   copy:
     src: '{{ output_dir }}/squid.crt'
     dest: /etc/pki/ca-trust/source/anchors/
   register: squid_ca
 
 - name: Ensure registry certificate is present in anchors
+  become: true
   copy:
     content: '{{ hostvars.registry.selfsigned_certificate.certificate }}'
     dest: /etc/pki/ca-trust/source/anchors/registry.crt
@@ -12,6 +14,7 @@
   register: registry_cert
 
 - name: Ensure any additional CAs are present in anchors
+  become: true
   copy:
     content: '{{ item.content }}'
     dest: /etc/pki/ca-trust/source/anchors/{{ item.name }}.crt
@@ -19,6 +22,7 @@
   register: extra_cas
 
 - name: Update CA trust
+  become: true
   command: update-ca-trust
   when: squid_ca.changed or registry_cert.changed or extra_cas.changed
  
