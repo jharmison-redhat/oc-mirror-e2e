@@ -20,7 +20,6 @@
   include_role:
     name: registry_certs
   vars:
-    cert_style: '{{ cert_style }}'
     cert_directory: /home/quay/config
     cert_owner: '{{ quay_uid }}'
     cert_group: quay
