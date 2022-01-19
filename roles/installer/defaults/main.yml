@@ -13,3 +13,7 @@ cluster_subnets: '{{ hostvars.controller.terraform.outputs.vpc.value.private_sub
 
 installer_aws_access_key_id: '{{ hostvars.controller.terraform.outputs.ocp_installer.value.access_key }}'
 installer_aws_secret_access_key: '{{ hostvars.controller.terraform.outputs.ocp_installer.value.secret_key }}'
+
+cluster_ssh_key: '{{ lookup("file", output_dir + "/" + cluster_name + "_ed25519.pub") }}'
+
+install_directory: '{{ ansible_env["HOME"] }}/install'

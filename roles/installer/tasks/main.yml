@@ -1,4 +1,14 @@
 ---
+- name: Copy SSH keys
+  copy:
+    src: '{{ output_dir }}/{{ cluster_name }}_{{ item }}'
+    dest: '{{ ansible_env["HOME"] }}/.ssh/'
+    setype: ssh_home_t
+    mode: '0400'
+  loop:
+  - ed25519
+  - ed25519.pub
+
 - name: Ensure aws credentials directory exists
   file:
     path: '{{ ansible_env["HOME"] }}/.aws'
@@ -26,4 +36,9 @@
 - name: Template install-config.yaml
   template:
     src: install-config.yaml.j2
-    dest: '{{ ansible_env["HOME"] }}/install-config.yaml'
+    dest: '{{ install_directory }}/install-config.yaml'
+
+- name: Create OpenShift manifests
+  command: openshift-install create manifests
+  args:
+    chdir: '{{ install_directory }}'
