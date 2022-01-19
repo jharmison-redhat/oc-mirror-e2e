@@ -33,6 +33,11 @@
       {% endif -%}
       {% endfor -%}
 
+- name: Ensure install directory exists
+  file:
+    path: '{{ install_directory }}'
+    state: directory
+
 - name: Template install-config.yaml
   template:
     src: install-config.yaml.j2
