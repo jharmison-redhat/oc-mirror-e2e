@@ -1,0 +1,7 @@
+---
+cert_style: letsencrypt
+cert_directory: /etc/pki/tls/custom
+registry_admin:
+  username: quay
+  password: password
+  email: quay@example.com

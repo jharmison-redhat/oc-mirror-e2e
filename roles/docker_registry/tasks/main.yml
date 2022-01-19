@@ -1,0 +1,75 @@
+---
+- name: Install packages necessary
+  become: true
+  package:
+    name: httpd-tools
+    state: installed
+
+- name: Ensure registry directories exist
+  become: true
+  file:
+    path: '{{ registry_directory }}/{{ item }}'
+    state: directory
+  loop:
+  - auth
+  - certs
+
+- name: Create registry certificates
+  include_role:
+    name: registry_certs
+  vars:
+    cert_style: '{{ cert_style }}'
+    cert_directory: '{{ registry_directory }}/certs'
+
+- name: Check for valid password
+  become: true
+  command: htpasswd -bBv '{{ registry_directory }}/auth/htpasswd' '{{ item.username }}' '{{ item.password }}'
+  failed_when: false
+  changed_when: false
+  loop: '{{ registry_users }}'
+  register: htpasswd_check
+
+- name: Blank stale htpasswd file
+  become: true
+  copy:
+    content: ''
+    dest: '{{ registry_directory }}/auth/htpasswd'
+  when: htpasswd_check|json_query('results[*].rc')|sort|last > 0
+
+- name: (Re)Create registry htpasswd file
+  become: true
+  command: htpasswd -bB '{{ registry_directory }}/auth/htpasswd' '{{ item.username }}' '{{ item.password }}'
+  loop: '{{ registry_users }}'
+  register: htpasswd
+  when: htpasswd_check|json_query('results[*].rc')|sort|last > 0
+
+- name: Manage the registry container
+  become: true
+  containers.podman.podman_container:
+    name: registry
+    image: docker.io/library/registry:2
+    force_restart: '{{ htpasswd.changed }}'
+    env:
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
+      REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+      REGISTRY_HTTP_TLS_CERTIFICATE: /certs/ssl.cert
+      REGISTRY_HTTP_TLS_KEY: /certs/ssl.key
+      REGISTRY_HTTP_DEBUG_ADDR: 0.0.0.0:5001
+      REGISTRY_COMPATIBILITY_SCHEMA1_ENABLED: true
+      REGISTRY_STORAGE: s3
+      REGISTRY_STORAGE_S3_REGION: '{{ registry_bucket.region }}'
+      REGISTRY_STORAGE_S3_BUCKET: '{{ registry_bucket.bucket }}'
+      REGISTRY_STORAGE_S3_ACCESSKEY: '{{ registry_bucket.access_key }}'
+      REGISTRY_STORAGE_S3_SECRETKEY: '{{ registry_bucket.secret_key }}'
+      REGISTRY_STORAGE_S3_ENCRYPT: 'false'
+      REGISTRY_STORAGE_S3_SECURE: 'true'
+      REGISTRY_STORAGE_S3_V4AUTH: 'true'
+      REGISTRY_STORAGE_S3_CHUNKSIZE: '5242880'
+      REGISTRY_STORAGE_S3_ROOTDIRECTORY: /
+    volume:
+    - '{{ registry_directory }}/auth:/auth:z'
+    - '{{ registry_directory }}/certs:/certs:z'
+    publish:
+    - 443:5000
+    - 5001:5001

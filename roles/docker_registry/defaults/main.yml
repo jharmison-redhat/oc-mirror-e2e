@@ -1,0 +1,10 @@
+---
+registry_directory: /opt/registry
+cert_style: letsencrypt
+
+registry_admin:
+  username: admin
+  password: password
+
+registry_users:
+- '{{ registry_admin }}'

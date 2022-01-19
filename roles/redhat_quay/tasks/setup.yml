@@ -1,10 +1,4 @@
 ---
-- name: Ensure that requested cert style exists
-  assert:
-    that:
-    - cert_style in implemented_cert_styles
-    fail_msg: The certificate style you have selected, {{ cert_style }}, is not implemented yet.
-
 - name: Ensure host is configured as a container host
   become: true
   dnf:
