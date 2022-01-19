@@ -38,6 +38,12 @@
     path: '{{ install_directory }}'
     state: directory
 
+# Needs better idempotency handling here
+# - Did install-config change?
+# - Is there an installed cluster?
+# - Have we already generated manifests?
+# - Have CatalogSources changed?
+# - etc.
 - name: Template install-config.yaml
   template:
     src: install-config.yaml.j2
@@ -47,3 +53,23 @@
   command: openshift-install create manifests
   args:
     chdir: '{{ install_directory }}'
+
+- name: Identify all catalogSources
+  find:
+    paths: '{{ mirror_directory }}'
+    file_type: file
+    patterns: "catalogSource-*.yaml"
+  register: catalog_sources
+
+- name: Bring in catalogSources
+  copy:
+    remote_src: yes
+    src: '{{ item.path }}'
+    dest: '{{ install_directory }}/manifests/'
+  loop: '{{ catalog_sources.files }}'
+
+- name: Install OpenShift
+  command: openshift-install create cluster
+  args:
+    chdir: '{{ install_directory }}'
+  when: install_openshift|default(false)|bool
