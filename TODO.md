@@ -16,7 +16,7 @@ Important for finished product
 
 - [ ] Linting, dependency update tracking, other generic CI
 - [ ] Better handle imageset-config.yml to enable multiple CI scenarios
-- [ ] E2e test from known good state, using proper Ansible tests
+- [ ] E2e test (for the E2e test environment, yes) from known good state, using proper Ansible tests and very simply checks of functionality
 - [ ] CD to publish collection and EE
 - [x] Add generic Docker registry
 - [ ] Build out an easy-to-execute test matrix interface
@@ -49,6 +49,7 @@ Important for improving usability
 ---------------------------------
 
 - [ ] User docs
+  - Need to get role doc generation up and running, rather than short hand-crafted blurbs
 - [ ] Quickstart from scratch, assume nothing
 
 Quay things
@@ -56,7 +57,7 @@ Quay things
 
 - [ ] Make Quay installation work disconnected (podman save, podman load)
 - [ ] Enable [Clair disconnected](https://access.redhat.com/documentation/en-us/red_hat_quay/3.6/html/manage_red_hat_quay/clair-intro2#clair-disconnected)
-- [ ] Quay hacky tasks moving to proper modules
+- [ ] Quay [hacky tasks](/roles/redhat_quay/tasks/main.yml#117) moving to proper modules
 - [ ] Better backend storage abstractions
   - [ ] Local Storage
   - [ ] Different S3 auth modes
