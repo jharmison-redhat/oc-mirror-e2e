@@ -4,7 +4,10 @@ TODO
 MVP
 ---
 
-- [ ] Finish `openshift-install` from bastion
+- [ ] Fix DNS to use internal names for inter-VPC communication that are more specific than the OpenShift Hosted Zone
+  - Need to change the Terraform to not conflict with the OpenShift Hosted Zone, and also create a new hosted zone that's more specific to satisfy Route53 resolving behavior
+  - https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/hosted-zone-private-considerations.html#hosted-zone-private-considerations-public-private-overlapping
+- [x] Finish `openshift-install` from bastion
 - [ ] Implement mirror-to-disk sneakernet flow
   - [x] Manipulate instance disk size based on mirror flow (disk or registry)
 
