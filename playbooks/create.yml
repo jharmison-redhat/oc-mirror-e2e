@@ -62,9 +62,6 @@
   become: true
   vars:
     ca_cert_and_key: '{{ hostvars.controller.ca.stdout }}'
-    allowed_urls:
-    - .{{ cluster_name }}.{{ cluster_domain }}
-    - .rhui3.{{ aws_region }}.aws.ce.redhat.com
   roles:
   - role: proxy
   tags:

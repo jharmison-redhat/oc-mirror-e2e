@@ -34,6 +34,7 @@
     ansible_host: '{{ item.hostname }}'
     ansible_user: '{{ item.user }}'
     inventory_dir: '{{ inventory_dir }}'
+    private_hostname: '{{ item.private_hostname|default(omit) }}'
     ansible_ssh_private_key_file: '{{ keypair.filename }}'
     ansible_ssh_common_args: >-
       {%- if item.jump_host|default(None) != None -%}
@@ -50,11 +51,13 @@
     groups:
     - connected
     hostname: '{{ terraform.outputs.registry_instance.value.hostname }}'
+    private_hostname: '{{ terraform.outputs.registry_instance.value.private_hostname }}'
     user: '{{ terraform.outputs.registry_instance.value.username }}'
   - name: proxy
     groups:
     - connected
     hostname: '{{ terraform.outputs.proxy_instance.value.hostname }}'
+    private_hostname: '{{ terraform.outputs.proxy_instance.value.private_hostname }}'
     user: '{{ terraform.outputs.proxy_instance.value.username }}'
   - name: bastion
     groups:
@@ -110,7 +113,9 @@
     common_name: '{{ terraform.outputs.registry_instance.value.hostname }}'
     subject_alt_name:
     - DNS:{{ terraform.outputs.registry_instance.value.hostname }}
+    - DNS:{{ terraform.outputs.registry_instance.value.private_hostname }}
     - IP:{{ terraform.outputs.registry_instance.value.ip }}
+    - IP:{{ terraform.outputs.registry_instance.value.private_ip }}
 
 - name: Generate Certificate for registry, signed by the CA
   community.crypto.x509_certificate:

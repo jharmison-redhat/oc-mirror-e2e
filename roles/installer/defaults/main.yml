@@ -1,5 +1,5 @@
 ---
-registry_hostname: '{{ hostvars.controller.terraform.outputs.registry_instance.value.hostname }}'
+registry_hostname: '{{ hostvars.registry.private_hostname }}'
 local_registry_pull_secret: |-
   auths:
     {{ registry_hostname }}:

@@ -3,3 +3,6 @@
 {% for url in allowed_urls %}
 {{ url }}
 {% endfor %}
+{% if rhui_cert.stat.exists %}
+.rhui3.{{ aws_region }}.aws.ce.redhat.com
+{% endif %}

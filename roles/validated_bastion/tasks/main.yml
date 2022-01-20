@@ -8,4 +8,4 @@
   containers.podman.podman_login:
     username: '{{ registry_admin.username }}'
     password: '{{ registry_admin.password }}'
-    registry: '{{ hostvars.registry.ansible_host }}'
+    registry: '{{ hostvars.registry.private_hostname }}'
