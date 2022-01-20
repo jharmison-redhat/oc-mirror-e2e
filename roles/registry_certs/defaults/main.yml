@@ -1,7 +1,7 @@
 ---
 cert_directory: /etc/pki/tls/custom
 
-registry_hostname: '{{ hostvars.registry.hostname }}'
+registry_hostname: '{{ hostvars.registry.private_hostname }}'
 registry_admin:
   username: quay
   password: password

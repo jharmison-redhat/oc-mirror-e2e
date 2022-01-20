@@ -42,7 +42,7 @@
   - include_role:
       name: '{{ registry_type }}'
     vars:
-      registry_hostname: '{{ ansible_host }}'
+      registry_hostname: '{{ private_hostname }}'
       registry_storage_details:
         host: s3.{{ registry_bucket.region }}.amazonaws.com
         s3_bucket: '{{ registry_bucket.bucket }}'
