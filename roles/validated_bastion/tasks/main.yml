@@ -1,9 +1,4 @@
 ---
-- name: Install container-tools
-  dnf:
-    name: '@container-tools'
-    state: installed
-
 - name: Login to quay registry to validate connection
   containers.podman.podman_login:
     username: '{{ registry_admin.username }}'

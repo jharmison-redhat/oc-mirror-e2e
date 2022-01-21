@@ -1,10 +1,4 @@
 ---
-- name: Ensure host is configured as a container host
-  become: true
-  dnf:
-    name: '@container-tools'
-    state: installed
-
 - name: Ensure that local password directory exists
   file:
     path: '{{ password_dir }}'
