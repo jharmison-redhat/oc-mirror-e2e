@@ -94,6 +94,8 @@
   hosts: bastion
   vars_files:
   - '{{ playbook_dir }}/vars/defaults.yml'
+  vars:
+    additional_trust_bundle: '{{ lookup("file", output_dir + "/squid.crt") }}'
   pre_tasks:
   - include_role:
       name: sneakernet

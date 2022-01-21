@@ -38,7 +38,7 @@
     path: '{{ install_directory }}'
     state: directory
 
-# Needs better idempotency handling here
+# FIXME: Needs better idempotency handling here
 # - Did install-config change?
 # - Is there an installed cluster?
 # - Have we already generated manifests?
