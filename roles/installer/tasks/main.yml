@@ -30,8 +30,8 @@
       {% for icsp in icsps['content']|b64decode|split('---') %}
       {% if icsp|from_yaml != None %}
       {{ (icsp|from_yaml).spec.repositoryDigestMirrors|to_yaml }}
-      {% endif -%}
-      {% endfor -%}
+      {%- endif %}
+      {% endfor %}
 
 - name: Ensure install directory exists
   file:
