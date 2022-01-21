@@ -18,7 +18,6 @@
   include_role:
     name: registry_certs
   vars:
-    cert_style: '{{ cert_style }}'
     cert_directory: '{{ registry_directory }}/certs'
 
 - name: Check for valid password
