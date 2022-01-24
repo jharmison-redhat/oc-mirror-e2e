@@ -71,5 +71,3 @@
     mode: pull
     src: '{{ install_directory }}'
     dest: '{{ output_dir }}/install'
-  when:
-  - openshift_install.changed

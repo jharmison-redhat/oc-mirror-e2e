@@ -1,4 +1,10 @@
 ---
+- name: Ensure rsync is installed to use synchronize
+  become: true
+  package:
+    name: rsync
+    state: installed
+
 - name: Copy SSH keys
   copy:
     src: '{{ output_dir }}/{{ cluster_name }}_{{ item }}'
@@ -18,6 +24,12 @@
   template:
     src: credentials.j2
     dest: '{{ ansible_env["HOME"] }}/.aws/credentials'
+
+- name: Recover credentials - just in case
+  fetch:
+    src: '{{ ansible_env["HOME"] }}/.aws/credentials'
+    dest: '{{ output_dir }}/aws_credentials'
+    flat: yes
 
 - name: Recover iscp yaml
   slurp:

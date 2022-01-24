@@ -4,6 +4,18 @@
   vars_files:
   - '{{ playbook_dir }}/vars/defaults.yml'
   tasks:
+
+  - name: Uninstall OpenShift
+    include_role:
+      name: installer
+      tasks_from: uninstalled.yml
+    vars:
+      install_directory: '{{ output_dir }}/install'
+      oc_path: '{{ output_dir }}/clients/oc'
+      openshift_install_path: '{{ output_dir }}/clients/openshift-install'
+      extra_uninstall_env:
+        AWS_SHARED_CREDENTIALS_FILE: '{{ output_dir }}/aws_credentials'
+
   - name: Destroy the terraform deployment
     include_role:
       name: provisioner

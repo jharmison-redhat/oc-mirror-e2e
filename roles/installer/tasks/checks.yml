@@ -1,6 +1,6 @@
 ---
 - name: Check to see if OpenShift is responding
-  shell: oc get nodes
+  shell: '{{ oc_path|default("oc") }}' get nodes
   changed_when: false
   failed_when: false
   environment:
@@ -11,6 +11,13 @@
   stat:
     path: '{{ install_directory }}/auth/kubeconfig'
   register: kubeconfig
+
+- name: Check to see if any tfstate exists
+  find:
+    paths: '{{ install_directory }}'
+    file_type: file
+    patterns: '*.tfstate'
+  register: tfstate
 
 - name: Check to see if manifests directory exists
   stat:

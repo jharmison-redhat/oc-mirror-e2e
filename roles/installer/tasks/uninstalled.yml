@@ -1,0 +1,16 @@
+---
+- name: Check status of installation
+  include_tasks: checks.yml
+
+- name: Uninstall OpenShift
+  command: '{{ openshift_install_path|default("openshift-install") }} destroy cluster'
+  args:
+    chdir: '{{ install_directory }}'
+  environment: '{{ extra_uninstall_env|default(omit) }}'
+  when:
+    - >-
+      responding.rc == 0 or
+      kubeconfig.stat.exists or
+      tfstate.matched > 0 or
+      manifests.stat.exists
+  register: uninstall_openshift
