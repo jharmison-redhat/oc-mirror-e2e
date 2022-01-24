@@ -1,0 +1,5 @@
+---
+implemented_cert_styles:
+  - letsencrypt
+  - byo
+  - selfsigned

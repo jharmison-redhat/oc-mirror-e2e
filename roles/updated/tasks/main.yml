@@ -16,3 +16,9 @@
   become: true
   reboot:
   when: needs_rebooting.rc != 0
+
+- name: Ensure host is configured as a container host
+  become: true
+  dnf:
+    name: '@container-tools'
+    state: installed

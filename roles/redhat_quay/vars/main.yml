@@ -92,8 +92,3 @@ container_unit_execstart: >-
 empty_results:
   results:
   - changed: false
-
-implemented_cert_styles:
-  - letsencrypt
-  - byo
-  - selfsigned

@@ -1,0 +1,103 @@
+---
+- name: Install packages necessary
+  become: true
+  package:
+    name: httpd-tools
+    state: installed
+
+- name: Ensure registry directories exist
+  become: true
+  file:
+    path: '{{ registry_directory }}/{{ item }}'
+    state: directory
+  loop:
+  - auth
+  - certs
+
+- name: Create registry certificates
+  include_role:
+    name: registry_certs
+  vars:
+    cert_directory: '{{ registry_directory }}/certs'
+
+- name: Check for valid password
+  become: true
+  command: htpasswd -bBv '{{ registry_directory }}/auth/htpasswd' '{{ item.username }}' '{{ item.password }}'
+  failed_when: false
+  changed_when: false
+  loop: '{{ registry_users }}'
+  register: htpasswd_check
+
+- name: Blank stale htpasswd file
+  become: true
+  copy:
+    content: ''
+    dest: '{{ registry_directory }}/auth/htpasswd'
+  when: htpasswd_check|json_query('results[*].rc')|sort|last > 0
+
+- name: (Re)Create registry htpasswd file
+  become: true
+  command: htpasswd -bB '{{ registry_directory }}/auth/htpasswd' '{{ item.username }}' '{{ item.password }}'
+  loop: '{{ registry_users }}'
+  register: htpasswd
+  when: htpasswd_check|json_query('results[*].rc')|sort|last > 0
+
+- name: Drop the UI proxy configuration
+  become: true
+  template:
+    src: nginx.conf.j2
+    dest: '{{ registry_directory }}/nginx.conf'
+  register: ui_config
+
+- name: Drop the registry configuration
+  become: true
+  template:
+    src: config.yml.j2
+    dest: '{{ registry_directory }}/config.yml'
+  register: config
+
+- name: Only bind the pod to 80 if it's available
+  block:
+  - name: Manage the registry pod
+    become: true
+    containers.podman.podman_pod:
+      name: docker-registry
+      state: started
+      ports:
+      - 80:80
+      - 443:443
+  rescue:
+  - name: Manage the registry pod (without port 80)
+    become: true
+    containers.podman.podman_pod:
+      name: docker-registry
+      state: started
+      ports:
+      - 443:443
+
+- name: Manage the registry container
+  become: true
+  containers.podman.podman_container:
+    name: registry
+    image: docker.io/library/registry:2
+    pod: docker-registry
+    force_restart: '{{ htpasswd.changed or config.changed }}'
+    volume:
+    - '{{ registry_directory }}/auth:/auth:z'
+    - '{{ registry_directory }}/config.yml:/etc/docker/registry/config.yml:z'
+
+- name: Manage the registry UI container
+  become: true
+  containers.podman.podman_container:
+    name: registry-ui
+    image: docker.io/joxit/docker-registry-ui:latest
+    pod: docker-registry
+    force_restart: '{{ ui_config.changed }}'
+    env:
+      SINGLE_REGISTRY: true
+      REGISTRY_TITLE: Disconnected Mirror Registry
+      SHOW_CONTENT_DIGEST: true
+      DELETE_IMAGES: true
+    volume:
+    - '{{ registry_directory }}/nginx.conf:/etc/nginx/conf.d/default.conf'
+    - '{{ registry_directory }}/certs:/certs:z'

@@ -31,9 +31,13 @@
   add_host:
     name: '{{ item.name }}'
     groups: '{{ ["terraformed"] + item.groups|default([]) }}'
-    ansible_host: '{{ item.hostname }}'
+    ansible_host: '{{ item.ansible_host }}'
     ansible_user: '{{ item.user }}'
     inventory_dir: '{{ inventory_dir }}'
+    tf_private_ip: '{{ item.tf_private_ip }}'
+    tf_public_ip: '{{ item.tf_public_ip|default(omit) }}'
+    private_hostname: '{{ item.private_hostname }}'
+    public_hostname: '{{ item.public_hostname|default(omit) }}'
     ansible_ssh_private_key_file: '{{ keypair.filename }}'
     ansible_ssh_common_args: >-
       {%- if item.jump_host|default(None) != None -%}
@@ -49,19 +53,29 @@
   - name: registry
     groups:
     - connected
-    hostname: '{{ terraform.outputs.registry_instance.value.hostname }}'
+    ansible_host: '{{ terraform.outputs.registry_instance.value.hostname }}'
+    public_hostname: '{{ terraform.outputs.registry_instance.value.hostname }}'
+    private_hostname: '{{ terraform.outputs.registry_instance.value.private_hostname }}'
     user: '{{ terraform.outputs.registry_instance.value.username }}'
+    tf_private_ip: '{{ terraform.outputs.registry_instance.value.private_ip }}'
+    tf_public_ip: '{{ terraform.outputs.registry_instance.value.ip }}'
   - name: proxy
     groups:
     - connected
-    hostname: '{{ terraform.outputs.proxy_instance.value.hostname }}'
+    ansible_host: '{{ terraform.outputs.proxy_instance.value.hostname }}'
+    public_hostname: '{{ terraform.outputs.proxy_instance.value.hostname }}'
+    private_hostname: '{{ terraform.outputs.proxy_instance.value.private_hostname }}'
     user: '{{ terraform.outputs.proxy_instance.value.username }}'
+    tf_private_ip: '{{ terraform.outputs.proxy_instance.value.private_ip }}'
+    tf_public_ip: '{{ terraform.outputs.proxy_instance.value.ip }}'
   - name: bastion
     groups:
     - disconnected
-    hostname: '{{ terraform.outputs.bastion_instance.value.private_ip }}'
+    ansible_host: '{{ terraform.outputs.bastion_instance.value.private_ip }}'
+    private_hostname: '{{ terraform.outputs.bastion_instance.value.private_hostname }}'
     user: '{{ terraform.outputs.bastion_instance.value.username }}'
     jump_host: -i "{{ keypair.filename }}" "{{ terraform.outputs.proxy_instance.value.username }}@{{ terraform.outputs.proxy_instance.value.hostname }}"
+    tf_private_ip: '{{ terraform.outputs.bastion_instance.value.private_ip }}'
 
 - name: Generate self-signed private key for proxy
   community.crypto.openssl_privatekey:
@@ -107,9 +121,11 @@
     country_name: '{{ cert_country|default("US") }}'
     organization_name: Quay
     email_address: '{{ registry_admin.email }}'
-    common_name: '{{ terraform.outputs.registry_instance.value.hostname }}'
+    common_name: '{{ terraform.outputs.registry_instance.value.private_hostname }}'
     subject_alt_name:
+    - DNS:{{ terraform.outputs.registry_instance.value.private_hostname }}
     - DNS:{{ terraform.outputs.registry_instance.value.hostname }}
+    - IP:{{ terraform.outputs.registry_instance.value.private_ip }}
     - IP:{{ terraform.outputs.registry_instance.value.ip }}
 
 - name: Generate Certificate for registry, signed by the CA

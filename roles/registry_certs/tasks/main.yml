@@ -1,0 +1,9 @@
+---
+- name: Ensure that requested cert style exists
+  assert:
+    that:
+    - cert_style in implemented_cert_styles
+    fail_msg: The certificate style you have selected, {{ cert_style }}, is not implemented yet.
+
+- name: Include the tasks for {{ cert_style }}
+  include_tasks: '{{ cert_style }}.yml'

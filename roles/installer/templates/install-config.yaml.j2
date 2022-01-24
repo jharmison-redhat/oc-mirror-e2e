@@ -43,6 +43,6 @@ platform:
 {% endfor %}
 sshKey: {{ cluster_ssh_key }}
 publish: Internal
-pullSecret: '{{ local_registry_pull_secret }}'
+pullSecret: '{{ local_registry_pull_secret|from_yaml|to_json }}'
 imageContentSources:
 {{ icsp_mirrors }}

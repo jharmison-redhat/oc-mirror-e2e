@@ -27,15 +27,4 @@ force_mirror_update: false
 
 compliance_operator_version: '0.1.44'
 
-registry_hostname: '{{ hostvars.controller.terraform.outputs.registry_instance.value.hostname }}'
-
-local_registry_pull_secret: |-
-  auths:
-    {{ registry_hostname }}:
-      auth: {{ (registry_admin.username + ":" + registry_admin.password)|b64encode }}
-      email: {{ registry_admin.email }}
-
-toplevel_namespace: oc-mirror
-oc_mirror_metadata_image: '{{ registry_hostname }}/{{ toplevel_namespace }}/imageset-metadata:latest'
-
-combined_pull_secret: '{{ console_redhat_com_pull_secret|combine(local_registry_pull_secret|from_yaml, recursive=True)|to_json }}'
+registry_hostname: '{{ hostvars.registry.private_hostname }}'

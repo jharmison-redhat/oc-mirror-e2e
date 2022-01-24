@@ -42,7 +42,7 @@
   - include_role:
       name: '{{ registry_type }}'
     vars:
-      registry_hostname: '{{ ansible_host }}'
+      registry_hostname: '{{ private_hostname }}'
       registry_storage_details:
         host: s3.{{ registry_bucket.region }}.amazonaws.com
         s3_bucket: '{{ registry_bucket.bucket }}'
@@ -62,9 +62,6 @@
   become: true
   vars:
     ca_cert_and_key: '{{ hostvars.controller.ca.stdout }}'
-    allowed_urls:
-    - .{{ cluster_name }}.{{ cluster_domain }}
-    - .rhui3.{{ aws_region }}.aws.ce.redhat.com
   roles:
   - role: proxy
   tags:
@@ -97,6 +94,8 @@
   hosts: bastion
   vars_files:
   - '{{ playbook_dir }}/vars/defaults.yml'
+  vars:
+    additional_trust_bundle: '{{ lookup("file", output_dir + "/squid.crt") }}'
   pre_tasks:
   - include_role:
       name: sneakernet

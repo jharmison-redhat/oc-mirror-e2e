@@ -1,0 +1,15 @@
+---
+registry_directory: /opt/registry
+
+registry_admin:
+  username: admin
+  password: password
+
+registry_users:
+- '{{ registry_admin }}'
+
+registry_urls:
+- '{{ public_hostname }}'
+- '{{ private_hostname }}'
+- '{{ tf_private_ip }}'
+- '{{ tf_public_ip }}'

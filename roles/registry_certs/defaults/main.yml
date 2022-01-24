@@ -1,0 +1,13 @@
+---
+cert_directory: /etc/pki/tls/custom
+
+registry_hostname: '{{ hostvars.registry.private_hostname }}'
+registry_admin:
+  username: quay
+  password: password
+  email: quay@example.com
+
+cert_style: letsencrypt
+
+registry_certificate: ""
+registry_certificate_key: ""

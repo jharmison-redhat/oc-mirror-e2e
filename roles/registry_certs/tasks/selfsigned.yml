@@ -14,7 +14,12 @@
     path: '{{ cert_directory }}/ssl.csr'
     privatekey_path: '{{ cert_directory }}/ssl.key'
     common_name: '{{ registry_hostname }}'
-    subject_alt_name: 'DNS:{{ registry_hostname }}'
+    subject_alt_name:
+    - DNS:{{ hostvars.controller.terraform.outputs.registry_instance.value.hostname }}
+    - DNS:{{ hostvars.controller.terraform.outputs.registry_instance.value.private_hostname }}
+    - IP:{{ hostvars.controller.terraform.outputs.registry_instance.value.ip }}
+    - IP:{{ hostvars.controller.terraform.outputs.registry_instance.value.private_ip }}
+
     email_address: '{{ registry_admin.email|default("admin@" + registry_hostname) }}'
     country_name: '{{ cert_country|default("US") }}'
     organization_name: '{{ cert_org|default(registry_hostname.split(".", 1)[1]) }}'

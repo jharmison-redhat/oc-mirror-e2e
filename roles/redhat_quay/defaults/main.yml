@@ -19,10 +19,6 @@ deploy_clair: true
 
 do_redhat_login: true
 
-cert_style: letsencrypt
-registry_certificate: ""
-registry_certificate_key: ""
-
 quay_version: "3.6.2"
 
 quay_image: registry.redhat.io/quay/quay-rhel8:v{{ quay_version }}

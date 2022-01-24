@@ -17,7 +17,8 @@
     uid: '{{ quay_uid }}'
 
 - name: Install certs
-  include_tasks: certs/{{ cert_style }}.yml
+  include_role:
+    name: registry_certs
   vars:
     cert_directory: /home/quay/config
     cert_owner: '{{ quay_uid }}'
