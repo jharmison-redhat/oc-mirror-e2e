@@ -1,6 +1,6 @@
 ---
 - name: Check to see if OpenShift is responding
-  shell: '{{ oc_path|default("oc") }}' get nodes
+  shell: '{{ oc_path|default("oc") }} get nodes'
   changed_when: false
   failed_when: false
   environment:
