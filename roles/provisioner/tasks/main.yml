@@ -31,10 +31,13 @@
   add_host:
     name: '{{ item.name }}'
     groups: '{{ ["terraformed"] + item.groups|default([]) }}'
-    ansible_host: '{{ item.hostname }}'
+    ansible_host: '{{ item.ansible_host }}'
     ansible_user: '{{ item.user }}'
     inventory_dir: '{{ inventory_dir }}'
-    private_hostname: '{{ item.private_hostname|default(omit) }}'
+    tf_private_ip: '{{ item.tf_private_ip }}'
+    tf_public_ip: '{{ item.tf_public_ip|default(omit) }}'
+    private_hostname: '{{ item.private_hostname }}'
+    public_hostname: '{{ item.public_hostname|default(omit) }}'
     ansible_ssh_private_key_file: '{{ keypair.filename }}'
     ansible_ssh_common_args: >-
       {%- if item.jump_host|default(None) != None -%}
@@ -50,7 +53,8 @@
   - name: registry
     groups:
     - connected
-    hostname: '{{ terraform.outputs.registry_instance.value.hostname }}'
+    ansible_host: '{{ terraform.outputs.registry_instance.value.hostname }}'
+    public_hostname: '{{ terraform.outputs.registry_instance.value.hostname }}'
     private_hostname: '{{ terraform.outputs.registry_instance.value.private_hostname }}'
     user: '{{ terraform.outputs.registry_instance.value.username }}'
     tf_private_ip: '{{ terraform.outputs.registry_instance.value.private_ip }}'
@@ -58,7 +62,8 @@
   - name: proxy
     groups:
     - connected
-    hostname: '{{ terraform.outputs.proxy_instance.value.hostname }}'
+    ansible_host: '{{ terraform.outputs.proxy_instance.value.hostname }}'
+    public_hostname: '{{ terraform.outputs.proxy_instance.value.hostname }}'
     private_hostname: '{{ terraform.outputs.proxy_instance.value.private_hostname }}'
     user: '{{ terraform.outputs.proxy_instance.value.username }}'
     tf_private_ip: '{{ terraform.outputs.proxy_instance.value.private_ip }}'
@@ -66,7 +71,7 @@
   - name: bastion
     groups:
     - disconnected
-    hostname: '{{ terraform.outputs.bastion_instance.value.private_ip }}'
+    ansible_host: '{{ terraform.outputs.bastion_instance.value.private_ip }}'
     private_hostname: '{{ terraform.outputs.bastion_instance.value.private_hostname }}'
     user: '{{ terraform.outputs.bastion_instance.value.username }}'
     jump_host: -i "{{ keypair.filename }}" "{{ terraform.outputs.proxy_instance.value.username }}@{{ terraform.outputs.proxy_instance.value.hostname }}"
