@@ -13,3 +13,9 @@
       tfstate.matched > 0 or
       manifests.stat.exists
   register: uninstall_openshift
+
+- name: Remove installer directory
+  file:
+    path: '{{ install_directory }}'
+    state: absent
+  when: uninstall_openshift.changed
