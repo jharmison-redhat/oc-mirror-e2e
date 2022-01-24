@@ -1,0 +1,11 @@
+---
+- name: Move install-config into place
+  copy:
+    remote_src: true
+    src: '{{ install_directory|dirname }}/install-config-orig.yaml'
+    dest: '{{ install_directory }}/install-config.yaml'
+
+- name: Create OpenShift manifests
+  command: openshift-install create manifests
+  args:
+    chdir: '{{ install_directory }}'

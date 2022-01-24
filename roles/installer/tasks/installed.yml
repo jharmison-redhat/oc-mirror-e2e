@@ -1,0 +1,75 @@
+---
+- name: Check status of installation
+  include_tasks: checks.yml
+
+- name: Short circuit if OpenShift should be responding but isn't
+  assert:
+    that:
+    - (responding.rc == 0 and kubeconfig.stat.exists) or (responding.rc != 0 and not kubeconfig.stat.exists)
+    fail_msg: OpenShift is {{ "not " if responding.rc != 0 }}responding, and is {{ "not " if not kubeconfig.stat.exists }}expected to be.
+    success_msg: OpenShift is {{ "not " if responding.rc != 0 }}responding, and {{ "not " if not kubeconfig.stat.exists }}expected to be.
+
+# If OpenShift is not responding:
+#   If manifests don't exist:
+#     copy install-config from orig
+#     create manifests
+#   Copy catalogsources
+#   Install OpenShift
+# Fetch installer stuff
+
+- name: Create manifests
+  include_tasks: manifests.yml
+  when:
+  - responding.rc != 0
+  - not kubeconfig.stat.exists
+  - not manifests.stat.exists
+
+- name: Identify all catalogSources
+  find:
+    paths: '{{ mirror_directory }}'
+    file_type: file
+    patterns: "catalogSource-*.yaml"
+  register: catalog_sources
+  when:
+  - responding.rc != 0
+  - not kubeconfig.stat.exists
+
+- name: Bring in catalogSources
+  copy:
+    remote_src: yes
+    src: '{{ item.path }}'
+    dest: '{{ install_directory }}/manifests/'
+  loop: '{{ catalog_sources.files }}'
+  when:
+  - responding.rc != 0
+  - not kubeconfig.stat.exists
+
+- name: Install OpenShift
+  command: openshift-install create cluster
+  args:
+    chdir: '{{ install_directory }}'
+  register: openshift_install
+  when:
+  - responding.rc != 0
+  - not kubeconfig.stat.exists
+
+- name: Rerun checks
+  include_tasks: checks.yml
+  when:
+  - responding.rc != 0
+  - not kubeconfig.stat.exists
+
+- name: Confirm cluster is responding
+  assert:
+    that:
+    - responding.rc == 0
+    fail_msg: OpenShift is not answering requests, and it is expected to be.
+    success_msg: OpenShift is answering requests as expected.
+
+- name: Recover OpenShift installer directory
+  ansible.posix.synchronize:
+    mode: pull
+    src: '{{ install_directory }}'
+    dest: '{{ output_dir }}/install'
+  when:
+  - openshift_install.changed

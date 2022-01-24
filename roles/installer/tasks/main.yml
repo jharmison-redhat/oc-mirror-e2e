@@ -27,49 +27,21 @@
 - name: Save off icsp mirrors
   set_fact:
     icsp_mirrors: |-
-      {% for icsp in icsps['content']|b64decode|split('---') %}
+      {% for icsp in icsps.content|b64decode|split('---') %}
       {% if icsp|from_yaml != None %}
       {{ (icsp|from_yaml).spec.repositoryDigestMirrors|to_yaml }}
       {%- endif %}
       {% endfor %}
+
+- name: Template install-config-orig.yaml
+  template:
+    src: install-config.yaml.j2
+    dest: '{{ install_directory|dirname }}/install-config-orig.yaml'
 
 - name: Ensure install directory exists
   file:
     path: '{{ install_directory }}'
     state: directory
 
-# FIXME: Needs better idempotency handling here
-# - Did install-config change?
-# - Is there an installed cluster?
-# - Have we already generated manifests?
-# - Have CatalogSources changed?
-# - etc.
-- name: Template install-config.yaml
-  template:
-    src: install-config.yaml.j2
-    dest: '{{ install_directory }}/install-config.yaml'
-
-- name: Create OpenShift manifests
-  command: openshift-install create manifests
-  args:
-    chdir: '{{ install_directory }}'
-
-- name: Identify all catalogSources
-  find:
-    paths: '{{ mirror_directory }}'
-    file_type: file
-    patterns: "catalogSource-*.yaml"
-  register: catalog_sources
-
-- name: Bring in catalogSources
-  copy:
-    remote_src: yes
-    src: '{{ item.path }}'
-    dest: '{{ install_directory }}/manifests/'
-  loop: '{{ catalog_sources.files }}'
-
-- name: Install OpenShift
-  command: openshift-install create cluster
-  args:
-    chdir: '{{ install_directory }}'
-  when: install_openshift|default(false)|bool
+- name: Ensure OpenShift is installed
+  import_tasks: installed.yml
