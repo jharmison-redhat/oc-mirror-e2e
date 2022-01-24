@@ -7,3 +7,9 @@ registry_admin:
 
 registry_users:
 - '{{ registry_admin }}'
+
+registry_urls:
+- {{ hostname }}
+- {{ private_hostname }}
+- {{ tf_private_ip }}
+- {{ tf_public_ip }}
