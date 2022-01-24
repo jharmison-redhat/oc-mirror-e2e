@@ -10,7 +10,7 @@ MVP
 - [x] Finish `openshift-install` from bastion
 - [ ] Implement mirror-to-disk sneakernet flow
   - [x] Manipulate instance disk size based on mirror flow (disk or registry)
-- [ ] Ensure delete playbook always succeeds by making sure failed OCP installed are cleaned up
+- [x] Ensure delete playbook always succeeds by making sure failed OCP installed are cleaned up
   - Should be able to `block` and `always` `openshift-install` to recover resources to controller, then run `openshift-install destroy cluster` from controller with appropriate env
   - May need to do some checks to ensure that we don't reprovision and just bring in tfstate anyways....
 
