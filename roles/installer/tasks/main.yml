@@ -1,10 +1,4 @@
 ---
-- name: Ensure rsync is installed to use synchronize
-  become: true
-  package:
-    name: rsync
-    state: installed
-
 - name: Copy SSH keys
   copy:
     src: '{{ output_dir }}/{{ cluster_name }}_{{ item }}'
