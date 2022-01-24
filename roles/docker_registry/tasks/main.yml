@@ -96,6 +96,8 @@
     env:
       SINGLE_REGISTRY: true
       REGISTRY_TITLE: Disconnected Mirror Registry
+      SHOW_CONTENT_DIGEST: true
+      DELETE_IMAGES: true
     volume:
     - '{{ registry_directory }}/nginx.conf:/etc/nginx/conf.d/default.conf'
     - '{{ registry_directory }}/certs:/certs:z'
