@@ -6,8 +6,8 @@
   assert:
     that:
     - (responding.rc == 0 and kubeconfig.stat.exists) or (responding.rc != 0 and not kubeconfig.stat.exists)
-    fail_msg: OpenShift is {{ "not " if responding.rc != 0 }}responding, and is {{ "not " if not kubeconfig.stat.exists }}expected to be.
-    success_msg: OpenShift is {{ "not " if responding.rc != 0 }}responding, and {{ "not " if not kubeconfig.stat.exists }}expected to be.
+    fail_msg: OpenShift is {{ "not " if responding.rc != 0 else "" }}responding, and is {{ "not " if not kubeconfig.stat.exists else "" }}expected to be.
+    success_msg: OpenShift is {{ "not " if responding.rc != 0 else "" }}responding, and {{ "not " if not kubeconfig.stat.exists else "" }}expected to be.
 
 # If OpenShift is not responding:
 #   If manifests don't exist:
