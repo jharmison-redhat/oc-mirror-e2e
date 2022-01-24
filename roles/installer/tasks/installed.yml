@@ -67,7 +67,10 @@
     success_msg: OpenShift is answering requests as expected.
 
 - name: Recover OpenShift installer directory
+  become: yes
   ansible.posix.synchronize:
     mode: pull
     src: '{{ install_directory }}'
-    dest: '{{ output_dir }}/install'
+    dest: '{{ output_dir }}/'
+    rsync_opts:
+      - "--rsh='ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i {{ ansible_ssh_private_key_file }} -o ProxyCommand=\"ssh -W %h:%p -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i {{ hostvars.proxy.ansible_ssh_private_key_file }} {{ hostvars.proxy.ansible_user }}@{{ hostvars.proxy.ansible_host }}\"'"
