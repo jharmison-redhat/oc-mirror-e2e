@@ -30,6 +30,7 @@
     source_image: registry.redhat.io/ubi8/ubi:latest
     dest_image: '{{ oc_mirror_metadata_image.split(":", 2)[0] }}:fake'
     auth_file: '{{ ansible_env["HOME"] }}/.docker/config.json'
+  when: registry_type == "redhat_quay"
   failed_when: false
   changed_when: false
 
