@@ -22,3 +22,14 @@
   copy:
     src: '{{ mirror_data_recovery_dir }}/'
     dest: '{{ mirror_directory }}'
+
+- name: Identify andy disk-based mirror bundles
+  find:
+    paths: '{{ mirror_directory }}'
+    file_type: file
+    patterns: 'mirror*.tar'
+  register: mirrored_content
+
+- name: Publish mirror data into disconnected registry
+  command: oc-mirror --from "{{ item.path }}" docker://{{ registry_hostname }}/{{ toplevel_namespace }}
+  loop: '{{ mirrored_content.files }}'
