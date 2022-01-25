@@ -87,7 +87,7 @@ EOF
         done
     done
     rm -f "$change_batch"
-    aws route53 delete-hosted-zone --id $hz
+    aws route53 delete-hosted-zone --id "$hz"
 done
 
 for ak in $(aws iam list-access-keys --user-name "${cluster}.${domain}-registry" --query 'AccessKeyMetadata[*].AccessKeyId' --output text); do
@@ -98,3 +98,12 @@ for policy in $(aws iam list-attached-user-policies --user-name "${cluster}.${do
     aws iam delete-policy --policy-arn "$policy"
 done
 aws iam delete-user --user-name "${cluster}.${domain}-registry"
+
+for ak in $(aws iam list-access-keys --user-name "${cluster}.${domain}-ocp-installer" --query 'AccessKeyMetadata[*].AccessKeyId' --output text); do
+    aws iam delete-access-key --user-name "${cluster}.${domain}-ocp-installer" --access-key-id "$ak"
+done
+for policy in $(aws iam list-attached-user-policies --user-name "${cluster}.${domain}-ocp-installer" --query "AttachedPolicies[*].PolicyArn" --output text); do
+    aws iam detach-user-policy --user-name "${cluster}.${domain}-ocp-installer"  --policy-arn "$policy"
+    aws iam delete-policy --policy-arn "$policy"
+done
+aws iam delete-user --user-name "${cluster}.${domain}-ocp-installer"
