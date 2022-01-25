@@ -12,7 +12,7 @@ domain_hyphenated=$(echo "$domain" | tr '.' '-')
 domain_underscored=$(echo "$domain" | tr '.' '_')
 
 
-aws s3 rb "s3://${cluster}-${domain_hyphenated}-registry"
+aws s3 rb --force "s3://${cluster}-${domain}-registry"
 
 for instance in $(aws ec2 describe-instances --filters Name=tag:Project,Values=disconnected-openshift-testbed Name=instance-state-name,Values=running --query "Reservations[*].Instances[*].InstanceId" --output text); do
     for eip in $(aws ec2 describe-addresses --filter Name=instance-id,Values="$instance" --query "Addresses[*].AllocationId" --output text); do
