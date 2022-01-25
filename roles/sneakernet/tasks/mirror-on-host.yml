@@ -1,11 +1,11 @@
 ---
 - name: Mirror content to disk
-  command: '{{ oc_mirror_binary_location }} --config {{ ansible_env["HOME"] }}/imageset-config.yml --dir={{ mirror_directory }} file://{{ ansible_env["HOME"] }}/mirror'
+  command: '{{ oc_mirror_binary_location }} --config {{ ansible_env["HOME"] }}/imageset-config.yml file://{{ mirror_directory }}'
   when: oc_mirror_config.changed or force_mirror_update|bool
 
 - name: Identify mirrored content
   find:
-    paths: '{{ ansible_env["HOME"] }}'
+    paths: '{{ mirror_directory }}'
     file_type: file
     patterns: 'mirror*.tar'
   register: mirrored_content
