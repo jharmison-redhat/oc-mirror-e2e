@@ -23,6 +23,16 @@
     src: '{{ mirror_data_recovery_dir }}/'
     dest: '{{ mirror_directory }}'
 
+- name: Ensure pull secret location exists
+  file:
+    path: '{{ ansible_env["HOME"] }}/.docker'
+    state: directory
+
+- name: Drop pull secret for oc-mirror
+  copy:
+    content: '{{ local_registry_pull_secret|from_yaml|to_json }}'
+    dest: '{{ ansible_env["HOME"] }}/.docker/config.json'
+
 - name: Identify any disk-based mirror bundles
   find:
     paths: '{{ mirror_directory }}'
