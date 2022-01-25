@@ -17,8 +17,6 @@ registry_storage_path: /datastorage/registry
 
 deploy_clair: true
 
-do_redhat_login: true
-
 quay_version: "3.6.2"
 
 quay_image: registry.redhat.io/quay/quay-rhel8:v{{ quay_version }}

@@ -13,16 +13,6 @@ Python dependencies:
 - cryptography
     - (for advanced X.509 certificate work)
 
-Role Variables
---------------
-
-```yaml
-redhat_username: <some username>
-redhat_password: <some password>
-```
-
-_Undefaulted variables for logging in to registry.redhat.io, required for the official Red Hat Quay images._
-
 ---
 
 ```yaml
@@ -85,14 +75,6 @@ deploy_clair: true
 ```
 
 _Whether or not to deploy the Clair image scanner._
-
----
-
-```yaml
-do_redhat_login: true
-```
-
-_Whether to log in to registry.redhat.io, as required for official Red Hat Quay release images._
 
 ---
 
