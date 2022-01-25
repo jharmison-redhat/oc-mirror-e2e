@@ -1,4 +1,7 @@
 ---
+# You can set this to false to use the sneakernet workflow
+mirror_directly_to_registry: true
+
 # The region you want to deploy into
 aws_region: us-west-2
 
