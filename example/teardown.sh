@@ -48,9 +48,10 @@ done
 for hz in $(aws route53 list-hosted-zones | jq -r '.HostedZones[]|select(.Name == "'"$domain"'.").Id'); do
     change_batch=$(mktemp)
     for a_record in registry. proxy.; do
-        for rrs_name in $(aws route53 list-resource-record-sets --hosted-zone-id "$hz" | jq -r '.ResourceRecordSets[]|select(.Name|startswith("'"$a_record"'")).Name'); do
-            rrs=$(aws route53 list-resource-record-sets --hosted-zone-id "$hz" | jq '.ResourceRecordSets[]|select(.Name == "'"$rrs_name"'")')
-            cat << EOF > "$change_batch"
+        for rrs_name in $(aws route53 list-resource-record-sets --hosted-zone-id "$hz" | jq -r '.ResourceRecordSets[]|select(.Name|startswith("'"$a_record"'")).Name' || echo ""); do
+            rrs=$(aws route53 list-resource-record-sets --hosted-zone-id "$hz" | jq '.ResourceRecordSets[]|select(.Name == "'"$rrs_name"'")') ||:
+            if [ -n "$rrs" ]; then
+                cat << EOF > "$change_batch"
 {
     "Comment": "Teardown cleanup of records",
     "Changes": [{
@@ -59,10 +60,34 @@ for hz in $(aws route53 list-hosted-zones | jq -r '.HostedZones[]|select(.Name =
     }]
 }
 EOF
-            aws route53 change-resource-record-sets --hosted-zone-id "$hz" --change-batch "file://$change_batch"
+                aws route53 change-resource-record-sets --hosted-zone-id "$hz" --change-batch "file://$change_batch"
+            fi
         done
     done
     rm -f "$change_batch"
+done
+
+for hz in $(aws route53 list-hosted-zones | jq -r '.HostedZones[]|select(.Name == "'"internal.$cluster.$domain"'.").Id'); do
+    change_batch=$(mktemp)
+    for a_record in registry. proxy. bastion.; do
+        for rrs_name in $(aws route53 list-resource-record-sets --hosted-zone-id "$hz" | jq -r '.ResourceRecordSets[]|select(.Name|startswith("'"$a_record"'")).Name' || echo ""); do
+            rrs=$(aws route53 list-resource-record-sets --hosted-zone-id "$hz" | jq '.ResourceRecordSets[]|select(.Name == "'"$rrs_name"'")') ||:
+            if [ -n "$rrs" ]; then
+                cat << EOF > "$change_batch"
+{
+    "Comment": "Teardown cleanup of records",
+    "Changes": [{
+        "Action": "DELETE",
+        "ResourceRecordSet": $rrs
+    }]
+}
+EOF
+                aws route53 change-resource-record-sets --hosted-zone-id "$hz" --change-batch "file://$change_batch"
+            fi
+        done
+    done
+    rm -f "$change_batch"
+    aws route53 delete-hosted-zone --id $hz
 done
 
 for ak in $(aws iam list-access-keys --user-name "${cluster}.${domain}-registry" --query 'AccessKeyMetadata[*].AccessKeyId' --output text); do
