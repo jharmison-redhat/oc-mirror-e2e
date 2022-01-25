@@ -235,6 +235,7 @@
     paths: '{{ (results.files|last).path }}'
     file_type: file
     patterns: '*.yaml'
+  when: results.files|length > 0
   register: sources
 
 - name: Recover ICSPs and CatalogSources
@@ -243,6 +244,7 @@
     dest: '{{ mirror_data_recovery_dir }}/'
     flat: yes
     mode: '0644'
+  when: results.files|length > 0
   loop: '{{ sources.files }}'
 
 - name: Prepare recovery directory
