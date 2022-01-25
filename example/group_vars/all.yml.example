@@ -8,10 +8,6 @@ cluster_name: disco
 # The AWS Hosted Zone you will be using for DNS records, and the baseDomain for install-config.yml
 cluster_domain: redhat4govaws.io
 
-# Where to save artifacts on the controller while sneakernetting - you can leave these alone if you like
-bin_recovery_dir: '{{ output_dir }}/clients'
-mirror_data_recovery_dir: '{{ output_dir }}/mirror-data'
-
 # Registry type can be one of redhat_quay or docker_registry
 registry_type: redhat_quay
 

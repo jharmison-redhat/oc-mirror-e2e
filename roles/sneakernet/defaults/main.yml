@@ -17,11 +17,9 @@ client_directory: '{{ ansible_env["HOME"] }}/clients'
 # This is where the mirror content will be generated (connected) or hauled (disconnected)
 mirror_directory: '{{ ansible_env["HOME"] }}/mirror-content'
 
-# Controller path variables
-# Where all binaries will be hauled during sneakernet
-bin_recovery_dir: '{{ playbook_dir }}/tmp/clients'
-# Where all mirror data will be hauled during sneakernet
-mirror_data_recovery_dir: '{{ playbook_dir }}/tmp/mirror-data'
+# Where to save artifacts on the controller while sneakernetting - you can leave these alone if you like
+bin_recovery_dir: '{{ output_dir }}/clients'
+mirror_data_recovery_dir: '{{ output_dir }}/mirror-data'
 
 force_mirror_update: false
 
