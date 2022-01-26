@@ -1,4 +1,4 @@
-{% if imageset_config_override != "" %}
+{% if imageset_config_override == "" %}
 apiVersion: mirror.openshift.io/v1alpha1
 kind: ImageSetConfiguration
 {{ storage_config_snippets[storage_config_backend] | to_yaml }}
