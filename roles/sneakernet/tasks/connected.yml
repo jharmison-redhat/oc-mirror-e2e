@@ -213,7 +213,7 @@
 
 - name: Identify results directory
   find:
-    paths: '{{ mirror_directory }}'
+    paths: '{{ mirror_directory }}/oc-mirror-workspace'
     file_type: directory
     patterns: "results-*"
   register: results
