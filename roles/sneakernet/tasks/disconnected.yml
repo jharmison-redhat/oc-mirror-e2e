@@ -59,6 +59,7 @@
     file_type: file
     patterns: '*.yaml'
   register: oc_mirror_manifests
+  when: oc_mirror_results.files|length > 0
 
 - name: Copy oc_mirror manifests into place
   copy:
@@ -66,3 +67,6 @@
     src: '{{ item.path }}'
     dest: '{{ mirror_directory }}/'
   loop: '{{ oc_mirror_manifests.files }}'
+  when:
+  - oc_mirror_results.files|length > 0
+  - oc_mirror_manifests.files|length > 0
