@@ -1,0 +1,4 @@
+# This scenario uses a Red Hat Quay installation, built to mimic the outcomes
+#   of the non-production instructions in the documentation:
+# https://access.redhat.com/documentation/en-us/red_hat_quay/3.6/html-single/deploy_red_hat_quay_for_proof-of-concept_non-production_purposes/index
+registry_type: redhat_quay

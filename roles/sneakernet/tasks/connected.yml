@@ -137,48 +137,9 @@
     - type: helm
       creates: helm
 
-- name: Install git
-  become: true
-  package:
-    name: git
-    state: installed
-
-- name: Download oc-mirror
-  git:
-    repo: '{{ oc_mirror_source.repo }}'
-    dest: '{{ oc_mirror_clone_location }}'
-    version: '{{ oc_mirror_source.version }}'
-    force: yes
-  register: repo_download
-
-- name: Build oc-mirror toolset image
-  containers.podman.podman_image:
-    name: localhost/go-toolset:latest
-    path: '{{ oc_mirror_clone_location }}'
-    build: {}
-  register: builder_build
-
-- name: Check for existing binary
-  stat:
-    path: '{{ oc_mirror_binary_location }}'
-  register: oc_mirror
-
-- name: Compile oc-mirror
-  containers.podman.podman_container:
-    name: oc-mirror-build
-    image: localhost/go-toolset:latest
-    command: clean tidy build
-    privileged: true
-    interactive: true
-    tty: true
-    rm: true
-    detach: false
-    volume:
-    - '{{ oc_mirror_clone_location }}:/build:z'
-  when: >-
-    builder_build.changed or
-    repo_download.after != repo_download.before or
-    (not oc_mirror.stat.exists)
+- name: Compile oc-mirror from source if needed
+  include_tasks: compile.yml
+  when: lookup("file", bin_recovery_dir + "/oc-mirror", errors="ignore") == ""
 
 - name: Ensure mirror data directory exists
   file:

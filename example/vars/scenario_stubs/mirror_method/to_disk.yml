@@ -1,0 +1,6 @@
+# By setting this boolean to false, we go through the mirror-to-disk flow.
+#   Fully emulating "sneakernetting" means transferring all of the mirror
+#   content a full four times - once to download, once to recover, once to push
+#   to the bastion, and a final time to publish into the registry. This flow is
+#   much slower than the direct-to-registry flow.
+mirror_directly_to_registry: false

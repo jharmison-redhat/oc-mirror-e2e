@@ -13,6 +13,8 @@ MVP
 - [x] Ensure delete playbook always succeeds by making sure failed OCP installed are cleaned up
   - Should be able to `block` and `always` `openshift-install` to recover resources to controller, then run `openshift-install destroy cluster` from controller with appropriate env
   - May need to do some checks to ensure that we don't reprovision and just bring in tfstate anyways....
+- [ ] Better AWS credential handling
+- [ ] Make it easy to consume without copying entire directory structure
 
 Important for finished product
 ------------------------------
@@ -22,15 +24,11 @@ Important for finished product
 - [ ] E2e test (for the E2e test environment, yes) from known good state, using proper Ansible tests and very simply checks of functionality
 - [ ] CD to publish collection and EE
 - [x] Add generic Docker registry
-- [ ] Build out an easy-to-execute test matrix interface
-  - Things that would be good to include in the matrix:
-    - Mirror to registry / mirror to disk and haul
-    - Quay / Docker distribution
-    - Metadata storage backends
-    - OCP versions
-    - Catalogs (should do at least one operator from redhat, certified, and a fully custom catalog)
+- [x] Build out an easy-to-execute test matrix interface
+  - Things that would be good to add to the matrix:
     - Custom CA / Trusted / Self-signed/untrusted
     - docker/podman/custom authfile flows
+- [ ] Finish E2E flow to include full lifecycle test
   - Each flow should go through the following:
     - Initial mirror and publish
     - OpenShift install
@@ -44,14 +42,14 @@ Important for finished product
     - Operator upgrade
       - Validate that OLM sees new channel head and picks up upgrade availability
       - Validate that upgrade applies cleanly and operator remains usable
-- [ ] Enable shared tasks between test matrix runs (e.g. compile oc-mirror once, run with different scenarios)
+- [x] Enable shared tasks between test matrix runs (e.g. compile oc-mirror once, run with different scenarios)
   - Expect that compiled oc-mirror comes from earlier stage, only compile if necessary?
   - Better interface for specifying which oc-mirror to compile might be nice as well
 
 Important for improving usability
 ---------------------------------
 
-- [ ] User docs
+- [ ] Better user docs
   - Need to get role doc generation up and running, rather than short hand-crafted blurbs
 - [ ] Quickstart from scratch, assume nothing
 

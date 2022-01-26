@@ -1,3 +1,9 @@
 ---
 output_dir: /output
 openshift_version: "4.9"
+registry_admin:
+  username: admin
+  password: '{{ lookup("password", output_dir + "/registry_admin_password") }}'
+  email: "admin@{{ cluster_name }}.{{ cluster_domain }}"
+registry_type: redhat_quay
+mirror_directly_to_registry: true

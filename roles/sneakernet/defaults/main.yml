@@ -1,7 +1,7 @@
 ---
 oc_mirror_source:
   repo: https://github.com/openshift/oc-mirror.git
-  version: 3660f79441d753560f33549a725d0339186649e0
+  version: main
 
 mirror_directly_to_registry: true
 
@@ -21,8 +21,26 @@ mirror_directory: '{{ ansible_env["HOME"] }}/mirror-content'
 bin_recovery_dir: '{{ output_dir }}/clients'
 mirror_data_recovery_dir: '{{ output_dir }}/mirror-data'
 
+# Always rerun during initial connected workflow, even if it's not been run before
 force_mirror_update: false
 
-compliance_operator_version: '0.1.44'
-
+# This is the registry we'll be publishing to
 registry_hostname: '{{ hostvars.registry.private_hostname }}'
+
+# The selection for the type of registry backend in the imagesetConfig
+storage_config_backend: registry
+
+# Additional images to mirror in the imagesetConfig
+oc_mirror_additional_images:
+- registry.redhat.io/ubi8/ubi:latest
+
+# If set to any value other than an empty string, will be used to completely override the templated imageSet
+imageset_config_override: ""
+
+operator_blurb: |-
+  operators:
+    - catalog: registry.redhat.io/redhat/redhat-operator-index:v{{ openshift_version }}
+      headsOnly: false
+      packages:
+        - name: compliance-operator
+          startingVersion: '0.1.47'

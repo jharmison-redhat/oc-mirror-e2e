@@ -38,7 +38,7 @@ terraform.rc
 .tflint.d
 
 # Ansible content
-example/group_vars/all.yml
+example/vars/environment.yml
 example/artifacts
 example/output/*
 !example/output/.gitkeep
