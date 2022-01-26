@@ -1,13 +1,11 @@
 {% if imageset_config_override == "" %}
 apiVersion: mirror.openshift.io/v1alpha1
 kind: ImageSetConfiguration
-{{ storage_config_snippets[storage_config_backend] | to_yaml }}
-mirror:
+{{ storage_config_snippets[storage_config_backend] | to_nice_yaml(indent=2) }}mirror:
   ocp:
     channels:
       - name: stable-{{ openshift_version }}
-{{ operator_blurb|indent(2) }}
-{% if oc_mirror_additional_images|length > 0 %}
+{{ operator_blurb|indent(2, indentfirst=True) }}{% if oc_mirror_additional_images|length > 0 %}
   additionalImages:
 {% for additional_image in oc_mirror_additional_images %}
     - name: {{ additional_image }}
