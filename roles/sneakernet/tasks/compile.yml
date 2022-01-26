@@ -48,3 +48,10 @@
     builder_build.changed or
     repo_download.after != repo_download.before or
     (not oc_mirror.stat.exists)
+
+- name: Recover oc-mirror
+  fetch:
+    src: '{{ oc_mirror_binary_location }}'
+    dest: '{{ bin_recovery_dir }}/'
+    flat: yes
+    mode: '0755'

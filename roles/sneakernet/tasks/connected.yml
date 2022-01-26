@@ -20,6 +20,12 @@
     path: '{{ client_directory }}'
     state: directory
 
+- name: Prepare recovery directory
+  file:
+    path: '{{ bin_recovery_dir }}'
+    state: directory
+  delegate_to: controller
+
 - name: Grab the latest release checksums
   get_url:
     url: https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-{{ openshift_version }}/sha256sum.txt
@@ -140,7 +146,7 @@
 - name: Check for existing oc-mirror binary
   find:
     paths: '{{ bin_recovery_dir }}'
-    type: file
+    file_type: file
     patterns: oc-mirror
   delegate_to: controller
   register: oc_mirror_binary
@@ -229,12 +235,6 @@
   when: results.files|length > 0
   loop: '{{ sources.files }}'
 
-- name: Prepare recovery directory
-  file:
-    path: '{{ bin_recovery_dir }}'
-    state: directory
-  delegate_to: controller
-
 - name: Recover clients
   fetch:
     src: '{{ client_directory }}/{{ item }}'
@@ -245,10 +245,3 @@
   - openshift-install
   - oc
   - helm
-
-- name: Recover oc-mirror
-  fetch:
-    src: '{{ oc_mirror_binary_location }}'
-    dest: '{{ bin_recovery_dir }}/'
-    flat: yes
-    mode: '0755'
