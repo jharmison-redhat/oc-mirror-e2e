@@ -8,7 +8,7 @@ MVP
   - Need to change the Terraform to not conflict with the OpenShift Hosted Zone, and also create a new hosted zone that's more specific to satisfy Route53 resolving behavior
   - https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/hosted-zone-private-considerations.html#hosted-zone-private-considerations-public-private-overlapping
 - [x] Finish `openshift-install` from bastion
-- [ ] Implement mirror-to-disk sneakernet flow
+- [x] Implement mirror-to-disk sneakernet flow
   - [x] Manipulate instance disk size based on mirror flow (disk or registry)
 - [x] Ensure delete playbook always succeeds by making sure failed OCP installed are cleaned up
   - Should be able to `block` and `always` `openshift-install` to recover resources to controller, then run `openshift-install destroy cluster` from controller with appropriate env
