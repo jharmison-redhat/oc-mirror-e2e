@@ -139,7 +139,7 @@
 
 - name: Compile oc-mirror from source if needed
   include_tasks: compile.yml
-  when: lookup("file", bin_recovery_dir + "/oc-mirror", errors="ignore") == ""
+  when: lookup("file", bin_recovery_dir + "/oc-mirror", errors="ignore")|default("") == ""
 
 - name: Ensure mirror data directory exists
   file:
