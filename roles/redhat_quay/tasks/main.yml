@@ -12,16 +12,21 @@
     setype: systemd_unit_file_t
   register: pod_unit
 
-- name: Login to registry.redhat.io
+- name: Ensure containers directory exists
   become: true
   become_user: quay
-  containers.podman.podman_login:
-    username: '{{ redhat_username }}'
-    password: '{{ redhat_password }}'
-    registry: registry.redhat.io
-  environment:
-    XDG_RUNTIME_DIR: '{{ xdg_runtime_dir }}'
-  when: do_redhat_login|bool
+  file:
+    path: '{{ xdg_runtime_dir }}/containers'
+    state: directory
+    mode: '0700'
+
+- name: Ensure authfile exists
+  become: true
+  become_user: quay
+  copy:
+    content: '{{ console_redhat_com_pull_secret }}'
+    dest: '{{ xdg_runtime_dir }}/containers/auth.json'
+    mode: '0400'
 
 - name: Set up Quay containers
   import_tasks: quay.yml

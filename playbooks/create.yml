@@ -103,5 +103,4 @@
   roles:
   - role: installer
   tags:
-  - sneakernet
   - installer

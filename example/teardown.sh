@@ -12,7 +12,7 @@ domain_hyphenated=$(echo "$domain" | tr '.' '-')
 domain_underscored=$(echo "$domain" | tr '.' '_')
 
 
-aws s3 rb "s3://${cluster}-${domain_hyphenated}-registry"
+aws s3 rb --force "s3://${cluster}-${domain}-registry"
 
 for instance in $(aws ec2 describe-instances --filters Name=tag:Project,Values=disconnected-openshift-testbed Name=instance-state-name,Values=running --query "Reservations[*].Instances[*].InstanceId" --output text); do
     for eip in $(aws ec2 describe-addresses --filter Name=instance-id,Values="$instance" --query "Addresses[*].AllocationId" --output text); do
@@ -48,9 +48,10 @@ done
 for hz in $(aws route53 list-hosted-zones | jq -r '.HostedZones[]|select(.Name == "'"$domain"'.").Id'); do
     change_batch=$(mktemp)
     for a_record in registry. proxy.; do
-        for rrs_name in $(aws route53 list-resource-record-sets --hosted-zone-id "$hz" | jq -r '.ResourceRecordSets[]|select(.Name|startswith("'"$a_record"'")).Name'); do
-            rrs=$(aws route53 list-resource-record-sets --hosted-zone-id "$hz" | jq '.ResourceRecordSets[]|select(.Name == "'"$rrs_name"'")')
-            cat << EOF > "$change_batch"
+        for rrs_name in $(aws route53 list-resource-record-sets --hosted-zone-id "$hz" | jq -r '.ResourceRecordSets[]|select(.Name|startswith("'"$a_record"'")).Name' || echo ""); do
+            rrs=$(aws route53 list-resource-record-sets --hosted-zone-id "$hz" | jq '.ResourceRecordSets[]|select(.Name == "'"$rrs_name"'")') ||:
+            if [ -n "$rrs" ]; then
+                cat << EOF > "$change_batch"
 {
     "Comment": "Teardown cleanup of records",
     "Changes": [{
@@ -59,10 +60,34 @@ for hz in $(aws route53 list-hosted-zones | jq -r '.HostedZones[]|select(.Name =
     }]
 }
 EOF
-            aws route53 change-resource-record-sets --hosted-zone-id "$hz" --change-batch "file://$change_batch"
+                aws route53 change-resource-record-sets --hosted-zone-id "$hz" --change-batch "file://$change_batch"
+            fi
         done
     done
     rm -f "$change_batch"
+done
+
+for hz in $(aws route53 list-hosted-zones | jq -r '.HostedZones[]|select(.Name == "'"internal.$cluster.$domain"'.").Id'); do
+    change_batch=$(mktemp)
+    for a_record in registry. proxy. bastion.; do
+        for rrs_name in $(aws route53 list-resource-record-sets --hosted-zone-id "$hz" | jq -r '.ResourceRecordSets[]|select(.Name|startswith("'"$a_record"'")).Name' || echo ""); do
+            rrs=$(aws route53 list-resource-record-sets --hosted-zone-id "$hz" | jq '.ResourceRecordSets[]|select(.Name == "'"$rrs_name"'")') ||:
+            if [ -n "$rrs" ]; then
+                cat << EOF > "$change_batch"
+{
+    "Comment": "Teardown cleanup of records",
+    "Changes": [{
+        "Action": "DELETE",
+        "ResourceRecordSet": $rrs
+    }]
+}
+EOF
+                aws route53 change-resource-record-sets --hosted-zone-id "$hz" --change-batch "file://$change_batch"
+            fi
+        done
+    done
+    rm -f "$change_batch"
+    aws route53 delete-hosted-zone --id "$hz"
 done
 
 for ak in $(aws iam list-access-keys --user-name "${cluster}.${domain}-registry" --query 'AccessKeyMetadata[*].AccessKeyId' --output text); do
@@ -73,3 +98,12 @@ for policy in $(aws iam list-attached-user-policies --user-name "${cluster}.${do
     aws iam delete-policy --policy-arn "$policy"
 done
 aws iam delete-user --user-name "${cluster}.${domain}-registry"
+
+for ak in $(aws iam list-access-keys --user-name "${cluster}.${domain}-ocp-installer" --query 'AccessKeyMetadata[*].AccessKeyId' --output text); do
+    aws iam delete-access-key --user-name "${cluster}.${domain}-ocp-installer" --access-key-id "$ak"
+done
+for policy in $(aws iam list-attached-user-policies --user-name "${cluster}.${domain}-ocp-installer" --query "AttachedPolicies[*].PolicyArn" --output text); do
+    aws iam detach-user-policy --user-name "${cluster}.${domain}-ocp-installer"  --policy-arn "$policy"
+    aws iam delete-policy --policy-arn "$policy"
+done
+aws iam delete-user --user-name "${cluster}.${domain}-ocp-installer"

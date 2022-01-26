@@ -5,7 +5,7 @@ RUNTIME = podman
 ANSIBLE_TAGS =
 ANSIBLE_SKIP_TAGS =
 
-.PHONY: all prereqs collection publish ee run clean
+.PHONY: all prereqs collection publish ee run clean realclean
 
 all: collection
 
@@ -42,3 +42,6 @@ destroy: ee
 
 clean:
 	rm -rf jharmison_redhat-oc_mirror_e2e-*.tar.gz galaxy.yml example/artifacts/*
+
+realclean: clean
+	rm -rf example/output/*
