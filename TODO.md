@@ -14,7 +14,7 @@ MVP
   - Should be able to `block` and `always` `openshift-install` to recover resources to controller, then run `openshift-install destroy cluster` from controller with appropriate env
   - May need to do some checks to ensure that we don't reprovision and just bring in tfstate anyways....
 - [x] Better AWS credential handling
-- [ ] Make it easy to consume without copying entire directory structure
+- [x] Make it easy to consume without copying entire directory structure
 
 Important for finished product
 ------------------------------
@@ -26,25 +26,25 @@ Important for finished product
 - [x] Add generic Docker registry
 - [x] Build out an easy-to-execute test matrix interface
   - Things that would be good to add to the matrix:
-    - Custom CA / Trusted / Self-signed/untrusted
-    - docker/podman/custom authfile flows
+    - [ ] Custom CA / Trusted / Self-signed/untrusted
+    - [ ] docker/podman/custom authfile flows
 - [ ] Finish E2E flow to include full lifecycle test
   - Each flow should go through the following:
-    - Initial mirror and publish
-    - OpenShift install
-      - Validate basic API connectivity
-    - Operator install
-      - Validate operator operation
-    - Additional mirror and publish
-      - Validate that catalogs are good and upgrade graph is intact
-    - OpenShift upgrade
-      - Validate that upgrade picks up and applies cleanly
-    - Operator upgrade
-      - Validate that OLM sees new channel head and picks up upgrade availability
-      - Validate that upgrade applies cleanly and operator remains usable
+    - [x] Initial mirror and publish
+    - [x] OpenShift install
+      - [x] Validate basic API connectivity
+    - [ ]Operator install
+      - [ ] Validate operator operation
+    - [ ] Additional mirror and publish
+      - [ ] Validate that catalogs are good and upgrade graph is intact
+    - [ ] OpenShift upgrade
+      - [ ] Validate that upgrade picks up and applies cleanly
+    - [ ] Operator upgrade
+      - [ ] Validate that OLM sees new channel head and picks up upgrade availability
+      - [ ] Validate that upgrade applies cleanly and operator remains usable
 - [x] Enable shared tasks between test matrix runs (e.g. compile oc-mirror once, run with different scenarios)
-  - Expect that compiled oc-mirror comes from earlier stage, only compile if necessary?
-  - Better interface for specifying which oc-mirror to compile might be nice as well
+  - [x] Expect that compiled oc-mirror comes from earlier stage, only compile if necessary?
+  - [ ] Better interface for specifying which oc-mirror to compile might be nice as well
 
 Important for improving usability
 ---------------------------------
