@@ -5,7 +5,7 @@
   - '{{ playbook_dir }}/vars/defaults.yml'
   pre_tasks:
   - name: Load the scenario content
-    include_vars: /runner/vars/scenario_stubs/{{ item.key }}/{{ item.value }}.yml
+    include_vars: '{{ playbook_dir }}/vars/scenario_stubs/{{ item.key }}/{{ item.value }}.yml'
     loop: '{{ scenario_stubs|dict2items }}'
   roles:
     # The provisioner role consumes the terraform adjacent to the playbook
@@ -24,7 +24,7 @@
   - role: cloud_init_finished
   post_tasks:
   - name: Load the scenario content for the terraformed nodes
-    include_vars: /runner/vars/scenario_stubs/{{ item.key }}/{{ item.value }}.yml
+    include_vars: '{{ playbook_dir }}/vars/scenario_stubs/{{ item.key }}/{{ item.value }}.yml'
     loop: '{{ scenario_stubs|dict2items }}'
   tags:
   - always
