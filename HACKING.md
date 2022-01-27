@@ -24,7 +24,9 @@ ${EDITOR:-vi} example/vars/environment.yml
 ${EDITOR:-vi} example/vars/scenario.yml
 ```
 
-Inside these files are comments for how to go about filling out the variables. Once you've updated everything, save the variables file and you're ready to role. It's already `.gitignore`'d
+Inside these files are comments for how to go about filling out the variables. Once you've updated everything, save the variables file and you're ready to role. It's already `.gitignore`'d.
+
+You'll need AWS credentials available for consumption. The run.sh script makes an effort to run the container in a way that AWS variables are passed through appropriately. It will bring the entire `~/.aws` directory from your user profile, including the `credentials` file, and export any `AWS_` prefixed variables from your environment. This means you can export an access key ID and secret, or a profile name that exists in your AWS credentials file, and the project will consume them to use with the terraform content to build out the environment. A new set of credentials is created with slightly lower scoped privilege and used in the installation environment.
 
 ## Use
 
@@ -105,6 +107,14 @@ make clean
 Note that this cleanup doesn't touch the Terraform state created by the `community.general.terraform` module - only artifacts of the collection building and ansible-runner artifacts. You should, therefore, be able to run `terraform destroy` from the `example/output/terraform` directory manually, or run `make destroy clean` to tear down the terraform-provisioned infrastructure using Ansible before running the clean target.
 
 Also, in the event that something goes wrong with your terraform state for local hacking, you may also find the script at [example/teardown.sh](example/teardown.sh) useful, as it will tear down all of the Terraform-managed resources using [awscli](https://pypi.org/project/awscli/) without needing Terraform state.
+
+There is an additional target that completely removes anything recovered from outputs as well:
+
+```sh
+make realclean
+```
+
+Note that that output include terraform state. It is very destructive. It does not remove .gitignored environment.yml files with secret content.
 
 ### Makefile variables
 

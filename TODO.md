@@ -13,7 +13,7 @@ MVP
 - [x] Ensure delete playbook always succeeds by making sure failed OCP installed are cleaned up
   - Should be able to `block` and `always` `openshift-install` to recover resources to controller, then run `openshift-install destroy cluster` from controller with appropriate env
   - May need to do some checks to ensure that we don't reprovision and just bring in tfstate anyways....
-- [ ] Better AWS credential handling
+- [x] Better AWS credential handling
 - [ ] Make it easy to consume without copying entire directory structure
 
 Important for finished product
