@@ -1,0 +1,3 @@
+# This uses a regular docker.io/library/registry:2 registry, fronted with
+#   HTTP basic-auth and a simple UI to enable diagnosis/troubleshooting.
+registry_type: docker_registry

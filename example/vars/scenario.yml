@@ -1,0 +1,13 @@
+---
+# The metadata.name for install-config.yaml, and where all other resources are subdomained
+cluster_name: disco
+# The version of OpenShift to mirror and install
+openshift_version: "4.9"
+
+# The scenario stubs, loaded from adjacent to this file, to use. See the
+#   individual files for more information on what the choices mean.
+scenario_stubs:
+  metadata_backend: registry
+  mirror_method: to_registry
+  registry_type: docker_registry
+  operators_to_mirror: compliance_operator

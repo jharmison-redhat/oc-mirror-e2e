@@ -33,6 +33,13 @@ if [ -n "${ANSIBLE_SKIP_TAGS}" ]; then
     printf -- "--skip-tags ${ANSIBLE_SKIP_TAGS} " >> env/cmdline
 fi
 
+# To ensure that variable selections are pulled from vars we need these
+for vars_file in environment scenario ${ANSIBLE_EXTRA_VARS_FILES}; do
+    if [ -f "vars/${vars_file}.yml" ]; then
+        printf -- "--extra-vars '@vars/${vars_file}.yml' " >> env/cmdline
+    fi
+done
+
 # We need to save output, this is the default for the collection
 runtime_args+=(
     -v "$PWD/output:/output"

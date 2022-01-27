@@ -20,6 +20,12 @@
     path: '{{ client_directory }}'
     state: directory
 
+- name: Prepare recovery directory
+  file:
+    path: '{{ bin_recovery_dir }}'
+    state: directory
+  delegate_to: controller
+
 - name: Grab the latest release checksums
   get_url:
     url: https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-{{ openshift_version }}/sha256sum.txt
@@ -137,48 +143,30 @@
     - type: helm
       creates: helm
 
-- name: Install git
-  become: true
-  package:
-    name: git
-    state: installed
+- name: Check for existing oc-mirror binary
+  find:
+    paths: '{{ bin_recovery_dir }}'
+    file_type: file
+    patterns: oc-mirror
+  delegate_to: controller
+  register: oc_mirror_binary
 
-- name: Download oc-mirror
-  git:
-    repo: '{{ oc_mirror_source.repo }}'
-    dest: '{{ oc_mirror_clone_location }}'
-    version: '{{ oc_mirror_source.version }}'
-    force: yes
-  register: repo_download
+- name: Compile oc-mirror from source if needed
+  include_tasks: compile.yml
+  when: oc_mirror_binary.files|length == 0
 
-- name: Build oc-mirror toolset image
-  containers.podman.podman_image:
-    name: localhost/go-toolset:latest
-    path: '{{ oc_mirror_clone_location }}'
-    build: {}
-  register: builder_build
-
-- name: Check for existing binary
-  stat:
-    path: '{{ oc_mirror_binary_location }}'
-  register: oc_mirror
-
-- name: Compile oc-mirror
-  containers.podman.podman_container:
-    name: oc-mirror-build
-    image: localhost/go-toolset:latest
-    command: clean tidy build
-    privileged: true
-    interactive: true
-    tty: true
-    rm: true
-    detach: false
-    volume:
-    - '{{ oc_mirror_clone_location }}:/build:z'
-  when: >-
-    builder_build.changed or
-    repo_download.after != repo_download.before or
-    (not oc_mirror.stat.exists)
+- name: Bring oc-mirror into connected host
+  block:
+  - name: Ensure directories exist
+    file:
+      path: '{{ oc_mirror_binary_location|dirname }}'
+      state: directory
+  - name: Drop oc-mirror in place
+    copy:
+      src: '{{ bin_recovery_dir }}/oc-mirror'
+      dest: '{{ oc_mirror_binary_location }}'
+      mode: '0755'
+  when: oc_mirror_binary.files|length > 0
 
 - name: Ensure mirror data directory exists
   file:
@@ -225,7 +213,7 @@
 
 - name: Identify results directory
   find:
-    paths: '{{ mirror_directory }}'
+    paths: '{{ mirror_directory }}/oc-mirror-workspace'
     file_type: directory
     patterns: "results-*"
   register: results
@@ -247,12 +235,6 @@
   when: results.files|length > 0
   loop: '{{ sources.files }}'
 
-- name: Prepare recovery directory
-  file:
-    path: '{{ bin_recovery_dir }}'
-    state: directory
-  delegate_to: controller
-
 - name: Recover clients
   fetch:
     src: '{{ client_directory }}/{{ item }}'
@@ -263,10 +245,3 @@
   - openshift-install
   - oc
   - helm
-
-- name: Recover oc-mirror
-  fetch:
-    src: '{{ oc_mirror_binary_location }}'
-    dest: '{{ bin_recovery_dir }}/'
-    flat: yes
-    mode: '0755'

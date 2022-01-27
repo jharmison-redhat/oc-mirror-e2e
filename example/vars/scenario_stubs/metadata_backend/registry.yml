@@ -1,0 +1,2 @@
+# This will publish metadata to the same registry used for disconnected mirroring
+storage_config_backend: registry
