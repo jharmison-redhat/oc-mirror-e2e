@@ -5,7 +5,8 @@ kind: ImageSetConfiguration
   ocp:
     channels:
       - name: stable-{{ openshift_version }}
-{{ operator_blurb|indent(2, indentfirst=True) }}{% if oc_mirror_additional_images|length > 0 %}
+{{ operator_blurb|indent(2, indentfirst=True) }}
+{% if oc_mirror_additional_images|length > 0 %}
   additionalImages:
 {% for additional_image in oc_mirror_additional_images %}
     - name: {{ additional_image }}
