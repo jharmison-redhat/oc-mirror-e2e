@@ -24,6 +24,6 @@
       name: sneakernet
       tasks_from: disconnected
   roles:
-  - role: installer
+  - installer
   tags:
   - installer

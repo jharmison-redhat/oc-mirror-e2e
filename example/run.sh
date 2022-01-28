@@ -55,8 +55,7 @@ runtime_args+=(
     -v "$PWD:/runner"
 )
 
-playbooks="${1:-create test delete}"
-
+playbooks="${*:-create test delete}"
 set -e
 
 for playbook in $playbooks; do

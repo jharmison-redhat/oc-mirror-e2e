@@ -4,6 +4,7 @@ PUSH_IMAGE = registry.jharmison.com/ansible/oc-mirror-e2e
 RUNTIME = podman
 ANSIBLE_TAGS =
 ANSIBLE_SKIP_TAGS =
+ANSIBLE_PLAYBOOKS =
 
 .PHONY: all prereqs collection publish ee run clean realclean
 
@@ -35,7 +36,7 @@ ee-publish: ee
 	$(RUNTIME) push $(PUSH_IMAGE):latest
 
 run: ee
-	ANSIBLE_TAGS=$(ANSIBLE_TAGS) ANSIBLE_SKIP_TAGS=$(ANSIBLE_SKIP_TAGS) EE_VERSION=$(VERSION) RUNTIME=$(RUNTIME) example/run.sh
+	ANSIBLE_TAGS=$(ANSIBLE_TAGS) ANSIBLE_SKIP_TAGS=$(ANSIBLE_SKIP_TAGS) EE_VERSION=$(VERSION) RUNTIME=$(RUNTIME) example/run.sh $(ANSIBLE_PLAYBOOKS)
 
 destroy: ee
 	ANSIBLE_TAGS=$(ANSIBLE_TAGS) ANSIBLE_SKIP_TAGS=$(ANSIBLE_SKIP_TAGS) EE_VERSION=$(VERSION) RUNTIME=$(RUNTIME) example/run.sh delete

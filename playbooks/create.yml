@@ -7,7 +7,7 @@
   vars_files:
   - '{{ playbook_dir }}/vars/defaults.yml'
   roles:
-  - role: updated
+  - updated
   tags:
   - updated
 
@@ -19,7 +19,7 @@
   vars:
     ca_cert_and_key: '{{ hostvars.controller.ca.stdout }}'
   roles:
-  - role: proxy
+  - proxy
   tags:
   - proxy
 
@@ -30,7 +30,7 @@
   vars:
     registry_bucket: '{{ hostvars.controller.terraform.outputs.registry_bucket.value }}'
   roles:
-  - role: trusts_proxy
+  - trusts_proxy
   tasks:
   - include_role:
       name: '{{ registry_type }}'
@@ -54,8 +54,8 @@
   - '{{ playbook_dir }}/vars/defaults.yml'
   become: true
   roles:
-  - role: trusts_proxy
-  - role: updated
-  - role: validated_bastion
+  - trusts_proxy
+  - updated
+  - validated_bastion
   tags:
   - bastion

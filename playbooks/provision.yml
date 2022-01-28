@@ -11,7 +11,7 @@
     # The provisioner role consumes the terraform adjacent to the playbook
     # and exports the created ec2_instances to inventory, while also registering
     # the other outputs from the terraform module for use later in the playbook
-  - role: provisioner
+  - provisioner
   tags:
   - always
 
@@ -21,7 +21,7 @@
   - '{{ playbook_dir }}/vars/defaults.yml'
   gather_facts: false
   roles:
-  - role: cloud_init_finished
+  - cloud_init_finished
   post_tasks:
   - name: Load the scenario content for the terraformed nodes
     include_vars: '{{ playbook_dir }}/vars/scenario_stubs/{{ item.key }}/{{ item.value }}.yml'
