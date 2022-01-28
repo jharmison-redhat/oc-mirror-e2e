@@ -1,0 +1,29 @@
+---
+- name: Import the provisioned infrastructure
+  import_playbook: provision.yml
+
+- name: Download clients and mirror installation on connected host
+  hosts: registry
+  vars_files:
+  - '{{ playbook_dir }}/vars/defaults.yml'
+  tasks:
+  - include_role:
+      name: sneakernet
+      tasks_from: connected
+  tags:
+  - sneakernet
+
+- name: Install OpenShift
+  hosts: bastion
+  vars_files:
+  - '{{ playbook_dir }}/vars/defaults.yml'
+  vars:
+    additional_trust_bundle: '{{ lookup("file", output_dir + "/squid.crt") }}'
+  pre_tasks:
+  - include_role:
+      name: sneakernet
+      tasks_from: disconnected
+  roles:
+  - role: installer
+  tags:
+  - installer

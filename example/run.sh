@@ -49,14 +49,17 @@ runtime_args+=(
     -v "$PWD/output:/output"
 )
 
-# The playbook we're running
-runtime_args+=(
-    -e "RUNNER_PLAYBOOK=jharmison_redhat.oc_mirror_e2e.${1:-create}"
-)
 
 # Runner will pull our inventory, config, and env
 runtime_args+=(
     -v "$PWD:/runner"
 )
 
-${RUNTIME} run "${runtime_args[@]}" "oc-mirror-e2e:${EE_VERSION:-latest}"
+playbooks="${1:-create test delete}"
+
+set -e
+
+for playbook in $playbooks; do
+    playbook_arg=(-e "RUNNER_PLAYBOOK=jharmison_redhat.oc_mirror_e2e.$playbook")
+    ${RUNTIME} run "${runtime_args[@]}" "${playbook_arg[@]}" "oc-mirror-e2e:${EE_VERSION:-latest}"
+done
