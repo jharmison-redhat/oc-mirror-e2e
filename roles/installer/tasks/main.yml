@@ -51,3 +51,30 @@
 
 - name: Ensure OpenShift is installed
   import_tasks: installed.yml
+
+- name: Ensure the pip download directory exists
+  file:
+    path: '{{ output_dir }}/pip'
+    state: directory
+  delegate_to: localhost
+
+- name: Download the necessary python packages
+  command: python3.6 -m pip download kubernetes --dest "{{ output_dir }}/pip"
+  register: pip_download
+  changed_when: pip_download.stdout_lines|select("match", "^ Saved")|list|length > 0
+  delegate_to: localhost
+
+- name: Copy the python packages for interacting with the cluster
+  copy:
+    src: '{{ output_dir }}/pip'
+    dest: '{{ ansible_env["HOME"] }}/'
+
+- name: Install python packages for interacting with the cluster
+  become: true
+  pip:
+    name: '{{ pip_download.stdout_lines|select("search", (output_dir + "/pip/")|regex_escape)|map("regex_replace", "^.* " + (output_dir|regex_escape), ansible_env["HOME"])|list }}'
+
+- name: Ensure certificate is available for interacting with the clsuter
+  copy:
+    content: '{{ (lookup("file", output_dir + "/install/auth/kubeconfig")|from_yaml).clusters[0].cluster["certificate-authority-data"]|b64decode }}'
+    dest: '{{ cluster_ca_path }}'

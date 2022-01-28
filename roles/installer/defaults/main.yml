@@ -17,3 +17,8 @@ installer_aws_secret_access_key: '{{ hostvars.controller.terraform.outputs.ocp_i
 cluster_ssh_key: '{{ lookup("file", output_dir + "/" + cluster_name + "_ed25519.pub") }}'
 
 install_directory: '{{ ansible_env["HOME"] }}/install'
+
+openshift_modules_packages:
+- python38-pip
+
+cluster_ca_path: '{{ ansible_env["HOME"] }}/cluster-ca.crt'
