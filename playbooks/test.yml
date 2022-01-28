@@ -35,7 +35,7 @@
   module_defaults:
     group/k8s:
       host: https://api.{{ cluster_name }}.{{ cluster_domain }}:6443
-      ca_cert: '{{ (lookup("file", output_dir + "/install/auth/kubeconfig)|from_yaml).clusters[0].cluster["certificate-authority-data"]|b64decode }}'
+      ca_cert: '{{ (lookup("file", output_dir + "/install/auth/kubeconfig")|from_yaml).clusters[0].cluster["certificate-authority-data"]|b64decode }}'
   tasks:
   - block:
     - name: Log in to the cluster
