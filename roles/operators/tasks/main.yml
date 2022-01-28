@@ -1,0 +1,9 @@
+---
+- name: Install Operators
+  kubernetes.core.k8s:
+    state: present
+    definition: '{{ operator.value }}'
+  loop: '{{ operator_install|dict2items }}'
+  loop_control:
+    loop_var: operator
+    label: '{{ operator.key }}'

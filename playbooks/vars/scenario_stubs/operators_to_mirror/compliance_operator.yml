@@ -1,6 +1,5 @@
 # The operator blurb's schema is too complex to fully parametrize. It's easier
 #   to simply pass it in as a string, so we do.
-# More options will be present later!
 operator_blurb: |
   operators:
     - catalog: registry.redhat.io/redhat/redhat-operator-index:v{{ openshift_version }}
@@ -8,3 +7,35 @@ operator_blurb: |
       packages:
         - name: compliance-operator
           startingVersion: '0.1.47'
+
+operator_install:
+  compliance-operator: |
+    ---
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      labels:
+        openshift.io/cluster-monitoring: "true"
+      name: openshift-compliance
+    spec: {}
+    ---
+    apiVersion: operators.coreos.com/v1
+    kind: OperatorGroup
+    metadata:
+      name: compliance-operator
+      namespace: openshift-compliance
+    spec:
+      targetNamespaces:
+      - openshift-compliance
+    ---
+    apiVersion: operators.coreos.com/v1alpha1
+    kind: Subscription
+    metadata:
+      name: compliance-operator
+      namespace: openshift-compliance
+    spec:
+      channel: release-0.1
+      installPlanApproval: Automatic
+      name: compliance-operator
+      source: redhat-operators
+      sourceNamespace: openshift-marketplace

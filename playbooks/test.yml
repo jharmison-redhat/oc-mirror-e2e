@@ -27,3 +27,28 @@
   - installer
   tags:
   - installer
+
+- name: Install Operators
+  hosts: bastion
+  vars_files:
+  - '{{ playbook_dir }}/vars/defaults.yml'
+  module_defaults:
+    group/k8s:
+      host: https://api.{{ cluster_name }}.{{ cluster_domain }}:6443
+      ca_cert: '{{ (lookup("file", output_dir + "/install/auth/kubeconfig)|from_yaml).clusters[0].cluster["certificate-authority-data"]|b64decode }}'
+  tasks:
+  - block:
+    - name: Log in to the cluster
+      include_role:
+        name: logged_in
+    - name: Install and configure operator
+      include_role:
+        name: operators
+    always:
+    - name: Log out of the cluster
+      include_role:
+        name: logged_in
+      vars:
+        state: absent
+  tags:
+  - operators
