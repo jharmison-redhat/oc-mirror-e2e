@@ -11,6 +11,18 @@
   tags:
   - updated
 
+- name: Configure Squid
+  hosts: proxy
+  vars_files:
+  - '{{ playbook_dir }}/vars/defaults.yml'
+  become: true
+  vars:
+    ca_cert_and_key: '{{ hostvars.controller.ca.stdout }}'
+  roles:
+  - role: proxy
+  tags:
+  - proxy
+
 - name: Configure container registry
   hosts: registry
   vars_files:
@@ -35,18 +47,6 @@
       registry_certificate_key: '{{ lookup("file", output_dir+"/registry.key") }}'
   tags:
   - registry
-
-- name: Configure Squid
-  hosts: proxy
-  vars_files:
-  - '{{ playbook_dir }}/vars/defaults.yml'
-  become: true
-  vars:
-    ca_cert_and_key: '{{ hostvars.controller.ca.stdout }}'
-  roles:
-  - role: proxy
-  tags:
-  - proxy
 
 - name: Validate bastion configuration
   hosts: bastion
