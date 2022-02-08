@@ -38,5 +38,5 @@ operator_install:
       channel: release-0.1
       installPlanApproval: Automatic
       name: compliance-operator
-      source: redhat-operators
+      source: redhat-operator-index
       sourceNamespace: openshift-marketplace
