@@ -4,7 +4,7 @@ PUSH_IMAGE = registry.jharmison.com/ansible/oc-mirror-e2e
 RUNTIME = podman
 ANSIBLE_TAGS =
 ANSIBLE_SKIP_TAGS =
-ANSIBLE_PLAYBOOKS =
+ANSIBLE_PLAYBOOKS = create test delete
 
 .PHONY: all prereqs clean-prereqs collection publish ee ee-publish run clean realclean
 
