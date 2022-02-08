@@ -6,7 +6,7 @@ ANSIBLE_TAGS =
 ANSIBLE_SKIP_TAGS =
 ANSIBLE_PLAYBOOKS =
 
-.PHONY: all prereqs collection publish ee ee-publish run clean realclean
+.PHONY: all prereqs clean-prereqs collection publish ee ee-publish run clean realclean
 
 all: collection
 
@@ -25,7 +25,10 @@ all: collection
 .venv/bin/ansible-galaxy: .pip-prereqs
 .venv/bin/ansible-builder: .pip-prereqs
 
-prereqs: .venv/bin/yasha .venv/bin/ansible-galaxy .venv/bin/ansible-builder
+clean-prereqs:
+	rm -rf .venv
+
+prereqs: clean-prereqs .venv/bin/yasha .venv/bin/ansible-galaxy .venv/bin/ansible-builder
 
 ##############################################################################
 #                               COLLECTION                                   #
