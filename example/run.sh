@@ -23,6 +23,9 @@ for var in AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN AWS_PROFILE
         echo "$var: ${!var}" >> env/envvars
     fi
 done
+if [ ! -d "$HOME/.aws" ]; then
+    mkdir -p "$HOME/.aws"
+fi
 runtime_args+=(
    -v "$HOME/.aws:/aws"
 )
