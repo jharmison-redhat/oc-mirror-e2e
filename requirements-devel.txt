@@ -2,3 +2,4 @@ ansible >=5.2.0, <6.0.0
 ansible-builder >=1.0.1, <2.0.0
 yasha >=5.0, <6.0
 sshuttle >=1.1.0, <2.0.0
+awscli >=1.22.50, <2.0.0
