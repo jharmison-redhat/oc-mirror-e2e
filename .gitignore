@@ -55,6 +55,7 @@ execution-environment/context
 
 # Virtual environment
 .venv
+.pip-prereqs
 
 # Other development artifacts
 tags

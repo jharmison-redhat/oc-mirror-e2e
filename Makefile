@@ -10,8 +10,18 @@ ANSIBLE_PLAYBOOKS =
 
 all: collection
 
-prereqs:
-	pip install -r requirements-devel.txt
+.venv/bin/pip:
+	python3 -m venv .venv
+	.venv/bin/pip install --upgrade pip setuptools wheel
+
+.pip-prereqs: .venv/bin/pip
+	.venv/bin/pip install -r requirements-devel.txt
+	touch .pip-prereqs
+
+.venv/bin/yasha: .pip-prereqs
+.venv/bin/ansible-galaxy: .pip-prereqs
+.venv/bin/ansible-builder: .pip-prereqs
+prereqs: .venv/bin/yasha .venv/bin/ansible-galaxy .venv/bin/ansible-builder
 
 jharmison_redhat-oc_mirror_e2e-$(VERSION).tar.gz:
 	yasha --VERSION=$(VERSION) galaxy.yml.j2
