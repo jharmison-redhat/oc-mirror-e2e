@@ -51,7 +51,7 @@ Important for improving usability
 
 - [ ] Better user docs
   - Need to get role doc generation up and running, rather than short hand-crafted blurbs
-- [ ] Quickstart from scratch, assume nothing
+- [x] Quickstart from scratch, assume nothing
 
 Quay things
 -----------
