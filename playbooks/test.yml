@@ -1,6 +1,33 @@
 ---
-- name: Import the provisioned infrastructure
-  import_playbook: provision.yml
+- name: Import provisioned infrastructure
+  hosts: controller
+  vars_files:
+  - '{{ playbook_dir }}/vars/defaults.yml'
+  pre_tasks:
+  - name: Load the scenario content
+    include_vars: '{{ playbook_dir }}/vars/scenario_stubs/{{ item.key }}/{{ item.value }}.yml'
+    loop: '{{ scenario_stubs|dict2items }}'
+  tasks:
+  - name: Minimal import of provisioned infrastructure
+    include_role:
+      name: provisioner
+      tasks_from: minimal
+  tags:
+  - always
+
+- name: Load scenario content for terraformed nodes
+  hosts: terraformed
+  vars_files:
+  - '{{ playbook_dir }}/vars/defaults.yml'
+  gather_facts: false
+  roles:
+  - cloud_init_finished
+  post_tasks:
+  - name: Load the scenario content for the terraformed nodes
+    include_vars: '{{ playbook_dir }}/vars/scenario_stubs/{{ item.key }}/{{ item.value }}.yml'
+    loop: '{{ scenario_stubs|dict2items }}'
+  tags:
+  - always
 
 - name: Download clients and mirror installation on connected host
   hosts: registry
@@ -25,7 +52,14 @@
       tasks_from: disconnected
   roles:
   - installer
-  post_tasks:
+ tags:
+  - installer
+
+- name: Install Operators
+  hosts: bastion
+  vars_files:
+  - '{{ playbook_dir }}/vars/defaults.yml'
+  tasks:
   - block:
     - name: Log in to the cluster
       import_role:
@@ -44,27 +78,6 @@
         definition:
           spec:
             disableAllDefaultSources: true
-
-    always:
-    - name: Log out of the cluster
-      import_role:
-        name: logged_in
-      vars:
-        state: absent
-  tags:
-  - installer
-
-- name: Install Operators
-  hosts: bastion
-  vars_files:
-  - '{{ playbook_dir }}/vars/defaults.yml'
-  tasks:
-  - block:
-    - name: Log in to the cluster
-      import_role:
-        name: logged_in
-      vars:
-        state: present
 
     - name: Install and configure operator(s)
       include_role:
