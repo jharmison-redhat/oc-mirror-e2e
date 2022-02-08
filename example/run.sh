@@ -1,5 +1,4 @@
 #!/bin/bash
-
 cd "$(dirname "$(realpath "$0")")" || exit
 
 RUNTIME=${RUNTIME:-podman}
@@ -10,7 +9,7 @@ runtime_args=(--rm -it)
 runtime_args+=(--privileged --security-opt=label=disable)
 
 # Uniquely identify this run's container instance
-cluster_name=$(grep '^cluster_name: ' vars/scenario.yml | cut -d: -f2- | tr -d' ')
+cluster_name=$(grep '^cluster_name: ' vars/scenario.yml | cut -d: -f2- | tr -d ' ')
 runtime_args+=("--name=oc-mirror-e2e-$cluster_name")
 
 # AWS configuration depends on exporting user variables as well as the credentials directory
