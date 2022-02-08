@@ -52,7 +52,7 @@
       tasks_from: disconnected
   roles:
   - installer
- tags:
+  tags:
   - installer
 
 - name: Install Operators
