@@ -55,7 +55,12 @@ execution-environment/context
 
 # Virtual environment
 .venv
+
+# Makefile empty targets
 .pip-prereqs
+.collection-published
+.ee-built
+.ee-published
 
 # Other development artifacts
 tags
