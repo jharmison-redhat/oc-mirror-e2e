@@ -53,7 +53,7 @@ publish: .collection-published
 	cd execution-environment \
 	  && $(RUNTIME) build . -f Containerfile.builder -t extended-builder-image \
 	  && $(RUNTIME) build . -f Containerfile.base -t extended-base-image \
-	  && .venv/bin/ansible-builder build -v 3 --container-runtime $(RUNTIME) -t oc-mirror-e2e:$(VERSION)
+	  && ../.venv/bin/ansible-builder build -v 3 --container-runtime $(RUNTIME) -t oc-mirror-e2e:$(VERSION)
 	touch .ee-built
 
 ee: .ee-built
@@ -81,4 +81,7 @@ destroy: .ee-built
 clean:
 	rm -rf jharmison_redhat-oc_mirror_e2e-*.tar.gz galaxy.yml
 realclean: clean
-	rm -rf example/output/* example/artifacts/*
+	rm -rf example/output/* example/artifacts/* .venv .pip-prereqs .collection-published .ee-built .ee-published
+	$(RUNTIME) rmi extended-builder-image
+	$(RUNTIME) rmi extended-base-image
+	$(RUNTIME) rmi oc-mirror-e2e:$(VERSION)
