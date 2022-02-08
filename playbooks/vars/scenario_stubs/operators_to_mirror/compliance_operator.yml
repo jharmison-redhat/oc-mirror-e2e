@@ -3,11 +3,11 @@
 operator_blurb: |
   operators:
     - catalog: registry.redhat.io/redhat/redhat-operator-index:v{{ openshift_version }}
-      headsOnly: true
+      headsOnly: false
       packages:
         - name: compliance-operator
           channels:
-            - name: release-01
+            - name: release-0.1
 
 operator_install:
   compliance-operator: |
