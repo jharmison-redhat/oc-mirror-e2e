@@ -166,7 +166,7 @@ make destroy
 
 #### NOTE
 
-There are a large number of variables passed through to tehse targets. Please see the [variable definition below](#makefile-variables) to learn what they do.
+There are a large number of variables passed through to these targets. Please see the [variable definition below](#makefile-variables) to learn what they do.
 
 ### Cleaning up build artifacts
 
