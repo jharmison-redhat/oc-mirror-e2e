@@ -188,6 +188,8 @@ Note that that output includes terraform state. It is very destructive, and you 
 
 ### Extra scripts
 
+Both of these scripts require that `jq` be in your `$PATH`, as an additional dependency above the rest of the project. `jq` is just too good, sorry.
+
 In the event that something goes wrong with your terraform state for local hacking, you may also find the script at [example/teardown.sh](example/teardown.sh) useful, as it will tear down all of the Terraform-managed resources using [awscli](https://pypi.org/project/awscli/) without needing Terraform state. It does not, however, uninstall OpenShift and will fail if remnants of an OpenShift installation are still in the VPC.
 
 If you'd like to do some troubleshooting, the script at [example/connect.sh](example/connect.sh) is very useful as well. Given a valid Terraform-provisioned environment, it will read from tfstate and create an [sshuttle](https://sshuttle.readthedocs.io/) proxy into the private VPC subnets. This means that an unpublished "isolated" OpenShift instance can be connected to from your browser. It requires `sudo` on your host to run and you will be prompted appropriately.
