@@ -39,9 +39,11 @@
         name: logged_in
       vars:
         state: present
-    - name: Install and configure operator
-      import_role:
+
+    - name: Install and configure operator(s)
+      include_role:
         name: operators
+
     always:
     - name: Log out of the cluster
       import_role:

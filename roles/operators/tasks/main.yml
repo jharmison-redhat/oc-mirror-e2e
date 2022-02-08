@@ -2,6 +2,9 @@
 - name: Install Operators
   kubernetes.core.k8s:
     state: present
+    host: https://api.{{ cluster_name }}.{{ cluster_domain }}:6443
+    ca_cert: '{{ cluster_ca_path }}'
+    api_key: '{{ openshift_oauth_results.openshift_auth.api_key }}'
     definition: '{{ operator.value }}'
   loop: '{{ operator_install|dict2items }}'
   loop_control:

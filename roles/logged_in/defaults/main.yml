@@ -1,4 +1,2 @@
 ---
 state: present
-
-cluster_ca_path: '{{ ansible_env["HOME"] }}/cluster-ca.crt'

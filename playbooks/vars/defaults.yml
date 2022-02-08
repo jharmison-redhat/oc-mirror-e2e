@@ -5,6 +5,8 @@ registry_admin:
   password: '{{ lookup("password", output_dir + "/registry_admin_password") }}'
   email: "admin@{{ cluster_name }}.{{ cluster_domain }}"
 
+cluster_ca_path: '{{ ansible_env["HOME"] }}/cluster-ca.crt'
+
 # environment
 cluster_domain: redhat4govaws.io
 aws_region: us-east-2

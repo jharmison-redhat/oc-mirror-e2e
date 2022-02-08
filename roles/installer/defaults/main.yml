@@ -20,5 +20,3 @@ install_directory: '{{ ansible_env["HOME"] }}/install'
 
 openshift_modules_packages:
 - python38-pip
-
-cluster_ca_path: '{{ ansible_env["HOME"] }}/cluster-ca.crt'
