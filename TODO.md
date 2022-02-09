@@ -34,7 +34,7 @@ Important for finished product
     - [x] OpenShift install
       - [x] Validate basic API connectivity
     - [x]Operator install
-      - [ ] Validate operator operation
+      - [x] Validate operator operation
     - [ ] Additional mirror and publish
       - [ ] Validate that catalogs are good and upgrade graph is intact
     - [ ] OpenShift upgrade

@@ -1,5 +1,5 @@
-# The operator blurb's schema is too complex to fully parametrize. It's easier
-#   to simply pass it in as a string, so we do.
+# The ImageSetConfiguration operator blurb's schema is too complex to fully
+#   parametrize. It's easier to simply pass it in as a string, so we do.
 operator_blurb: |
   operators:
     - catalog: registry.redhat.io/redhat/redhat-operator-index:v{{ openshift_version }}
@@ -10,17 +10,15 @@ operator_blurb: |
             - name: release-0.1
 
 operator_install:
-  compliance-operator: |
-    ---
-    apiVersion: v1
+  compliance-operator:
+  - apiVersion: v1
     kind: Namespace
     metadata:
       labels:
         openshift.io/cluster-monitoring: "true"
       name: openshift-compliance
     spec: {}
-    ---
-    apiVersion: operators.coreos.com/v1
+  - apiVersion: operators.coreos.com/v1
     kind: OperatorGroup
     metadata:
       name: compliance-operator
@@ -28,8 +26,7 @@ operator_install:
     spec:
       targetNamespaces:
       - openshift-compliance
-    ---
-    apiVersion: operators.coreos.com/v1alpha1
+  - apiVersion: operators.coreos.com/v1alpha1
     kind: Subscription
     metadata:
       name: compliance-operator
@@ -40,3 +37,33 @@ operator_install:
       name: compliance-operator
       source: redhat-operator-index
       sourceNamespace: openshift-marketplace
+
+operator_validate:
+  compliance-operator:
+    installed:
+      api_version: operators.coreos.com/v1alpha1
+      kind: Subscription
+      name: compliance-operator
+      namespace: openshift-compliance
+      condition: .status.state == "AtLatestKnown"
+    works:
+      operate:
+        apiVersion: compliance.openshift.io/v1alpha1
+        kind: ScanSettingBinding
+        metadata:
+          name: nist-moderate
+          namespace: openshift-compliance
+        profiles:
+        - apiGroup: compliance.openshift.io/v1alpha1
+          kind: Profile
+          name: rhcos4-moderate
+        settingsRef:
+          apiGroup: compliance.openshift.io/v1alpha1
+          kind: ScanSetting
+          name: default
+      validate:
+        api_version: compliance.openshift.io/v1alpha1
+        kind: ComplianceScan
+        name: rhcos4-moderate-master
+        namespace: openshift-compliance
+        condition: .status.phase == "DONE"
