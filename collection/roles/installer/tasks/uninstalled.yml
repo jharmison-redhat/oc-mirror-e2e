@@ -7,6 +7,7 @@
   args:
     chdir: '{{ install_directory }}'
   environment: '{{ extra_uninstall_env|default(omit) }}'
+  ignore_errors: true
   when: >-
       responding.rc == 0 or
       kubeconfig.stat.exists or
