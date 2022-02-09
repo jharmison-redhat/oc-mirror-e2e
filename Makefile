@@ -33,12 +33,12 @@ prereqs: clean-prereqs .venv/bin/yasha .venv/bin/ansible-galaxy .venv/bin/ansibl
 ##############################################################################
 #                               COLLECTION                                   #
 ##############################################################################
-galaxy.yml: .pip-prereqs
-	-rm -f galaxy.yml
-	.venv/bin/yasha --VERSION=$(VERSION) galaxy.yml.j2
+collection/galaxy.yml: .pip-prereqs
+	-rm -f collection/galaxy.yml
+	.venv/bin/yasha --VERSION=$(VERSION) collection/galaxy.yml.j2
 
-jharmison_redhat-oc_mirror_e2e-$(VERSION).tar.gz: galaxy.yml
-	.venv/bin/ansible-galaxy collection build -v .
+jharmison_redhat-oc_mirror_e2e-$(VERSION).tar.gz: collection/galaxy.yml
+	.venv/bin/ansible-galaxy collection build -v collection
 
 collection: jharmison_redhat-oc_mirror_e2e-$(VERSION).tar.gz
 
@@ -82,7 +82,7 @@ destroy: .ee-built
 #                                 CLEANUP                                    #
 ##############################################################################
 clean:
-	rm -rf jharmison_redhat-oc_mirror_e2e-*.tar.gz galaxy.yml
+	rm -rf jharmison_redhat-oc_mirror_e2e-*.tar.gz collection/galaxy.yml
 realclean: clean clean-prereqs
 	rm -rf example/output/* example/artifacts/* .pip-prereqs .collection-published .ee-built .ee-published
 	-$(RUNTIME) rmi extended-builder-image

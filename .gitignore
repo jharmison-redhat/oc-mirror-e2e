@@ -46,7 +46,7 @@ example/env/*
 !example/env/.gitkeep
 
 # Compiled collection
-galaxy.yml
+collection/galaxy.yml
 jharmison_redhat-oc_mirror_e2e-*.tar.gz
 .galaxy-token
 
