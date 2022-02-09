@@ -85,6 +85,6 @@ clean:
 	rm -rf jharmison_redhat-oc_mirror_e2e-*.tar.gz galaxy.yml
 realclean: clean clean-prereqs
 	rm -rf example/output/* example/artifacts/* .pip-prereqs .collection-published .ee-built .ee-published
-	$(RUNTIME) rmi extended-builder-image
-	$(RUNTIME) rmi extended-base-image
-	$(RUNTIME) rmi oc-mirror-e2e:$(VERSION)
+	-$(RUNTIME) rmi extended-builder-image
+	-$(RUNTIME) rmi extended-base-image
+	-$(RUNTIME) rmi oc-mirror-e2e:$(VERSION)
