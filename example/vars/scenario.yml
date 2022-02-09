@@ -5,7 +5,7 @@ cluster_name: disco
 openshift_version: "4.9"
 
 # The scenario stubs, loaded from adjacent to this file, to use. See the
-#   individual files for more information on what the choices mean.
+#   individual files adjacent to the playbooks for more information on what the choices mean.
 scenario_stubs:
   metadata_backend: registry
   mirror_method: to_registry

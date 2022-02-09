@@ -1,0 +1,93 @@
+---
+- name: Import provisioned infrastructure
+  hosts: controller
+  vars_files:
+  - '{{ playbook_dir }}/vars/defaults.yml'
+  pre_tasks:
+  - name: Load the scenario content
+    include_vars: '{{ playbook_dir }}/vars/scenario_stubs/{{ item.key }}/{{ item.value }}.yml'
+    loop: '{{ scenario_stubs|dict2items }}'
+  tasks:
+  - name: Minimal import of provisioned infrastructure
+    include_role:
+      name: provisioner
+      tasks_from: minimal
+  tags:
+  - always
+
+- name: Load scenario content for terraformed nodes
+  hosts: terraformed
+  vars_files:
+  - '{{ playbook_dir }}/vars/defaults.yml'
+  gather_facts: false
+  roles:
+  - cloud_init_finished
+  post_tasks:
+  - name: Load the scenario content for the terraformed nodes
+    include_vars: '{{ playbook_dir }}/vars/scenario_stubs/{{ item.key }}/{{ item.value }}.yml'
+    loop: '{{ scenario_stubs|dict2items }}'
+  tags:
+  - always
+
+- name: Download clients and mirror installation on connected host
+  hosts: registry
+  vars_files:
+  - '{{ playbook_dir }}/vars/defaults.yml'
+  tasks:
+  - include_role:
+      name: sneakernet
+      tasks_from: connected
+  tags:
+  - sneakernet
+
+- name: Install OpenShift
+  hosts: bastion
+  vars_files:
+  - '{{ playbook_dir }}/vars/defaults.yml'
+  vars:
+    additional_trust_bundle: '{{ lookup("file", output_dir + "/squid.crt") }}'
+  pre_tasks:
+  - include_role:
+      name: sneakernet
+      tasks_from: disconnected
+  roles:
+  - installer
+  tags:
+  - installer
+
+- name: Install Operators
+  hosts: bastion
+  vars_files:
+  - '{{ playbook_dir }}/vars/defaults.yml'
+  tasks:
+  - block:
+    - name: Log in to the cluster
+      import_role:
+        name: logged_in
+      vars:
+        state: present
+
+    - name: Disable the default OperatorHub sources
+      kubernetes.core.k8s:
+        state: patched
+        host: https://api.{{ cluster_name }}.{{ cluster_domain }}:6443
+        ca_cert: '{{ cluster_ca_path }}'
+        api_key: '{{ openshift_oauth_results.openshift_auth.api_key }}'
+        kind: OperatorHub
+        name: cluster
+        definition:
+          spec:
+            disableAllDefaultSources: true
+
+    - name: Install and configure operator(s)
+      include_role:
+        name: operators
+
+    always:
+    - name: Log out of the cluster
+      import_role:
+        name: logged_in
+      vars:
+        state: absent
+  tags:
+  - operators

@@ -1,0 +1,63 @@
+---
+- name: Install Operators
+  kubernetes.core.k8s:
+    state: present
+    host: https://api.{{ cluster_name }}.{{ cluster_domain }}:6443
+    ca_cert: '{{ cluster_ca_path }}'
+    api_key: '{{ openshift_oauth_results.openshift_auth.api_key }}'
+    definition: '{{ operator.value }}'
+  loop: '{{ operator_install|dict2items }}'
+  loop_control:
+    loop_var: operator
+    label: '{{ operator.key }}'
+
+- name: Wait for operators to finish installing
+  kubernetes.core.k8s_info:
+    host: https://api.{{ cluster_name }}.{{ cluster_domain }}:6443
+    ca_cert: '{{ cluster_ca_path }}'
+    api_key: '{{ openshift_oauth_results.openshift_auth.api_key }}'
+    api_version: '{{ operator.value.installed.api_version }}'
+    kind: '{{ operator.value.installed.kind }}'
+    name: '{{ operator.value.installed.name }}'
+    namespace: '{{ operator.value.installed.namespace|default(omit) }}'
+  register: operator_installed
+  loop: '{{ operator_validate|dict2items }}'
+  loop_control:
+    loop_var: operator
+    label: '{{ operator.key }}'
+  until:
+  - operator_installed.resources|length > 0
+  - '(operator_installed.resources|first){{ operator.value.installed.condition }}'
+  retries: '{{ (operator.value.installed.timeout|default(600)|int / 10)|int }}'
+  delay: 10
+
+- name: Leverage operator CRDs to operate
+  kubernetes.core.k8s:
+    host: https://api.{{ cluster_name }}.{{ cluster_domain }}:6443
+    ca_cert: '{{ cluster_ca_path }}'
+    api_key: '{{ openshift_oauth_results.openshift_auth.api_key }}'
+    definition: '{{ operator.value.works.operate }}'
+  loop: '{{ operator_validate|dict2items }}'
+  loop_control:
+    loop_var: operator
+    label: '{{ operator.key }}'
+
+- name: Validate that operator did what it was supposed to do
+  kubernetes.core.k8s_info:
+    host: https://api.{{ cluster_name }}.{{ cluster_domain }}:6443
+    ca_cert: '{{ cluster_ca_path }}'
+    api_key: '{{ openshift_oauth_results.openshift_auth.api_key }}'
+    api_version: '{{ operator.value.works.validate.api_version }}'
+    kind: '{{ operator.value.works.validate.kind }}'
+    name: '{{ operator.value.works.validate.name }}'
+    namespace: '{{ operator.value.works.validate.namespace|default(omit) }}'
+  register: operator_installed
+  loop: '{{ operator_validate|dict2items }}'
+  loop_control:
+    loop_var: operator
+    label: '{{ operator.key }}'
+  until:
+  - operator_installed.resources|length > 0
+  - '(operator_installed.resources|first){{ operator.value.works.validate.condition }}'
+  retries: '{{ (operator.value.works.validate.timeout|default(1200)|int / 10)|int }}'
+  delay: 10

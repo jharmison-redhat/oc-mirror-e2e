@@ -1,0 +1,91 @@
+---
+- name: Ensure certificate directory exists
+  file:
+    path: '{{ output_dir }}'
+    state: directory
+
+- name: Generate an OpenSSH keypair
+  community.crypto.openssh_keypair:
+    path: '{{ output_dir }}/{{ cluster_name }}_ed25519'
+    type: ed25519
+    comment: '{{ registry_admin.email }}'
+  register: keypair
+
+- name: Copy the terraform to the output
+  copy:
+    src: '{{ role_path }}/files/terraform'
+    dest: '{{ output_dir }}/'
+    remote_src: yes
+
+- name: Generate the backend config
+  template:
+    src: backend-config.hcl.j2
+    dest: '{{ output_dir }}/terraform/backend-config.hcl'
+
+- name: Apply the terraform deployment
+  include_tasks: terraform.yml
+  vars:
+      public_key: '{{ keypair.public_key }}'
+
+- name: Update the inventory
+  include_tasks: inventory.yml
+
+- name: Generate self-signed private key for proxy
+  community.crypto.openssl_privatekey:
+    path: '{{ output_dir }}/squid.key'
+
+- name: Generate self-signed certificate signing request for proxy
+  community.crypto.openssl_csr:
+    path: '{{ output_dir }}/squid.csr'
+    privatekey_path: '{{ output_dir }}/squid.key'
+    country_name: '{{ cert_country|default("US") }}'
+    organization_name: squid
+    email_address: '{{ registry_admin.email }}'
+    common_name: squid
+    basic_constraints:
+    - CA:TRUE
+    key_usage:
+    - digitalSignature
+    - keyEncipherment
+    - dataEncipherment
+    - keyAgreement
+    - keyCertSign
+
+- name: Generate self-signed certificate for proxy
+  community.crypto.x509_certificate:
+    path: '{{ output_dir }}/squid.crt'
+    csr_path: '{{ output_dir }}/squid.csr'
+    privatekey_path: '{{ output_dir }}/squid.key'
+    provider: selfsigned
+
+- name: Save CA cert and key
+  command: cat {{ output_dir }}/squid.key {{ output_dir }}/squid.crt
+  changed_when: false
+  register: ca
+
+- name: Generate private key for registry
+  community.crypto.openssl_privatekey:
+    path: '{{ output_dir }}/registry.key'
+
+- name: Generate CSR for registry to be signed by proxy CA
+  community.crypto.openssl_csr:
+    path: '{{ output_dir }}/registry.csr'
+    privatekey_path: '{{ output_dir }}/registry.key'
+    country_name: '{{ cert_country|default("US") }}'
+    organization_name: Quay
+    email_address: '{{ registry_admin.email }}'
+    common_name: '{{ terraform.outputs.registry_instance.value.private_hostname }}'
+    subject_alt_name:
+    - DNS:{{ terraform.outputs.registry_instance.value.private_hostname }}
+    - DNS:{{ terraform.outputs.registry_instance.value.hostname }}
+    - IP:{{ terraform.outputs.registry_instance.value.private_ip }}
+    - IP:{{ terraform.outputs.registry_instance.value.ip }}
+
+- name: Generate Certificate for registry, signed by the CA
+  community.crypto.x509_certificate:
+    path: '{{ output_dir }}/registry.crt'
+    csr_path: '{{ output_dir }}/registry.csr'
+    privatekey_path: '{{ output_dir }}/registry.key'
+    provider: ownca
+    ownca_path: '{{ output_dir }}/squid.crt'
+    ownca_privatekey_path: '{{ output_dir }}/squid.key'

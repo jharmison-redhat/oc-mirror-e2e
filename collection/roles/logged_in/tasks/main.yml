@@ -1,0 +1,10 @@
+---
+- name: Set OpenShift cluster auth to {{ state }}
+  community.okd.openshift_auth:
+    host: https://api.{{ cluster_name }}.{{ cluster_domain }}:6443
+    ca_cert: '{{ cluster_ca_path }}'
+    username: '{{ "kubeadmin" if state == "present" else omit }}'
+    password: '{{ lookup("file", output_dir + "/install/auth/kubeadmin-password") if state == "present" else omit }}'
+    api_key: '{{ openshift_oauth_results.openshift_auth.api_key|default("") if state == "absent" else omit }}'
+    state: '{{ state }}'
+  register: openshift_oauth_results

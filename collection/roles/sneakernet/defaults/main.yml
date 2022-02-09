@@ -1,0 +1,40 @@
+---
+oc_mirror_source:
+  repo: https://github.com/openshift/oc-mirror.git
+  version: main
+
+mirror_directly_to_registry: true
+
+# Connected path variables
+# where to clone to
+oc_mirror_clone_location: '{{ ansible_env["HOME"] }}/oc-mirror'
+# where the binary will be built
+oc_mirror_binary_location: '{{ oc_mirror_clone_location }}/bin/oc-mirror'
+# This is where clients will be downloaded to
+client_directory: '{{ ansible_env["HOME"] }}/clients'
+
+# Shared path variables
+# This is where the mirror content will be generated (connected) or hauled (disconnected)
+mirror_directory: '{{ ansible_env["HOME"] }}/mirror-content'
+
+# Where to save artifacts on the controller while sneakernetting - you can leave these alone if you like
+bin_recovery_dir: '{{ output_dir }}/clients'
+mirror_data_recovery_dir: '{{ output_dir }}/mirror-data'
+
+# Always rerun during initial connected workflow, even if it's not been run before
+force_mirror_update: false
+
+# This is the registry we'll be publishing to
+registry_hostname: '{{ hostvars.registry.private_hostname }}'
+
+# The selection for the type of registry backend in the imagesetConfig
+storage_config_backend: registry
+
+# Additional images to mirror in the imagesetConfig
+oc_mirror_additional_images:
+- registry.redhat.io/ubi8/ubi:latest
+
+# If set to any value other than an empty string, will be used to completely override the templated imageSet
+imageset_config_override: ""
+
+operator_blurb: ""
