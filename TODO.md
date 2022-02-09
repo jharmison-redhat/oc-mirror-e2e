@@ -33,7 +33,7 @@ Important for finished product
     - [x] Initial mirror and publish
     - [x] OpenShift install
       - [x] Validate basic API connectivity
-    - [ ]Operator install
+    - [x]Operator install
       - [ ] Validate operator operation
     - [ ] Additional mirror and publish
       - [ ] Validate that catalogs are good and upgrade graph is intact
