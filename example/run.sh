@@ -36,7 +36,7 @@ if [ -n "${ANSIBLE_TAGS}" ]; then
     printf -- '--tags %s ' "${ANSIBLE_TAGS}" >> env/cmdline
 fi
 if [ -n "${ANSIBLE_SKIP_TAGS}" ]; then
-    printf -- '--skip-tags %s ' "${ANSIBLE_TAGS}" >> env/cmdline
+    printf -- '--skip-tags %s ' "${ANSIBLE_SKIP_TAGS}" >> env/cmdline
 fi
 
 # To ensure that variable selections are pulled from vars we need these
@@ -50,7 +50,6 @@ done
 runtime_args+=(
     -v "$PWD/output:/output"
 )
-
 
 # Runner will pull our inventory, config, and env
 runtime_args+=(
