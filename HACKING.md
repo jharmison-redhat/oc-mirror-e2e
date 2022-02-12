@@ -9,6 +9,14 @@ These instructions will help you to make changes to it and work on it as a devel
 You need Python 3, podman or docker, and GNU make installed on your system to get started. You will also need to authenticate to the [Red Hat Container Registry](https://access.redhat.com/RegistryAuthentication).
 
 ```sh
+# podman login registry.redhat.io
+Username: myrhusername
+Password: ***********
+```
+
+Clone the repository.
+
+```sh
 git clone https://github.com/jharmison-redhat/oc-mirror-e2e.git
 cd oc-mirror-e2e
 make prereqs
