@@ -2,7 +2,7 @@
 
 This Ansible content is designed to consume the [disconnected testbed terraform](https://github.com/jharmison-redhat/disconnected-openshift-testbed) and configure the instances for [oc-mirror](https://github.com/openshift/oc-mirror) E2E testing in a properly isolated environment.
 
-These instructions will help you to make changes to it and work on it as a developer.
+These instructions will help you to make changes to it and work on it as a developer. As there are environment variables to configure, and the option for different scenarios, it's encouraged to review this `HACKING.md` before proceeding.
 
 ## Setup
 
@@ -14,7 +14,7 @@ Username: myrhusername
 Password: ***********
 ```
 
-Clone the repository.
+To get started, clone the repository and build the prerequisites.
 
 ```sh
 git clone https://github.com/jharmison-redhat/oc-mirror-e2e.git
