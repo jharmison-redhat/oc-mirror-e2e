@@ -82,6 +82,9 @@
     - name: Install and configure operator(s)
       include_role:
         name: operators
+      when:
+      - scenario_stubs.operators_to_mirror is defined
+      - scenario_stubs.operators_to_mirror != None
 
     always:
     - name: Log out of the cluster
