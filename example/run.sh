@@ -8,9 +8,6 @@ runtime_args=(--rm -it)
 # We need to run as the user to just not deal with labelling
 runtime_args+=(--privileged --security-opt=label=disable)
 
-# Uniquely identify this run's container instance
-cluster_name=$(grep '^cluster_name: ' vars/scenario.yml | cut -d: -f2- | tr -d ' ')
-runtime_args+=("--name=oc-mirror-e2e-$cluster_name")
 
 # AWS configuration depends on exporting user variables as well as the credentials directory
 cat << EOF > env/envvars
@@ -40,11 +37,20 @@ if [ -n "${ANSIBLE_SKIP_TAGS}" ]; then
 fi
 
 # To ensure that variable selections are pulled from vars we need these
-for vars_file in environment scenario ${ANSIBLE_EXTRA_VARS_FILES}; do
+for vars_file in environment ${ANSIBLE_EXTRA_VARS_FILES:-scenario}; do
     if [ -f "vars/${vars_file}.yml" ]; then
         printf -- '--extra-vars "@vars/%s.yml" ' "${vars_file}" >> env/cmdline
+
+        # Uniquely identify this run's cluster name
+        possible_cluster_name=$(grep '^cluster_name: ' vars/scenario.yml | cut -d: -f2- | tr -d ' ')
+        if [ -n "$possible_cluster_name" ]; then
+            cluster_name="$possible_cluster_name"
+        fi
     fi
 done
+
+# Keep container instances separate
+runtime_args+=("--name=oc-mirror-e2e-$cluster_name")
 
 # We need to save output, this is the default for the collection
 runtime_args+=(
