@@ -7,16 +7,11 @@
   - '{{ ansible_env["HOME"] }}/bin'
   - '{{ mirror_directory }}'
 
-- name: Drop all sneakernet binaries into user's ~/bin
+- name: Drop oc-mirror into user's ~/bin
   copy:
-    src: '{{ bin_recovery_dir }}/{{ item }}'
+    src: '{{ bin_recovery_dir }}/oc-mirror'
     dest: '{{ ansible_env["HOME"] }}/bin/'
     mode: '0755'
-  loop:
-  - openshift-install
-  - oc
-  - helm
-  - oc-mirror
 
 - name: Drop all oc-mirror data
   copy:
@@ -45,6 +40,18 @@
   command: oc-mirror --from "{{ item.path }}" docker://{{ registry_hostname }}/{{ toplevel_namespace }}
   when: mirror_directly_to_registry|bool == false
   loop: '{{ mirrored_content.files }}'
+
+- name: Check for oc and openshift-install
+  stat:
+    path: '{{ ansible_env["HOME"] }}/bin/{{ item }}'
+  register: client_binary
+  loop:
+  - oc
+  - openshift-install
+
+- name: Extract clients
+  include_tasks: extract-clients.yml
+  when: false in client_binary|json_query('results[*].stat.exists')
 
 - name: Identify the latest results
   find:

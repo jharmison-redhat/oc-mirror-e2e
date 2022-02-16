@@ -10,8 +10,6 @@ mirror_directly_to_registry: true
 oc_mirror_clone_location: '{{ ansible_env["HOME"] }}/oc-mirror'
 # where the binary will be built
 oc_mirror_binary_location: '{{ oc_mirror_clone_location }}/bin/oc-mirror'
-# This is where clients will be downloaded to
-client_directory: '{{ ansible_env["HOME"] }}/clients'
 
 # Shared path variables
 # This is where the mirror content will be generated (connected) or hauled (disconnected)
