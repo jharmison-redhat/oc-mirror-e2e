@@ -4,6 +4,7 @@ PUSH_IMAGE = registry.jharmison.com/ansible/oc-mirror-e2e
 RUNTIME = podman
 ANSIBLE_TAGS =
 ANSIBLE_SKIP_TAGS =
+ANSIBLE_SCENARIO_VARS = scenario
 ANSIBLE_PLAYBOOKS = create test delete
 
 .PHONY: all prereqs clean-prereqs collection publish ee ee-publish run clean realclean
@@ -74,9 +75,9 @@ ee-publish: .ee-published
 #                               RUN CONTENT                                  #
 ##############################################################################
 run: .ee-built
-	ANSIBLE_TAGS=$(ANSIBLE_TAGS) ANSIBLE_SKIP_TAGS=$(ANSIBLE_SKIP_TAGS) EE_VERSION=$(VERSION) RUNTIME=$(RUNTIME) example/run.sh $(ANSIBLE_PLAYBOOKS)
+	ANSIBLE_TAGS=$(ANSIBLE_TAGS) ANSIBLE_SKIP_TAGS=$(ANSIBLE_SKIP_TAGS) EE_VERSION=$(VERSION) RUNTIME=$(RUNTIME) ANSIBLE_EXTRA_VARS_FILES="$(ANSIBLE_SCENARIO_VARS)" example/run.sh $(ANSIBLE_PLAYBOOKS)
 destroy: .ee-built
-	ANSIBLE_TAGS=$(ANSIBLE_TAGS) ANSIBLE_SKIP_TAGS=$(ANSIBLE_SKIP_TAGS) EE_VERSION=$(VERSION) RUNTIME=$(RUNTIME) example/run.sh delete
+	ANSIBLE_TAGS=$(ANSIBLE_TAGS) ANSIBLE_SKIP_TAGS=$(ANSIBLE_SKIP_TAGS) EE_VERSION=$(VERSION) RUNTIME=$(RUNTIME) ANSIBLE_EXTRA_VARS_FILES="$(ANSIBLE_SCENARIO_VARS)" example/run.sh delete
 
 ##############################################################################
 #                                 CLEANUP                                    #

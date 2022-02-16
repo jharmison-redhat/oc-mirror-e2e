@@ -21,6 +21,7 @@ If you want to run the content iteratively to validate that your changes are wor
 ```sh
 cp example/vars/environment.yml.example example/vars/environment.yml
 ${EDITOR:-vi} example/vars/environment.yml
+cp example/vars/scenario.yml.example example/vars/scenario.yml
 ${EDITOR:-vi} example/vars/scenario.yml
 ```
 
@@ -207,3 +208,4 @@ Both `awscli` and `sshuttle` are included in the `requirements-devel.txt`, so sh
 | `ANSIBLE_TAGS` | The tags to pass to the playbook call | "" |
 | `ANSIBLE_SKIP_TAGS` | The tags to skip in the playbook call | "" |
 | `ANSIBLE_PLAYBOOKS` | The playbooks to run, and the order to run them in, for the `run` target | create test delete |
+| `ANSIBLE_SCENARIO_VARS` | The scenario variables to load for all hosts in the playbooks (expected to be in example/vars with a .yml extension) | "scenario" |
