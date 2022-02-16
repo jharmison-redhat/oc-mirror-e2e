@@ -49,9 +49,43 @@
   - oc
   - openshift-install
 
-- name: Extract clients
-  include_tasks: extract-clients.yml
+- name: Recover the versions of OpenShift published
+  shell: >-
+    set -o pipefail &&
+    podman search
+    --limit 9999
+    --authfile '{{ ansible_env["HOME"] }}/.docker/config.json'
+    --list-tags
+    {{ registry_hostname }}/{{ toplevel_namespace }}/openshift/release
+    | tail -n+2
+    | awk '{print $2}'
+    | cut -d- -f1
+    | sort -Vu
+  args:
+    executable: /bin/bash
+  register: mirrored_versions
+  changed_when: false
+
+- name: Extract the clients from the latest mirror
+  shell: |-
+    function extract_binary {
+      binary=${1:?binary name is required}
+      image=${2:? image name is required}
+      podman run --replace --rm --name extract -d --entrypoint bash {{ registry_hostname }}/{{ toplevel_namespace }}/openshift/release:{{ mirrored_versions.stdout_lines|last }}-x86_64-$image -c 'while : ; do sleep 30; done'
+      podman cp "extract:/usr/bin/$binary" "{{ ansible_env["HOME"] }}/bin/$binary" || exit 1
+      sync
+      podman stop extract
+    }
+    extract_binary oc cli
+    extract_binary openshift-install installer
   when: false in client_binary|json_query('results[*].stat.exists')
+
+- name: Recover the installer to the controller
+  fetch:
+    src: '{{ ansible_env["HOME"] }}/bin/openshift-install'
+    dest: '{{ bin_recovery_dir }}/'
+    flat: yes
+    mode: '0755'
 
 - name: Identify the latest results
   find:

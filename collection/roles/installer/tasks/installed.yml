@@ -46,6 +46,8 @@
 
 - name: Install OpenShift
   command: openshift-install create cluster
+  environment:
+    OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE: '{{ registry_hostname }}/{{ toplevel_namespace }}/openshift/release:{{ mirrored_versions.stdout_lines|last }}-x86_64'
   args:
     chdir: '{{ install_directory }}'
   register: openshift_install

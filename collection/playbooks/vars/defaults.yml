@@ -11,6 +11,9 @@ cluster_ca_path: '{{ ansible_env["HOME"] }}/cluster-ca.crt'
 cluster_domain: redhat4govaws.io
 aws_region: us-east-2
 
+# registry configuration
+toplevel_namespace: oc-mirror
+
 # scenario
 cluster_name: disco
 openshift_version: "4.9"

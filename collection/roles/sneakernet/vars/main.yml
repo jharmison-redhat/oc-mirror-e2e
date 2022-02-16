@@ -5,7 +5,6 @@ local_registry_pull_secret: |-
       email: {{ registry_admin.email }}
 
 # Backend config for registry backend
-toplevel_namespace: oc-mirror
 oc_mirror_metadata_image: '{{ registry_hostname }}/{{ toplevel_namespace }}/imageset-metadata:latest'
 # Backend config for local backend
 oc_mirror_metadata_path: '{{ mirror_directory }}'

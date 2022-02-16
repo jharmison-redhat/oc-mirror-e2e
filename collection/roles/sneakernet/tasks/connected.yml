@@ -1,4 +1,10 @@
 ---
+- name: Ensure the bin recovery directory exists
+  file:
+    path: '{{ bin_recovery_dir }}'
+    state: directory
+  delegate_to: controller
+
 - name: Check for existing oc-mirror binary
   find:
     paths: '{{ bin_recovery_dir }}'
