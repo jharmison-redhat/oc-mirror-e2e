@@ -2,7 +2,9 @@
 cd "$(dirname "$(realpath "$0")")" || exit
 
 RUNTIME=${RUNTIME:-podman}
+SHELL="${ANSIBLE_EE_SHELL}"
 
+CMD=()
 runtime_args=(--rm -it)
 
 # We need to run as the user to just not deal with labelling
@@ -65,7 +67,15 @@ runtime_args+=(
 playbooks="${*:-create test delete}"
 set -e
 
+if [ "$ANSIBLE_EE_SHELL" ]; then
+    runtime_args+=(
+        --entrypoint "/bin/bash"
+        -it
+    )
+    playbooks="PLACEHOLDER"
+    CMD=(-li)
+fi
 for playbook in $playbooks; do
     playbook_arg=(-e "RUNNER_PLAYBOOK=jharmison_redhat.oc_mirror_e2e.$playbook")
-    ${RUNTIME} run "${runtime_args[@]}" "${playbook_arg[@]}" "oc-mirror-e2e:${EE_VERSION:-latest}"
+    ${RUNTIME} run "${runtime_args[@]}" "${playbook_arg[@]}" "oc-mirror-e2e:${EE_VERSION:-latest}" "${CMD[@]}"
 done

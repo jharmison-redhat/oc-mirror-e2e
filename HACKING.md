@@ -171,6 +171,12 @@ To run just the `delete` playbook, to clean up the environment, using the EE as 
 make destroy
 ```
 
+To debug things from inside the EE with an interactive shell:
+
+```sh
+make exec
+```
+
 #### NOTE
 
 There are a large number of variables passed through to these targets. Please see the [variable definition below](#makefile-variables) to learn what they do.
