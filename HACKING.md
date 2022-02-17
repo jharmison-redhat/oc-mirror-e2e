@@ -213,7 +213,7 @@ Both `awscli` and `sshuttle` are included in the `requirements-devel.txt`, so sh
 
 | Variable | Description | Default |
 | --- | --- | --- |
-| `VERSION` | The version of the collection and EE to package/use | 0.4.4 |
+| `VERSION` | The version of the collection and EE to package/use | 0.4.5 |
 | `GALAXY_TOKEN` | The API token from Ansible Galaxy for publishing a collection | Read at runtime from `.galaxy-token` |
 | `PUSH_IMAGE` | The container image name that the EE will be pushed to for publishing | registry.jharmison.com/ansible/oc-mirror-e2e |
 | `RUNTIME` | The OCI container runtime to use for operations that need one | `podman` |
