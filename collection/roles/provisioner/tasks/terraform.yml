@@ -1,6 +1,7 @@
 ---
 - name: Set the terraform deployment to {{ tf_task_state }}
   community.general.terraform:
+    binary_path: '{{ terraform_binary_path|default(omit) }}'
     project_path: '{{ output_dir }}/terraform'
     check_destroy: '{{ true if tf_task_state == "present" else false }}'
     force_init: true
