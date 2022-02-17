@@ -64,11 +64,25 @@
   changed_when: pip_download.stdout_lines|select("match", "^ Saved")|list|length > 0
   delegate_to: registry
 
-- name: Recovery the python packages to the controller
+- name: Identify python package files
+  find:
+    paths: '{{ ansible_env["HOME"] }}/pip-haul'
+    file_type: file
+  register: pip_files
+  delegate_to: registry
+
+- name: Ensure pip-haul directory is prepared on controller
+  file:
+    path: '{{ output_dir }}/pip-haul'
+    state: directory
+  delegate_to: controller
+
+- name: Recover the python packages to the controller
   fetch:
-    src: '{{ ansible_env["HOME"] }}/pip-haul'
-    dest: '{{ output_dir }}/pip-haul'
+    src: '{{ item.path }}'
+    dest: '{{ output_dir }}/pip-haul/'
     flat: yes
+  loop: '{{ pip_files.files }}'
   delegate_to: registry
 
 - name: Copy the python packages for interacting with the cluster
