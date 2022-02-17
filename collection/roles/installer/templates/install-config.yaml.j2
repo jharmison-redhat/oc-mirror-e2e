@@ -2,7 +2,7 @@ apiVersion: v1
 baseDomain: {{ cluster_domain }}
 {% if additional_trust_bundle != "" %}
 additionalTrustBundle: |
-{{ additional_trust_bundle|indent(width=2, indentfirst=True) }}
+{{ additional_trust_bundle|indent(width=2, first=True) }}
 {% endif %}
 compute:
 - architecture: amd64
