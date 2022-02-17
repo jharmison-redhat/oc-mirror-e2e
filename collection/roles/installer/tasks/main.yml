@@ -93,7 +93,7 @@
 - name: Install python packages for interacting with the cluster
   become: true
   pip:
-    name: '{{ pip_download.stdout_lines|select("search", (output_dir + "/pip/")|regex_escape)|map("regex_replace", "^.* " + (output_dir|regex_escape), ansible_env["HOME"])|list }}'
+    name: '{{ pip_files.files|map(attribute="path")|list }}'
 
 - name: Ensure certificate is available for interacting with the clsuter
   copy:
