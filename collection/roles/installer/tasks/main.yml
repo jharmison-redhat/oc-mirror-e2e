@@ -54,19 +54,26 @@
 
 - name: Ensure the pip download directory exists
   file:
-    path: '{{ output_dir }}/pip'
+    path: '{{ ansible_env["HOME"] }}/pip-haul'
     state: directory
-  delegate_to: localhost
+  delegate_to: registry
 
 - name: Download the necessary python packages
-  command: python3.6 -m pip download kubernetes --dest "{{ output_dir }}/pip"
+  command: python3.6 -m pip download kubernetes --dest "{{ ansible_env["HOME"] }}/pip-haul"
   register: pip_download
   changed_when: pip_download.stdout_lines|select("match", "^ Saved")|list|length > 0
-  delegate_to: localhost
+  delegate_to: registry
+
+- name: Recovery the python packages to the controller
+  fetch:
+    src: '{{ ansible_env["HOME"] }}/pip-haul'
+    dest: '{{ output_dir }}/pip-haul'
+    flat: yes
+  delegate_to: registry
 
 - name: Copy the python packages for interacting with the cluster
   copy:
-    src: '{{ output_dir }}/pip'
+    src: '{{ output_dir }}/pip-haul'
     dest: '{{ ansible_env["HOME"] }}/'
 
 - name: Install python packages for interacting with the cluster
