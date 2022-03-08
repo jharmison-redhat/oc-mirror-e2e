@@ -1,5 +1,5 @@
 {% if imageset_config_override == "" %}
-apiVersion: mirror.openshift.io/v1alpha1
+apiVersion: mirror.openshift.io/v1alpha2
 kind: ImageSetConfiguration
 {{ storage_config_snippets[storage_config_backend] | to_nice_yaml(indent=2) }}mirror:
   ocp:
