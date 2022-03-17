@@ -1,0 +1,10 @@
+# The ImageSetConfiguration operator blurb's schema is too complex to fully
+#   parametrize. It's easier to simply pass it in as a string, so we do.
+operator_blurb: |
+  operators:
+    - catalog: registry.redhat.io/redhat/redhat-operator-index:v{{ openshift_version }}
+      headsOnly: false
+      packages:
+        - name: ansible-automation-platform-operator
+          channels:
+            - name: stable-2.1
