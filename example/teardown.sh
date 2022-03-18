@@ -7,7 +7,7 @@ cd "$(dirname "$(realpath "$0")")" || exit
 
 set -x
 
-cluster=disco
+cluster=${TEARDOWN_CLUSTER:-disco}
 domain=redhat4govaws.io
 
 domain_underscored=$(echo "$domain" | tr '.' '_')
