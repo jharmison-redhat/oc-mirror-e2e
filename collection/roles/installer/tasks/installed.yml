@@ -44,35 +44,37 @@
   - responding.rc != 0
   - not kubeconfig.stat.exists
 
-- name: Install OpenShift
-  command: openshift-install create cluster
-  environment:
-    OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE: '{{ registry_hostname }}/{{ toplevel_namespace }}/openshift/release:{{ mirrored_versions.stdout_lines|last }}-x86_64'
-  args:
-    chdir: '{{ install_directory }}'
-  register: openshift_install
-  when:
-  - responding.rc != 0
-  - not kubeconfig.stat.exists
+- block:
+  - name: Install OpenShift
+    command: openshift-install create cluster
+    environment:
+      OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE: '{{ registry_hostname }}/{{ toplevel_namespace }}/openshift/release:{{ mirrored_versions.stdout_lines|last }}-x86_64'
+    args:
+      chdir: '{{ install_directory }}'
+    register: openshift_install
+    when:
+    - responding.rc != 0
+    - not kubeconfig.stat.exists
 
-- name: Rerun checks
-  include_tasks: checks.yml
-  when:
-  - responding.rc != 0
-  - not kubeconfig.stat.exists
+  - name: Rerun checks
+    include_tasks: checks.yml
+    when:
+    - responding.rc != 0
+    - not kubeconfig.stat.exists
 
-- name: Confirm cluster is responding
-  assert:
-    that:
-    - responding.rc == 0
-    fail_msg: OpenShift is not answering requests, and it is expected to be.
-    success_msg: OpenShift is answering requests as expected.
+  - name: Confirm cluster is responding
+    assert:
+      that:
+      - responding.rc == 0
+      fail_msg: OpenShift is not answering requests, and it is expected to be.
+      success_msg: OpenShift is answering requests as expected.
 
-- name: Recover OpenShift installer directory
-  become: yes
-  ansible.posix.synchronize:
-    mode: pull
-    src: '{{ install_directory }}'
-    dest: '{{ output_dir }}/'
-    rsync_opts:
+  always:
+  - name: Recover OpenShift installer directory
+    become: yes
+    ansible.posix.synchronize:
+      mode: pull
+      src: '{{ install_directory }}'
+      dest: '{{ output_dir }}/'
+      rsync_opts:
       - "--rsh='ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i {{ ansible_ssh_private_key_file }} -o ProxyCommand=\"ssh -W %h:%p -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i {{ hostvars.proxy.ansible_ssh_private_key_file }} {{ hostvars.proxy.ansible_user }}@{{ hostvars.proxy.ansible_host }}\"'"
