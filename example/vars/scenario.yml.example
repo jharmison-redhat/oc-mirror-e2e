@@ -4,6 +4,12 @@ cluster_name: disco
 # The version of OpenShift to mirror and install
 openshift_version: "4.9"
 
+# This can be set to specify a minor version of OpenShift to mirror
+# For further context on why this was added, and why you might want it, see:
+# https://coreos.slack.com/archives/C02JW6VCYS1/p1646753384654959
+# https://bugzilla.redhat.com/show_bug.cgi?id=2058421
+pinned_openshift_version: "4.9.22"
+
 # The scenario stubs, loaded from adjacent to this file, to use. See the
 #   individual files adjacent to the playbooks for more information on what the choices mean.
 scenario_stubs:

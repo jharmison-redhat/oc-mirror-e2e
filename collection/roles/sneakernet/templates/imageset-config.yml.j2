@@ -5,6 +5,10 @@ kind: ImageSetConfiguration
   ocp:
     channels:
       - name: stable-{{ openshift_version }}
+{% if pinned_openshift_version|default("") != "" %}
+        minVersion: {{ pinned_openshift_version }}
+        maxVersion: {{ pinned_openshift_version }}
+{% endif %}
 {{ operator_blurb|indent(2, first=True) }}
 {% if oc_mirror_additional_images|length > 0 %}
   additionalImages:

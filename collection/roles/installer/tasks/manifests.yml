@@ -8,6 +8,6 @@
 - name: Create OpenShift manifests
   command: openshift-install create manifests
   environment:
-    OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE: '{{ registry_hostname }}/{{ toplevel_namespace }}/openshift/release:{{ mirrored_versions.stdout_lines|last }}-x86_64'
+    OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE: '{{ registry_hostname }}/{{ toplevel_namespace }}/openshift/release-images:{{ mirrored_versions.stdout_lines|last }}-x86_64'
   args:
     chdir: '{{ install_directory }}'
