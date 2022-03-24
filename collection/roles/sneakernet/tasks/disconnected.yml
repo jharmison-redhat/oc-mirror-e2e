@@ -41,14 +41,6 @@
   when: mirror_directly_to_registry|bool == false
   loop: '{{ mirrored_content.files }}'
 
-- name: Check for oc and openshift-install
-  stat:
-    path: '{{ ansible_env["HOME"] }}/bin/{{ item }}'
-  register: client_binary
-  loop:
-  - oc
-  - openshift-install
-
 - name: Recover the versions of OpenShift published
   shell: >-
     set -o pipefail &&
@@ -65,6 +57,24 @@
     executable: /bin/bash
   register: mirrored_versions
   changed_when: false
+
+- name: Drop specified oc and openshift-install
+  copy:
+    src: '{{ item }}'
+    dest: '{{ ansible_env["HOME"] }}/bin/{{ item|basename }}'
+    mode: '0755'
+  loop: '{{ oc_bin_list + openshift_install_bin_list }}'
+  vars:
+    oc_bin_list: '{{ [oc_bin] if oc_bin is defined else [] }}'
+    openshift_install_bin_list: '{{ [openshift_install_bin] if openshift_install_bin is defined else [] }}'
+
+- name: Check for oc and openshift-install
+  stat:
+    path: '{{ ansible_env["HOME"] }}/bin/{{ item }}'
+  register: client_binary
+  loop:
+  - oc
+  - openshift-install
 
 - name: Extract the clients from the latest mirror
   shell: |-
@@ -86,6 +96,7 @@
     dest: '{{ bin_recovery_dir }}/'
     flat: yes
     mode: '0755'
+  when: false in client_binary|json_query('results[*].stat.exists')
 
 - name: Identify the latest results
   find:
