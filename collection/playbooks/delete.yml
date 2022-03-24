@@ -15,8 +15,8 @@
       tasks_from: uninstalled.yml
     vars:
       install_directory: '{{ output_dir }}/install'
-      oc_path: '{{ output_dir }}/clients/oc'
-      openshift_install_path: '{{ output_dir }}/clients/openshift-install'
+      oc_path: '{{ oc_bin|default(output_dir+"/clients/oc") }}'
+      openshift_install_path: '{{ openshift_install_bin|default(output_dir+"/clients/openshift-install" }}'
       extra_uninstall_env:
         AWS_ACCESS_KEY_ID: '{{ lookup("ini", "aws_access_key_id", section="default", file=(output_dir + "/aws_credentials")) }}'
         AWS_SECRET_ACCESS_KEY: '{{ lookup("ini", "aws_secret_access_key", section="default", file=(output_dir + "/aws_credentials")) }}'
