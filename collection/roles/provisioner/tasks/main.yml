@@ -11,16 +11,8 @@
     comment: '{{ registry_admin.email }}'
   register: keypair
 
-- name: Copy the terraform to the output
-  copy:
-    src: '{{ role_path }}/files/terraform'
-    dest: '{{ output_dir }}/'
-    remote_src: yes
-
-- name: Generate the backend config
-  template:
-    src: backend-config.hcl.j2
-    dest: '{{ output_dir }}/terraform/backend-config.hcl'
+- name: Ensure terraform setup is completed
+  include_tasks: setup.yml
 
 - name: Apply the terraform deployment
   include_tasks: terraform.yml

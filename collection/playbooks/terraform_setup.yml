@@ -1,0 +1,12 @@
+---
+- name: Setup the terraform environment for CI
+  hosts: controller
+  vars_files:
+  - '{{ playbook_dir }}/vars/defaults.yml'
+  tasks:
+  - name: Setup the terraform environment
+    include_role:
+      name: provisioner
+      tasks_from: setup.yml
+  tags:
+  - always
