@@ -29,4 +29,4 @@
     loop:
     - '{{ tf_init.stdout }}'
     - '{{ tf_init.stderr }}'
-    when: not tf_lock.stat_exists
+    when: not tf_lock.stat.exists
