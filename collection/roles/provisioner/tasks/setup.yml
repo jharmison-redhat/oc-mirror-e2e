@@ -19,7 +19,7 @@
   - name: Initialize Terraform
     shell: |
       cd {{ output_dir }}/terraform
-      terraform init -backend-config=backend-config.hcl
+      {{ terraform_binary_path|default("terraform") }} init -backend-config=backend-config.hcl
     when: not tf_lock.stat.exists
     register: tf_init
   always:
