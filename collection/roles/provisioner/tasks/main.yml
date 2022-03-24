@@ -19,6 +19,12 @@
   vars:
       public_key: '{{ keypair.public_key }}'
 
+- name: Generate a terraform destroy script
+  template:
+    src: tf-destroy.sh.j2
+    dest: '{{ output_dir }}/terraform/tf-destroy.sh'
+    mode: '0755'
+
 - name: Update the inventory
   include_tasks: inventory.yml
 
