@@ -1,0 +1,32 @@
+---
+- name: Copy the terraform to the output
+  copy:
+    src: '{{ role_path }}/files/terraform'
+    dest: '{{ output_dir }}/'
+    remote_src: yes
+
+- name: Generate the backend config
+  template:
+    src: backend-config.hcl.j2
+    dest: '{{ output_dir }}/terraform/backend-config.hcl'
+
+- name: Check for terraform init
+  stat:
+    path: '{{ output_dir }}/terraform/.terraform.lock.hcl'
+  register: tf_lock
+
+- block:
+  - name: Initialize Terraform
+    shell: |
+      cd {{ output_dir }}/terraform
+      {{ terraform_binary_path|default("terraform") }} init -backend-config=backend-config.hcl
+    when: not tf_lock.stat.exists
+    register: tf_init
+  always:
+  - name: Print terraform init output
+    debug:
+      msg: '{{ item }}'
+    loop:
+    - '{{ tf_init.stdout }}'
+    - '{{ tf_init.stderr }}'
+    when: not tf_lock.stat.exists

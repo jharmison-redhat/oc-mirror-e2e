@@ -1,6 +1,8 @@
 ---
 - name: Mirror content to disk
   command: '{{ oc_mirror_binary_location }} --config {{ ansible_env["HOME"] }}/imageset-config.yml file://{{ mirror_directory }}'
+  args:
+    chdir: '{{ mirror_directory }}'
   when: oc_mirror_config.changed or force_mirror_update|bool
 
 - name: Identify mirrored content

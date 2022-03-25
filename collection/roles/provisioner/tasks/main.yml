@@ -11,21 +11,19 @@
     comment: '{{ registry_admin.email }}'
   register: keypair
 
-- name: Copy the terraform to the output
-  copy:
-    src: '{{ role_path }}/files/terraform'
-    dest: '{{ output_dir }}/'
-    remote_src: yes
-
-- name: Generate the backend config
-  template:
-    src: backend-config.hcl.j2
-    dest: '{{ output_dir }}/terraform/backend-config.hcl'
+- name: Ensure terraform setup is completed
+  include_tasks: setup.yml
 
 - name: Apply the terraform deployment
   include_tasks: terraform.yml
   vars:
       public_key: '{{ keypair.public_key }}'
+
+- name: Generate a terraform destroy script
+  template:
+    src: tf-destroy.sh.j2
+    dest: '{{ output_dir }}/terraform/tf-destroy.sh'
+    mode: '0755'
 
 - name: Update the inventory
   include_tasks: inventory.yml

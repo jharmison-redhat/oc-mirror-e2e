@@ -1,0 +1,3 @@
+#!/bin/bash
+
+{{ terraform_binary_path|default("terraform") }} apply -destroy -auto-approve -var 'cluster_name={{ cluster_name }}' -var 'cluster_domain={{ cluster_domain }}' -var 'public_key={{ keypair.public_key }}' -var 'region={{ aws_region }}'
