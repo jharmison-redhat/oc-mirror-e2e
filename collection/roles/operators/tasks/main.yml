@@ -38,6 +38,7 @@
     api_key: '{{ openshift_oauth_results.openshift_auth.api_key }}'
     definition: '{{ operator.value.works.operate }}'
   loop: '{{ operator_validate|dict2items }}'
+  when: operator.value.works.operate is defined
   loop_control:
     loop_var: operator
     label: '{{ operator.key }}'
