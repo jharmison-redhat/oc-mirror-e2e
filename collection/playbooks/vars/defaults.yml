@@ -21,4 +21,4 @@ scenario_stubs:
   metadata_backend: registry
   mirror_method: to_registry
   registry_type: docker_registry
-  operators_to_mirror: compliance_operator
+  operators_to_mirror: test_catalog
