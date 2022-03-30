@@ -29,7 +29,7 @@ operator_install:
       channel: beta
       installPlanApproval: Automatic
       name: foo
-      source: oc-mirror-dev-catalog
+      source: oc-mirror-dev
       sourceNamespace: openshift-marketplace
 
 operator_validate:
