@@ -2,7 +2,6 @@
 operator_blurb: |
   operators:
     - catalog: registry.jharmison.com/redhatgov/oc-mirror-dev:test-catalog-latest
-      headsOnly: true
 
 operator_install:
   foo-operator:
