@@ -1,14 +1,14 @@
 #!/bin/bash
 
-read -rsp "WARNING! This script does not save your Terraform state. Are you sure you want to destroy the terraformed infrastructure, without recovering state? Press Enter to continue, or Ctrl+C to cancel." throwaway
+cluster=${TEARDOWN_CLUSTER:-disco}
+domain=${TEARDOWN_DOMAIN:-redhat4govaws.io}
+
+read -rsp "WARNING! This script only tears down the infrastructure that the disconnected-testbed Terraform would have provisioned and does not save your Terraform state. Are you sure you want to destroy $(printf '\e[31;1m')${cluster}.${domain}$(printf '\e[0m') infrastructure, without recovering state? Press Enter to continue, or Ctrl+C to cancel." throwaway
 echo
 
 cd "$(dirname "$(realpath "$0")")" || exit
 
 set -x
-
-cluster=${TEARDOWN_CLUSTER:-disco}
-domain=redhat4govaws.io
 
 domain_underscored=$(echo "$domain" | tr '.' '_')
 
