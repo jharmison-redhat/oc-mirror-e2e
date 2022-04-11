@@ -1,0 +1,6 @@
+---
+expected_version:
+  latest: foo-v0.3.1
+  diff: foo-v0.3.2
+  prune: foo-v0.1.1
+  prune-diff: foo-v0.2.0

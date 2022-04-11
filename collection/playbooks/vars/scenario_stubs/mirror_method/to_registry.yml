@@ -1,3 +1,0 @@
-# Setting this to true mirrors directly to the registry while connected. The
-#   registry is reachable on the connected side as well as the isolated.
-mirror_directly_to_registry: true
