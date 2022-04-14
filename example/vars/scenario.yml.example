@@ -29,3 +29,11 @@ mirror_directly_to_registry: true
 #   - docker_registry
 #   - redhat_quay
 registry_type: docker_registry
+
+# operators_to_mirror
+# Determines which operators should be mirrored, installed, and tested
+# The value should be a list of strings from the following options:
+#   - foo
+#   - compliance_operator
+operators_to_mirror:
+- foo

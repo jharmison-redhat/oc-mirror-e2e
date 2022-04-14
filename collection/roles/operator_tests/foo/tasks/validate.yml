@@ -1,0 +1,31 @@
+---
+- name: Wait for Foo to finish installing
+  kubernetes.core.k8s_info:
+    host: https://api.{{ cluster_name }}.{{ cluster_domain }}:6443
+    ca_cert: '{{ cluster_ca_path }}'
+    api_key: '{{ openshift_oauth_results.openshift_auth.api_key }}'
+    api_version: operators.coreos.com/v1alpha1
+    kind: Subscription
+    name: foo
+    namespace: foo-operator
+  register: foo_installed
+  until:
+  - foo_installed.resources|length > 0
+  - (foo_installed.resources|first).status.state == "AtLatestKnown"
+  retries: 60
+  delay: 10
+
+- name: Validate that Foo installed the expected version
+  kubernetes.core.k8s_log:
+    host: https://api.{{ cluster_name }}.{{ cluster_domain }}:6443
+    ca_cert: '{{ cluster_ca_path }}'
+    api_key: '{{ openshift_oauth_results.openshift_auth.api_key }}'
+    api_version: apps/v1
+    kind: Deployment
+    namespace: foo-operator
+    name: foo-operator
+  register: operator_log
+  until:
+  - expected_version[catalog_version] in operator_log.log
+  retries: 6
+  delay: 10

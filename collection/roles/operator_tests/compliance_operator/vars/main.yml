@@ -1,0 +1,9 @@
+---
+catalog: registry.redhat.io/redhat/redhat-operator-index:v{{ openshift_version }}
+
+full: true
+
+packages:
+- name: compliance-operator
+  channels:
+  - name: release-0.1

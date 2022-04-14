@@ -1,0 +1,34 @@
+---
+- name: Install Foo Operator
+  kubernetes.core.k8s:
+    state: present
+    host: https://api.{{ cluster_name }}.{{ cluster_domain }}:6443
+    ca_cert: '{{ cluster_ca_path }}'
+    api_key: '{{ openshift_oauth_results.openshift_auth.api_key }}'
+    definition:
+    - apiVersion: v1
+      kind: Namespace
+      metadata:
+        labels:
+          openshift.io/cluster-monitoring: "true"
+        name: foo-operator
+      spec: {}
+    - apiVersion: operators.coreos.com/v1
+      kind: OperatorGroup
+      metadata:
+        name: foo-operator
+        namespace: foo-operator
+      spec:
+        targetNamespaces:
+        - foo-operator
+    - apiVersion: operators.coreos.com/v1alpha1
+      kind: Subscription
+      metadata:
+        name: foo
+        namespace: foo-operator
+      spec:
+        channel: beta
+        installPlanApproval: Automatic
+        name: foo
+        source: oc-mirror-dev
+        sourceNamespace: openshift-marketplace
