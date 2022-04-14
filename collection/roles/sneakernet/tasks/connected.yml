@@ -55,18 +55,18 @@
   - name: Mirror content directly into registry
     include_tasks: mirror-directly-to-registry.yml
     when: mirror_directly_to_registry|bool == true
-  
+
   - name: Download mirror content on connected host
     include_tasks: mirror-on-host.yml
     when: mirror_directly_to_registry|bool == false
-  
+
   - name: Identify results directory
     find:
       paths: '{{ mirror_directory }}/oc-mirror-workspace'
       file_type: directory
       patterns: "results-*"
     register: results
-  
+
   - name: Identify results ICSPs and CatalogSources
     find:
       paths: '{{ (results.files|last).path }}'
@@ -74,7 +74,7 @@
       patterns: '*.yaml'
     when: results.files|length > 0
     register: sources
-  
+
   - name: Recover ICSPs and CatalogSources
     fetch:
       src: '{{ item.path }}'
@@ -83,11 +83,11 @@
       mode: '0644'
     when: results.files|length > 0
     loop: '{{ sources.files }}'
-  
+
   always: # Recover logs even if anything else fails
   - name: Recover oc-mirror log
     fetch:
       src: '{{ mirror_directory }}/.oc-mirror.log'
-      dest: '{{ output_dir }}/'
+      dest: '{{ output_dir }}/oc-mirror-{{ ansible_date_time.iso8601_basic_short }}.log'
       flat: yes
       mode: '0644'
