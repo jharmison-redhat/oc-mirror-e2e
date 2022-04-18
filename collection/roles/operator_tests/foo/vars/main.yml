@@ -3,7 +3,7 @@ foo_catalog: quay.io/redhatgov/oc-mirror-dev:test-catalog-{{ catalog_version }}
 foo_catalog_full: true
 
 foo_packages:
-- name: foo-operator
+- name: foo
   channels:
   - name: beta
 
