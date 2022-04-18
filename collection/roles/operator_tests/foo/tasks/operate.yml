@@ -1,3 +1,18 @@
 ---
-- debug:
-    msg: The foo operator has no operation. Skipping.
+- name: Wait for Foo to finish installing
+  kubernetes.core.k8s_info:
+    host: https://api.{{ cluster_name }}.{{ cluster_domain }}:6443
+    ca_cert: '{{ cluster_ca_path }}'
+    api_key: '{{ openshift_oauth_results.openshift_auth.api_key }}'
+    api_version: operators.coreos.com/v1alpha1
+    kind: Subscription
+    name: foo
+    namespace: foo-operator
+  register: foo_installed
+  until:
+  - foo_installed.resources|length > 0
+  - (foo_installed.resources|first).status.state == "AtLatestKnown"
+  retries: 60
+  delay: 10
+
+# The foo operator doesn't respond to CRs, so no additional operation is necessary
