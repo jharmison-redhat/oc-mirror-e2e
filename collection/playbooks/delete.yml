@@ -3,10 +3,6 @@
   hosts: controller
   vars_files:
   - '{{ playbook_dir }}/vars/defaults.yml'
-  pre_tasks:
-  - name: Load the scenario content
-    include_vars: '{{ playbook_dir }}/vars/scenario_stubs/{{ item.key }}/{{ item.value }}.yml'
-    loop: '{{ scenario_stubs|dict2items }}'
   tasks:
 
   - name: Uninstall OpenShift

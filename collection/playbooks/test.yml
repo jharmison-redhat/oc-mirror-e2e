@@ -3,29 +3,11 @@
   hosts: controller
   vars_files:
   - '{{ playbook_dir }}/vars/defaults.yml'
-  pre_tasks:
-  - name: Load the scenario content
-    include_vars: '{{ playbook_dir }}/vars/scenario_stubs/{{ item.key }}/{{ item.value }}.yml'
-    loop: '{{ scenario_stubs|dict2items }}'
   tasks:
   - name: Minimal import of provisioned infrastructure
     include_role:
       name: provisioner
       tasks_from: minimal
-  tags:
-  - always
-
-- name: Load scenario content for terraformed nodes
-  hosts: terraformed
-  vars_files:
-  - '{{ playbook_dir }}/vars/defaults.yml'
-  gather_facts: false
-  roles:
-  - cloud_init_finished
-  post_tasks:
-  - name: Load the scenario content for the terraformed nodes
-    include_vars: '{{ playbook_dir }}/vars/scenario_stubs/{{ item.key }}/{{ item.value }}.yml'
-    loop: '{{ scenario_stubs|dict2items }}'
   tags:
   - always
 
