@@ -1,9 +1,0 @@
----
-- name: Fail if operators are specifying incompatible full settings with other operators from the same catalog
-  assert:
-    that: catalog_full in operator_catalogs|communit.general.json_query('[?catalog==`{{ catalog }}`].full')|list
-  when: catalog in operator_catalogs|community.general.json_query("[].catalog")|list
-
-- name: Add the new package to the catalog list
-  set_fact:
-    operator_catalogs: '{{ operator_catalogs|combine([{"catalog": catalog, "full": catalog_full, "packages": packages}], recursive=True, list_merge="append") }}'

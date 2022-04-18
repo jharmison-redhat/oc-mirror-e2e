@@ -1,5 +1,10 @@
 ---
-- name: Merge operator catalogs
-  include_role:
-    name: operator_tests/merge_operator_catalogs
-    public: true
+- name: Merge foo into operator catalogs
+  catalog_merge:
+    operator_catalogs: '{{ operator_catalogs|default([]) }}'
+    catalog: '{{ foo_catalog }}'
+    full: '{{ foo_catalog_full }}'
+    packages: '{{ foo_packages }}'
+  register: catalog_merge
+
+- debug: var=catalog_merge

@@ -1,8 +1,8 @@
 ---
-catalog: registry.redhat.io/redhat/redhat-operator-index:v{{ openshift_version }}
-catalog_full: true
+compliance_operator_catalog: registry.redhat.io/redhat/redhat-operator-index:v{{ openshift_version }}
+compliance_operator_catalog_full: true
 
-packages:
+compliance_operator_packages:
 - name: compliance-operator
   channels:
   - name: release-0.1

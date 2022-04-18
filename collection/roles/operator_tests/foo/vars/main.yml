@@ -1,5 +1,13 @@
 ---
-expected_version:
+foo_catalog: quay.io/redhatgov/oc-mirror-dev:test-catalog-{{ catalog_version }}
+foo_catalog_full: false
+
+foo_packages:
+- name: foo-operator
+  channels:
+  - name: beta
+
+foo_expected_versions:
   latest: foo-v0.3.1
   diff: foo-v0.3.2
   prune: foo-v0.1.1
