@@ -1,7 +1,7 @@
 ---
 - name: Collect configuration variables from operators
   include_role:
-    name: '{{ item }}'
+    name: 'operator_tests/{{ item }}'
     public: true
   loop: '{{ operators_to_mirror }}'
 

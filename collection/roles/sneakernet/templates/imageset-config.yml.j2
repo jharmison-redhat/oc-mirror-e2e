@@ -12,7 +12,7 @@ kind: ImageSetConfiguration
 {% if operators_to_mirror|length > 0 %}
   operators:
 {{ operator_catalogs | to_nice_yaml(indent=2) | indent(4, first=True) }}
-{% endif %}
+{%- endif %}
 {% if oc_mirror_additional_images|length > 0 %}
   additionalImages:
 {% for additional_image in oc_mirror_additional_images %}
