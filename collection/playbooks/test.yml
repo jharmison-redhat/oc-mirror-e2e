@@ -79,12 +79,23 @@
           spec:
             disableAllDefaultSources: true
 
-    - name: Install and configure operator(s)
+    - name: Install operator(s)
       include_role:
-        name: operators
-      when:
-      - scenario_stubs.operators_to_mirror is defined
-      - scenario_stubs.operators_to_mirror != None
+        name: operator_tests/{{ item }}
+        tasks_from: install
+      loop: '{{ operators_to_mirror }}'
+
+    - name: Leverage operator(s)
+      include_role:
+        name: operator_tests/{{ item }}
+        tasks_from: operate
+      loop: '{{ operators_to_mirror }}'
+
+    - name: Validate operator(s)
+      include_role:
+        name: operator_tests/{{ item }}
+        tasks_from: validate
+      loop: '{{ operators_to_mirror }}'
 
     always:
     - name: Log out of the cluster
