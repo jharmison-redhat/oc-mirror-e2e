@@ -1,7 +1,6 @@
 ---
 catalog: registry.redhat.io/redhat/redhat-operator-index:v{{ openshift_version }}
-
-full: true
+catalog_full: true
 
 packages:
 - name: compliance-operator

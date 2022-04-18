@@ -9,7 +9,12 @@ kind: ImageSetConfiguration
         minVersion: {{ pinned_openshift_version }}
         maxVersion: {{ pinned_openshift_version }}
 {% endif %}
-{{ operator_blurb|indent(2, first=True) }}
+{% if operators_to_mirror|length > 0 %}
+  operators:
+{% for catalog in operator_catalogs %}
+{{ catalog|to_nice_yaml|indent(4, first=True) }}
+{% endfor %}
+{% endif %}
 {% if oc_mirror_additional_images|length > 0 %}
   additionalImages:
 {% for additional_image in oc_mirror_additional_images %}

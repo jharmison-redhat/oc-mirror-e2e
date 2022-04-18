@@ -1,0 +1,5 @@
+---
+- name: Merge operator catalogs
+  include_role:
+    name: operator_tests/merge_operator_catalogs
+    public: true

@@ -17,8 +17,7 @@ toplevel_namespace: oc-mirror
 # scenario
 cluster_name: disco
 openshift_version: "4.9"
-scenario_stubs:
-  metadata_backend: registry
-  mirror_method: to_registry
-  registry_type: docker_registry
-  operators_to_mirror: test_catalog
+storage_config_backend: registry
+mirror_directly_to_registry: true
+registry_type: docker_registry
+operators_to_mirror: ["foo"]

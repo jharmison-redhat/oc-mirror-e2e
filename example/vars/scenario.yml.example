@@ -32,8 +32,11 @@ registry_type: docker_registry
 
 # operators_to_mirror
 # Determines which operators should be mirrored, installed, and tested
+# Note that some of the operators define a second phase, and those operators will result
+#   in a second run of oc-mirror, including some additional validation. The ones that
+#   have this second phase are marked with an asterisk below.
 # The value should be a list of strings from the following options:
-#   - foo
+#   - foo *
 #   - compliance_operator
 operators_to_mirror:
 - foo
