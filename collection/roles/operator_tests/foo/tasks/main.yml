@@ -5,6 +5,3 @@
     catalog: '{{ foo_catalog }}'
     full: '{{ foo_catalog_full }}'
     packages: '{{ foo_packages }}'
-  register: catalog_merge
-
-- debug: var=catalog_merge

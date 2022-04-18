@@ -5,6 +5,3 @@
     catalog: '{{ compliance_operator_catalog }}'
     full: '{{ compliance_operator_catalog_full }}'
     packages: '{{ compliance_operator_packages }}'
-  register: catalog_merge
-
-- debug: var=catalog_merge
