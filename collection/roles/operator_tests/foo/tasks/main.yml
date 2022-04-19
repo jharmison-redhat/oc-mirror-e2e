@@ -1,7 +1,17 @@
 ---
+# Need to track which publish we're on and use that to pick the version, probably with a max of the length of the list
+- name: Set foo catalog version
+  set_fact:
+    foo_catalog_version: '{{ foo_catalog_phases[0] }}'
+
+# Need to push the catalog to the dest
+
+# Need to update the catalog to use the dest here
 - name: Merge foo into operator catalogs
   catalog_merge:
     operator_catalogs: '{{ operator_catalogs|default([]) }}'
     catalog: '{{ foo_catalog }}'
     full: '{{ foo_catalog_full }}'
     packages: '{{ foo_packages }}'
+
+# Need to increment the phase index here

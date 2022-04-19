@@ -1,5 +1,11 @@
 ---
-foo_catalog: quay.io/redhatgov/oc-mirror-dev:test-catalog-{{ catalog_version }}
+foo_catalog: quay.io/redhatgov/oc-mirror-dev:test-catalog-{{ foo_catalog_version }}
+foo_dest_catalog: {{ registry_hostname }}/redhatgov/oc-mirror-dev:test-catalog-prune
+
+foo_catalog_phases:
+- prune
+- prune-diff
+
 foo_catalog_full: true
 
 foo_packages:
