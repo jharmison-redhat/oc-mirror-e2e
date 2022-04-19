@@ -7,11 +7,11 @@
     api_version: operators.coreos.com/v1alpha1
     kind: Subscription
     name: compliance-operator
-    namespace: foo-operator
-  register: foo_installed
+    namespace: openshift-compliance
+  register: compliance_operator_installed
   until:
-  - foo_installed.resources|length > 0
-  - (foo_installed.resources|first).status.state == "AtLatestKnown"
+  - compliance_operator_installed.resources|length > 0
+  - (compliance_operator_installed.resources|first).status.state == "AtLatestKnown"
   retries: 60
   delay: 10
 
@@ -24,7 +24,7 @@
     api_version: compliance.openshift.io/v1alpha1
     kind: ScanSettingBinding
     name: nist-moderate
-    namespace: compliance-operator
+    namespace: openshift-compliance
     definition:
       profiles:
       - apiGroup: compliance.openshift.io/v1alpha1
