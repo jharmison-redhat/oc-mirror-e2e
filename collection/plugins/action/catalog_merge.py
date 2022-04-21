@@ -37,7 +37,10 @@ class ActionModule(ActionBase):
             if operator_catalog.get('catalog') == catalog:
                 if boolean(operator_catalog.get('full')) != full:
                     raise AnsibleActionFail('Unable to merge two catalog specs with different full specifications')
-                operator_catalog.get('packages').extend(packages)
+                catalog_packages = operator_catalog.get('packages')
+                for package in packages:
+                    if package not in catalog_packages:
+                        catalog_packages.append(package)
                 added = True
                 break
         if not added:

@@ -72,6 +72,8 @@
   - include_role:
       name: sneakernet
       tasks_from: disconnected/publish.yml
+    vars:
+      foo_catalog_version: prune-diff
     when: conduct_second_publish|bool or 'foo' in operators_to_mirror
   tags:
   - republish
@@ -82,6 +84,8 @@
   - '{{ playbook_dir }}/vars/defaults.yml'
   tasks:
   - include_tasks: tasks/validate_operators.yml
+    vars:
+      foo_catalog_version: prune-diff
     when: conduct_second_publish|bool or 'foo' in operators_to_mirror
   tags:
   - republish
