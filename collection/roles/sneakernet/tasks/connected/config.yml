@@ -1,4 +1,14 @@
 ---
+- name: Ensure pull secret location exists
+  file:
+    path: '{{ ansible_env["HOME"] }}/.docker'
+    state: directory
+
+- name: Drop pull secret for oc-mirror
+  copy:
+    content: '{{ combined_pull_secret }}'
+    dest: '{{ ansible_env["HOME"] }}/.docker/config.json'
+
 - name: Collect configuration variables from operators
   include_role:
     name: 'operator_tests/{{ item }}'
@@ -10,13 +20,3 @@
     src: imageset-config.yml.j2
     dest: '{{ ansible_env["HOME"] }}/imageset-config.yml'
   register: oc_mirror_config
-
-- name: Ensure pull secret location exists
-  file:
-    path: '{{ ansible_env["HOME"] }}/.docker'
-    state: directory
-
-- name: Drop pull secret for oc-mirror
-  copy:
-    content: '{{ combined_pull_secret }}'
-    dest: '{{ ansible_env["HOME"] }}/.docker/config.json'
