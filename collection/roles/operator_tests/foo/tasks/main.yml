@@ -1,6 +1,6 @@
 ---
 - name: Copy the foo index to the destination before mirroring (this allows us to move it to a different source tag)
-  containers.podman.image:
+  containers.podman.podman_image:
     name: '{{ foo_catalog }}'
     pull: true
     push: true
