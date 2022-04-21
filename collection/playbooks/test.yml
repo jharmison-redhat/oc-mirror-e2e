@@ -60,7 +60,7 @@
     loop:
     - config
     - mirror
-    when: conduct_second_publish|bool
+    when: conduct_second_publish|bool or 'foo' in operators_to_mirror
   tags:
   - republish
 
@@ -72,7 +72,7 @@
   - include_role:
       name: sneakernet
       tasks_from: disconnected/publish.yml
-    when: conduct_second_publish|bool
+    when: conduct_second_publish|bool or 'foo' in operators_to_mirror
   tags:
   - republish
 
@@ -82,6 +82,6 @@
   - '{{ playbook_dir }}/vars/defaults.yml'
   tasks:
   - include_tasks: tasks/validate_operators.yml
-    when: conduct_second_publish|bool
+    when: conduct_second_publish|bool or 'foo' in operators_to_mirror
   tags:
   - republish
