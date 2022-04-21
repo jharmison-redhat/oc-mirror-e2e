@@ -1,0 +1,57 @@
+---
+- name: Recover the versions of OpenShift published
+  shell: >-
+    set -o pipefail &&
+    podman search
+    --limit 9999
+    --authfile '{{ ansible_env["HOME"] }}/.docker/config.json'
+    --list-tags
+    {{ registry_hostname }}/{{ toplevel_namespace }}/openshift/release
+    | tail -n+2
+    | awk '{print $2}'
+    | cut -d- -f1
+    | sort -Vu
+  args:
+    executable: /bin/bash
+  register: mirrored_versions
+  changed_when: false
+
+- name: Drop specified oc and openshift-install
+  copy:
+    src: '{{ item }}'
+    dest: '{{ ansible_env["HOME"] }}/bin/{{ item|basename }}'
+    mode: '0755'
+  loop: '{{ oc_bin_list + openshift_install_bin_list }}'
+  vars:
+    oc_bin_list: '{{ [oc_bin] if oc_bin is defined else [] }}'
+    openshift_install_bin_list: '{{ [openshift_install_bin] if openshift_install_bin is defined else [] }}'
+
+- name: Check for oc and openshift-install
+  stat:
+    path: '{{ ansible_env["HOME"] }}/bin/{{ item }}'
+  register: client_binary
+  loop:
+  - oc
+  - openshift-install
+
+- name: Extract the clients from the latest mirror
+  shell: |-
+    function extract_binary {
+      binary=${1:?binary name is required}
+      image=${2:? image name is required}
+      podman run --replace --rm --name extract -d --entrypoint bash {{ registry_hostname }}/{{ toplevel_namespace }}/openshift/release:{{ mirrored_versions.stdout_lines|last }}-x86_64-$image -c 'while : ; do sleep 30; done'
+      podman cp "extract:/usr/bin/$binary" "{{ ansible_env["HOME"] }}/bin/$binary" || exit 1
+      sync
+      podman stop extract
+    }
+    extract_binary oc cli
+    extract_binary openshift-install installer
+  when: false in client_binary|json_query('results[*].stat.exists')
+
+- name: Recover the installer to the controller
+  fetch:
+    src: '{{ ansible_env["HOME"] }}/bin/openshift-install'
+    dest: '{{ bin_recovery_dir }}/'
+    flat: yes
+    mode: '0755'
+  when: false in client_binary|json_query('results[*].stat.exists')

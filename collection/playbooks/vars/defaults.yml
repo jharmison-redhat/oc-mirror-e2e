@@ -21,3 +21,6 @@ storage_config_backend: registry
 mirror_directly_to_registry: true
 registry_type: docker_registry
 operators_to_mirror: ["foo"]
+
+# this is automatically tripped on when using the foo operator, but can be manually specified also
+conduct_second_publish: false

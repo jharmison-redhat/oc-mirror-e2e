@@ -1,0 +1,42 @@
+---
+- name: Ensure that the directories exist
+  file:
+    path: '{{ item }}'
+    state: directory
+  loop:
+  - '{{ ansible_env["HOME"] }}/bin'
+  - '{{ mirror_directory }}'
+
+- name: Drop oc-mirror into user's ~/bin
+  copy:
+    src: '{{ bin_recovery_dir }}/oc-mirror'
+    dest: '{{ ansible_env["HOME"] }}/bin/'
+    mode: '0755'
+
+- name: Drop all oc-mirror data
+  copy:
+    src: '{{ mirror_data_recovery_dir }}/'
+    dest: '{{ mirror_directory }}'
+
+- name: Ensure pull secret location exists
+  file:
+    path: '{{ ansible_env["HOME"] }}/.docker'
+    state: directory
+
+- name: Drop pull secret for oc-mirror
+  copy:
+    content: '{{ local_registry_pull_secret|from_yaml|to_json }}'
+    dest: '{{ ansible_env["HOME"] }}/.docker/config.json'
+
+- name: Identify any disk-based mirror bundles
+  find:
+    paths: '{{ mirror_directory }}'
+    file_type: file
+    patterns: 'mirror*.tar'
+  when: mirror_directly_to_registry|bool == false
+  register: mirrored_content
+
+- name: Publish mirror data into disconnected registry
+  command: oc-mirror --from "{{ item.path }}" docker://{{ registry_hostname }}/{{ toplevel_namespace }}
+  when: mirror_directly_to_registry|bool == false
+  loop: '{{ mirrored_content.files }}'

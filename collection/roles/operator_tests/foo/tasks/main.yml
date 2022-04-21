@@ -1,17 +1,16 @@
 ---
-# Need to track which publish we're on and use that to pick the version, probably with a max of the length of the list
-- name: Set foo catalog version
-  set_fact:
-    foo_catalog_version: '{{ foo_catalog_phases[0] }}'
+- name: Copy the foo index to the destination before mirroring (this allows us to move it to a different source tag)
+  containers.podman.image:
+    name: '{{ foo_catalog }}'
+    pull: true
+    push: true
+    auth_file: '{{ ansible_env["HOME"] }}/.docker/config.json'
+    push_args:
+      dest: '{{ foo_dest_catalog }}'
 
-# Need to push the catalog to the dest
-
-# Need to update the catalog to use the dest here
-- name: Merge foo into operator catalogs
+- name: Merge foo index {{ foo_catalog_version }} into operator catalogs
   catalog_merge:
     operator_catalogs: '{{ operator_catalogs|default([]) }}'
-    catalog: '{{ foo_catalog }}'
+    catalog: '{{ foo_dest_catalog }}'
     full: '{{ foo_catalog_full }}'
     packages: '{{ foo_packages }}'
-
-# Need to increment the phase index here

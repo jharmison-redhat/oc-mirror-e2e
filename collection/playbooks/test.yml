@@ -42,48 +42,46 @@
   vars_files:
   - '{{ playbook_dir }}/vars/defaults.yml'
   tasks:
-  - block:
-    - name: Log in to the cluster
-      import_role:
-        name: logged_in
-      vars:
-        state: present
-
-    - name: Disable the default OperatorHub sources
-      kubernetes.core.k8s:
-        state: patched
-        host: https://api.{{ cluster_name }}.{{ cluster_domain }}:6443
-        ca_cert: '{{ cluster_ca_path }}'
-        api_key: '{{ openshift_oauth_results.openshift_auth.api_key }}'
-        kind: OperatorHub
-        name: cluster
-        definition:
-          spec:
-            disableAllDefaultSources: true
-
-    - name: Install operator(s)
-      include_role:
-        name: operator_tests/{{ item }}
-        tasks_from: install
-      loop: '{{ operators_to_mirror }}'
-
-    - name: Leverage operator(s)
-      include_role:
-        name: operator_tests/{{ item }}
-        tasks_from: operate
-      loop: '{{ operators_to_mirror }}'
-
-    - name: Validate operator(s)
-      include_role:
-        name: operator_tests/{{ item }}
-        tasks_from: validate
-      loop: '{{ operators_to_mirror }}'
-
-    always:
-    - name: Log out of the cluster
-      import_role:
-        name: logged_in
-      vars:
-        state: absent
+  - import_tasks: tasks/validate_operators.yml
   tags:
   - operators
+
+- name: Conduct a second mirror operation
+  hosts: registry
+  vars_files:
+  - '{{ playbook_dir }}/vars/defaults.yml'
+  tasks:
+  - include_role:
+      name: sneakernet
+      tasks_from: connected/{{ item }}.yml
+    vars:
+      force_mirror_update: true
+      foo_catalog_version: prune-diff
+    loop:
+    - config
+    - mirror
+    when: conduct_second_publish|bool
+  tags:
+  - republish
+
+- name: Conduct a second publish operation (if necessary)
+  hosts: bastion
+  vars_files:
+  - '{{ playbook_dir }}/vars/defaults.yml'
+  tasks:
+  - include_role:
+      name: sneakernet
+      tasks_from: disconnected/publish.yml
+    when: conduct_second_publish|bool
+  tags:
+  - republish
+
+- name: Rerun validation of operators with latest publish
+  hosts: bastion
+  vars_files:
+  - '{{ playbook_dir }}/vars/defaults.yml'
+  tasks:
+  - include_tasks: tasks/validate_operators.yml
+    when: conduct_second_publish|bool
+  tags:
+  - republish
