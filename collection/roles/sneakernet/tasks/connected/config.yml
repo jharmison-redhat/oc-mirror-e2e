@@ -11,9 +11,11 @@
 
 - name: Collect configuration variables from operators
   include_role:
-    name: 'operator_tests/{{ item }}'
+    name: 'operator_tests/{{ operator }}'
     public: true
   loop: '{{ operators_to_mirror }}'
+  loop_control:
+    loop_var: operator
 
 - name: Drop oc-mirror configuration
   template:
