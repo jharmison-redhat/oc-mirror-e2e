@@ -18,6 +18,18 @@
         spec:
           disableAllDefaultSources: true
 
+  - name: Restart catalog pod
+    kubernetes.core.k8s:
+      state: absent
+      host: https://api.{{ cluster_name }}.{{ cluster_domain }}:6443
+      ca_cert: '{{ cluster_ca_path }}'
+      api_key: '{{ openshift_oauth_results.openshift_auth.api_key }}'
+      label_selectors:
+        - "olm.catalogSource=oc-mirror-dev"
+      kind: Pod
+      namespace: openshift-marketplace
+    when: restart_dev_catalog|default(false)|bool
+
   - name: Install operator(s)
     include_role:
       name: operator_tests/{{ item }}

@@ -85,6 +85,7 @@
   tasks:
   - include_tasks: tasks/validate_operators.yml
     vars:
+      restart_dev_catalog: true
       foo_catalog_version: prune-diff
     when: conduct_second_publish|bool or 'foo' in operators_to_mirror
   tags:
