@@ -4,16 +4,39 @@ cluster_name: disco
 # The version of OpenShift to mirror and install
 openshift_version: "4.9"
 
-# This can be set to specify a minor version of OpenShift to mirror
-# For further context on why this was added, and why you might want it, see:
-# https://coreos.slack.com/archives/C02JW6VCYS1/p1646753384654959
-# https://bugzilla.redhat.com/show_bug.cgi?id=2058421
-pinned_openshift_version: "4.9.22"
+# The following determine the testing scenario that is run, and can mostly be selected
+# independently of each other.
 
-# The scenario stubs, loaded from adjacent to this file, to use. See the
-#   individual files adjacent to the playbooks for more information on what the choices mean.
-scenario_stubs:
-  metadata_backend: registry
-  mirror_method: to_registry
-  registry_type: docker_registry
-  operators_to_mirror: compliance_operator
+# storage_config_backend
+# Determines where the metadata is stored for oc-mirror runs. Local metadata is saved on
+# disk on the node running the connected oc-mirror workflows. If registry is selected, the
+# "disconnected" registry is pushed to directly from the connected node.
+# Options:
+#   - local
+#   - registry
+storage_config_backend: registry
+
+# mirror_directly_to_registry
+# Determines whether the connected node pushes the mirror into the registry directly with
+# oc-mirror, or whether the imageset is mirrored to disk and hauled over the "airgap" for
+# publishing from the disconnected bastion.
+# The value should be a yaml boolean
+mirror_directly_to_registry: true
+
+# registry_type
+# Determines what kind of registry is instantiated for the "disconnected" registry.
+# Options:
+#   - docker_registry
+#   - redhat_quay
+registry_type: docker_registry
+
+# operators_to_mirror
+# Determines which operators should be mirrored, installed, and tested
+# Note that some of the operators define a second phase, and those operators will result
+#   in a second run of oc-mirror, including some additional validation. The ones that
+#   have this second phase are marked with an asterisk below.
+# The value should be a list of strings from the following options:
+#   - foo *
+#   - compliance_operator
+operators_to_mirror:
+- foo

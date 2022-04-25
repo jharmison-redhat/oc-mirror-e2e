@@ -2,14 +2,17 @@
 apiVersion: mirror.openshift.io/v1alpha2
 kind: ImageSetConfiguration
 {{ storage_config_snippets[storage_config_backend] | to_nice_yaml(indent=2) }}mirror:
-  ocp:
+  platform:
     channels:
       - name: stable-{{ openshift_version }}
 {% if pinned_openshift_version|default("") != "" %}
         minVersion: {{ pinned_openshift_version }}
         maxVersion: {{ pinned_openshift_version }}
 {% endif %}
-{{ operator_blurb|indent(2, first=True) }}
+{% if operators_to_mirror|length > 0 %}
+  operators:
+{{ operator_catalogs | to_nice_yaml(indent=2) | indent(4, first=True) }}
+{%- endif %}
 {% if oc_mirror_additional_images|length > 0 %}
   additionalImages:
 {% for additional_image in oc_mirror_additional_images %}

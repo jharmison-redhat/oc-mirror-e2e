@@ -34,5 +34,3 @@ oc_mirror_additional_images:
 
 # If set to any value other than an empty string, will be used to completely override the templated imageSet
 imageset_config_override: ""
-
-operator_blurb: ""

@@ -90,7 +90,7 @@
   become: true
   containers.podman.podman_container:
     name: registry-ui
-    image: docker.io/joxit/docker-registry-ui:latest
+    image: docker.io/joxit/docker-registry-ui:2.1
     pod: docker-registry
     force_restart: '{{ ui_config.changed }}'
     env:

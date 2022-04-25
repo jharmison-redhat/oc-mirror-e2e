@@ -1,0 +1,16 @@
+---
+- name: Validate that the Compliance Operator scan finished successfully
+  kubernetes.core.k8s_info:
+    host: https://api.{{ cluster_name }}.{{ cluster_domain }}:6443
+    ca_cert: '{{ cluster_ca_path }}'
+    api_key: '{{ openshift_oauth_results.openshift_auth.api_key }}'
+    api_version: compliance.openshift.io/v1alpha1
+    kind: ComplianceScan
+    name: rhcos4-moderate-master
+    namespace: openshift-compliance
+  register: scan
+  until:
+  - scan.resources|length > 0
+  - (scan.resources|first).status.phase == "DONE"
+  retries: 60
+  delay: 10

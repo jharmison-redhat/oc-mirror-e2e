@@ -1,0 +1,7 @@
+---
+- name: Merge the Compliance Operator into operator catalogs
+  catalog_merge:
+    operator_catalogs: '{{ operator_catalogs|default([]) }}'
+    catalog: '{{ compliance_operator_catalog }}'
+    full: '{{ compliance_operator_catalog_full }}'
+    packages: '{{ compliance_operator_packages }}'

@@ -64,7 +64,8 @@ This will rebuild the collection from your present working copy, rebuild the exe
     - `mirror_directly_to_registry: false` results in the imageset being saved to disk and hauled back to the controller, emulating "sneakernet" workflows
   - Completes the "sneakernet" workflow by moving binaries and imageset tarballs (if applicable) to the isolated bastion
   - Installs OpenShift using the sneakernetted content with no internet access at all
-  - Installs an operator, if listed in the scenario
+  - Installs, leverages, and validates the operators listed in your scenario
+  - If `foo` was specified in the operators (or the variable `conduct_second_publish` was specified as `true`), runs a second mirror, publish, validate phase to make sure that the mirrored content was updated for `foo`
 - Delete
   - Uninstalls OpenShift directly from the Execution Environment, using the installer directory recovered from the Registry node above
   - Deprovisions the remaining infrastructure using terraform

@@ -1,0 +1,16 @@
+---
+foo_catalog: quay.io/redhatgov/oc-mirror-dev:test-catalog-{{ foo_catalog_version }}
+foo_dest_catalog: '{{ registry_hostname }}/redhatgov/oc-mirror-dev:test-catalog-prune'
+
+foo_catalog_full: true
+
+foo_packages:
+- name: foo
+  channels:
+  - name: beta
+
+foo_expected_versions:
+  latest: foo-v0.3.1
+  diff: foo-v0.3.2
+  prune: foo-v0.1.1
+  prune-diff: foo-v0.2.0

@@ -1,0 +1,25 @@
+---
+- name: Pull the foo index selected from Quay
+  containers.podman.podman_image:
+    name: '{{ foo_catalog }}'
+    pull: true
+
+- name: Retag the image to the dest
+  containers.podman.podman_tag:
+    image: '{{ foo_catalog }}'
+    target_names:
+    - '{{ foo_dest_catalog }}'
+
+- name: Push the foo index image to the disconnected registry (to allow us to move the tag)
+  containers.podman.podman_image:
+    name: '{{ foo_dest_catalog }}'
+    pull: false
+    push: true
+    auth_file: '{{ ansible_env["HOME"] }}/.docker/config.json'
+
+- name: Merge foo index {{ foo_catalog_version }} into operator catalogs
+  catalog_merge:
+    operator_catalogs: '{{ operator_catalogs|default([]) }}'
+    catalog: '{{ foo_dest_catalog }}'
+    full: '{{ foo_catalog_full }}'
+    packages: '{{ foo_packages }}'

@@ -1,0 +1,34 @@
+---
+- name: Install the Compliance Operator
+  kubernetes.core.k8s:
+    state: present
+    host: https://api.{{ cluster_name }}.{{ cluster_domain }}:6443
+    ca_cert: '{{ cluster_ca_path }}'
+    api_key: '{{ openshift_oauth_results.openshift_auth.api_key }}'
+    definition:
+    - apiVersion: v1
+      kind: Namespace
+      metadata:
+        labels:
+          openshift.io/cluster-monitoring: "true"
+        name: openshift-compliance
+      spec: {}
+    - apiVersion: operators.coreos.com/v1
+      kind: OperatorGroup
+      metadata:
+        name: compliance-operator
+        namespace: openshift-compliance
+      spec:
+        targetNamespaces:
+          - openshift-compliance
+    - apiVersion: operators.coreos.com/v1alpha1
+      kind: Subscription
+      metadata:
+        name: compliance-operator
+        namespace: openshift-compliance
+      spec:
+        channel: release-0.1
+        installPlanApproval: Automatic
+        name: compliance-operator
+        source: redhat-operator-index
+        sourceNamespace: openshift-marketplace
