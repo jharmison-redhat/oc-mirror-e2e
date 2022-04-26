@@ -1,4 +1,4 @@
-VERSION = 0.6.0
+VERSION = 0.6.1
 GALAXY_TOKEN := $(shell cat .galaxy-token)
 PUSH_IMAGE = registry.jharmison.com/ansible/oc-mirror-e2e
 RUNTIME = podman
