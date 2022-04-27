@@ -33,21 +33,9 @@
     loop: '{{ sources.files }}'
 
   always: # Recover logs even if anything else fails
-  - name: Set the timestamp for the log
-    set_fact:
-      oc_mirror_log_timestamp: '{{ ansible_date_time.iso8601_basic_short  }}'
-
   - name: Recover oc-mirror log
     fetch:
       src: '{{ mirror_directory }}/.oc-mirror.log'
-      dest: '{{ output_dir }}/oc-mirror-{{ oc_mirror_log_timestamp }}.log'
+      dest: '{{ output_dir }}/oc-mirror-{{ ansible_date_time.iso8601_basic_short }}.log'
       flat: yes
       mode: '0644'
-
-  - name: Symlink oc-mirror log to latest
-    file:
-      state: link
-      src: '{{ output_dir }}/oc-mirror-{{ oc_mirror_log_timestamp }}.log'
-      dest: '{{ output_dir }}/.oc-mirror.log'
-      force: yes
-    delegate_to: controller

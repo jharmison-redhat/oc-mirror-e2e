@@ -36,8 +36,31 @@
   when: mirror_directly_to_registry|bool == false
   register: mirrored_content
 
-- name: Publish mirror data into disconnected registry
-  command: oc-mirror --from "{{ item.path }}" docker://{{ registry_hostname }}/{{ toplevel_namespace }}
-  async: 1800  # wait up to half an hour for publishing
-  when: mirror_directly_to_registry|bool == false
+- block:
+  - name: Publish mirror data into disconnected registry
+    command: oc-mirror --from "{{ item.path }}" docker://{{ registry_hostname }}/{{ toplevel_namespace }}
+    async: 1800  # wait up to half an hour for publishing
+    poll: 5
+    args:
+      chdir: '{{ mirror_directory }}'
+    when: mirror_directly_to_registry|bool == false
+    loop: '{{ mirrored_content.files }}'
+  always: # Recover logs even if publishing fails
+  - name: Recover oc-mirror log
+    fetch:
+      src: '{{ mirror_directory }}/.oc-mirror.log'
+      dest: '{{ output_dir }}/oc-mirror-publish-{{ ansible_date_time.iso8601_basic_short }}.log'
+      flat: yes
+      mode: '0644'
+
+- name: Remove published bundles
+  file:
+    path: '{{ item.path }}'
+    state: absent
   loop: '{{ mirrored_content.files }}'
+
+- name: Remove published bundles from controller
+  file:
+    path: '{{ mirror_data_recovery_dir }}'
+    state: absent
+  delegate_to: controller
