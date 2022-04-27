@@ -14,7 +14,7 @@
   register: oc_mirror_binary
 
 - name: Compile oc-mirror from source if needed
-  include_tasks: compile.yml
+  include_tasks: connected/compile.yml
   when: oc_mirror_binary.files|length == 0
 
 - name: Bring oc-mirror into connected host

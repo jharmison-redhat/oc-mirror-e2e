@@ -1,11 +1,11 @@
 ---
 - block:
   - name: Mirror content directly into registry
-    include_tasks: mirror-directly-to-registry.yml
+    include_tasks: connected/mirror-directly-to-registry.yml
     when: mirror_directly_to_registry|bool == true
 
   - name: Download mirror content on connected host
-    include_tasks: mirror-on-host.yml
+    include_tasks: connected/mirror-on-host.yml
     when: mirror_directly_to_registry|bool == false
 
   - name: Identify results directory

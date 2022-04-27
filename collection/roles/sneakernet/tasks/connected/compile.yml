@@ -44,6 +44,8 @@
     detach: false
     volume:
     - '{{ oc_mirror_clone_location }}:/build:z'
+  async: 1800  # wait up to half an hour for compilation
+  poll: 5
   when: >-
     builder_build.changed or
     repo_download.after != repo_download.before or

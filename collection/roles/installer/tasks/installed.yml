@@ -47,6 +47,8 @@
 - block:
   - name: Install OpenShift
     command: openshift-install create cluster
+    async: 3600  # wait up to an hour for cluster installation
+    poll: 5
     environment:
       OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE: '{{ registry_hostname }}/{{ toplevel_namespace }}/openshift/release-images:{{ mirrored_versions.stdout_lines|last }}-x86_64'
     args:
