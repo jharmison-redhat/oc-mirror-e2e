@@ -38,5 +38,6 @@
 
 - name: Publish mirror data into disconnected registry
   command: oc-mirror --from "{{ item.path }}" docker://{{ registry_hostname }}/{{ toplevel_namespace }}
+  async: 1800  # wait up to half an hour for publishing
   when: mirror_directly_to_registry|bool == false
   loop: '{{ mirrored_content.files }}'
