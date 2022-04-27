@@ -58,7 +58,7 @@
   file:
     path: '{{ item.path }}'
     state: absent
-  loop: '{{ mirrored_content.files }}'
+  loop: '{{ mirrored_content.files|default([]) }}'
 
 - name: Remove published bundles from controller
   file:
