@@ -1,4 +1,4 @@
-VERSION = 0.6.2
+VERSION = $(shell cat VERSION)
 GALAXY_TOKEN := $(shell cat .galaxy-token)
 PUSH_IMAGE = registry.jharmison.com/ansible/oc-mirror-e2e
 RUNTIME = podman
@@ -34,7 +34,7 @@ prereqs: clean-prereqs .venv/bin/yasha .venv/bin/ansible-galaxy .venv/bin/ansibl
 ##############################################################################
 #                               COLLECTION                                   #
 ##############################################################################
-collection/galaxy.yml: .pip-prereqs
+collection/galaxy.yml: .pip-prereqs VERSION
 	-rm -f collection/galaxy.yml
 	.venv/bin/yasha --VERSION=$(VERSION) collection/galaxy.yml.j2
 
