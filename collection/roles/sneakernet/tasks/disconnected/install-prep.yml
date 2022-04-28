@@ -1,14 +1,14 @@
 ---
 - name: Identify the latest results
   find:
-    paths: '{{ ansible_env["HOME"] }}/oc-mirror-workspace'
+    paths: '{{ mirror_directory }}'
     file_type: directory
     patterns: 'results-*'
   register: oc_mirror_results
 
 - name: Identify the CatalogSources and ICSPs from the latest results
   find:
-    paths: '{{ (oc_mirror_results.files|last).path }}'
+    paths: '{{ (oc_mirror_results.files|sort|last).path }}'
     file_type: file
     patterns: '*.yaml'
   register: oc_mirror_manifests
