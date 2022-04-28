@@ -22,12 +22,27 @@
       patterns: "results-*"
     register: results
 
-  - name: Recover lastest results
+  - name: Identify results bundles
+    find:
+      paths: '{{ remote_mirror_data_dir }}'
+      file_type: file
+      patterns: "mirror_seq*.tar"
+    register: results_bundles
+
+  - name: Recover lastest results directories
     ansible.posix.synchronize:
       src: '{{ (results.files|sort|last).path }}'
       dest: '{{ controller_mirror_data_dir }}/'
       mode: pull
     when: results.files|length > 0
+
+  - name: Recover latest results bundles
+    fetch:
+      src: '{{ (results_bundles.files|sort|last).path }}'
+      dest: '{{ controller_mirror_data_dir }}/'
+      flat: yes
+      mode: '0644'
+    when: results_bundles.files|length > 0
 
   always: # Recover logs even if anything else fails
   - name: Recover oc-mirror log
