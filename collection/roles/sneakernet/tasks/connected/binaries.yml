@@ -32,5 +32,5 @@
 
 - name: Ensure mirror data directory exists
   file:
-    path: '{{ mirror_directory }}'
+    path: '{{ remote_mirror_data_dir }}'
     state: directory

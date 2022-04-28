@@ -7,7 +7,7 @@ local_registry_pull_secret: |-
 # Backend config for registry backend
 oc_mirror_metadata_image: '{{ registry_hostname }}/{{ toplevel_namespace }}/imageset-metadata:latest'
 # Backend config for local backend
-oc_mirror_metadata_path: '{{ mirror_directory }}'
+oc_mirror_metadata_path: '{{ remote_mirror_data_dir }}'
 
 combined_pull_secret: '{{ console_redhat_com_pull_secret|combine(local_registry_pull_secret|from_yaml, recursive=True)|to_json }}'
 

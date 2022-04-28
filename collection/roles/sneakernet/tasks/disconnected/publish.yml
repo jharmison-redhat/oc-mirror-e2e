@@ -5,7 +5,7 @@
     state: directory
   loop:
   - '{{ ansible_env["HOME"] }}/bin'
-  - '{{ mirror_directory }}'
+  - '{{ remote_mirror_data_dir }}'
 
 - name: Drop oc-mirror into user's ~/bin
   copy:
@@ -15,8 +15,8 @@
 
 - name: Drop all oc-mirror data
   copy:
-    src: '{{ mirror_data_recovery_dir }}/'
-    dest: '{{ mirror_directory }}'
+    src: '{{ controller_mirror_data_dir }}'
+    dest: '{{ remote_mirror_data_dir }}'
 
 - name: Ensure pull secret location exists
   file:
@@ -28,40 +28,29 @@
     content: '{{ local_registry_pull_secret|from_yaml|to_json }}'
     dest: '{{ ansible_env["HOME"] }}/.docker/config.json'
 
-- name: Identify any disk-based mirror bundles
-  find:
-    paths: '{{ mirror_directory }}'
-    file_type: file
-    patterns: 'mirror*.tar'
-  when: mirror_directly_to_registry|bool == false
-  register: mirrored_content
+- name: Conduct the publishing of content in mirror-to-disk workflow
+  block:
+  - name: Identify any disk-based mirror bundles
+    find:
+      paths: '{{ remote_mirror_data_dir }}'
+      file_type: file
+      recurse: true
+      patterns: 'mirror*.tar'
+    register: mirrored_content
 
-- block:
-  - name: Publish mirror data into disconnected registry
+  - name: Publish the latest mirror data into disconnected registry
     command: oc-mirror --from "{{ item.path }}" docker://{{ registry_hostname }}/{{ toplevel_namespace }}
     async: 1800  # wait up to half an hour for publishing
     poll: 5
     args:
-      chdir: '{{ mirror_directory }}'
-    when: mirror_directly_to_registry|bool == false
-    loop: '{{ mirrored_content.files }}'
+      chdir: '{{ remote_mirror_data_dir }}'
+    loop: '{{ [mirrored_content.files|default([])|last] }}'
+
   always: # Recover logs even if publishing fails
   - name: Recover oc-mirror log
     fetch:
-      src: '{{ mirror_directory }}/.oc-mirror.log'
+      src: '{{ remote_mirror_data_dir }}/.oc-mirror.log'
       dest: '{{ output_dir }}/oc-mirror-publish-{{ ansible_date_time.iso8601_basic_short }}.log'
-      flat: yes
+      flat: true
       mode: '0644'
-    when: mirror_directly_to_registry|bool == false
-
-- name: Remove published bundles
-  file:
-    path: '{{ item.path }}'
-    state: absent
-  loop: '{{ mirrored_content.files|default([]) }}'
-
-- name: Remove published bundles from controller
-  file:
-    path: '{{ mirror_data_recovery_dir }}'
-    state: absent
-  delegate_to: controller
+  when: mirror_directly_to_registry|bool == false
