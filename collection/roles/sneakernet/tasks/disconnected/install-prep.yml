@@ -8,7 +8,7 @@
 
 - name: Identify the CatalogSources and ICSPs from the latest results
   find:
-    paths: '{{ (oc_mirror_results.files|sort|last).path }}'
+    paths: '{{ oc_mirror_results.files|json_query("[].path")|sort|last }}'
     file_type: file
     patterns: '*.yaml'
   register: oc_mirror_manifests

@@ -31,14 +31,14 @@
 
   - name: Recover lastest results directories
     ansible.posix.synchronize:
-      src: '{{ (results.files|sort|last).path }}'
+      src: '{{ results.files|json_query("[].path")|sort|last }}'
       dest: '{{ controller_mirror_data_dir }}/'
       mode: pull
     when: results.files|length > 0
 
   - name: Recover latest results bundles
     fetch:
-      src: '{{ (results_bundles.files|sort|last).path }}'
+      src: '{{ results_bundles.files|json_query("[].path")|sort|last }}'
       dest: '{{ controller_mirror_data_dir }}/'
       flat: yes
       mode: '0644'
