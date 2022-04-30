@@ -1,41 +1,53 @@
 ---
 - block:
-  - name: Mirror content directly into registry
-    include_tasks: connected/mirror-directly-to-registry.yml
-    when: mirror_directly_to_registry|bool == true
+  - name: Mirror content to disk
+    command: '{{ oc_mirror_binary_location }} --config {{ ansible_env["HOME"] }}/imageset-config.yml {{ mirror_dest }}'
+    async: 3600  # wait up to an hour for mirroring
+    poll: 5
+    args:
+      chdir: '{{ remote_mirror_data_dir }}'
+    vars:
+      mirror_dest: >-
+        {% if mirror_directly_to_registry|bool %}
+        docker://{{ registry_hostname }}/{{ toplevel_namespace }}
+        {% else %}
+        file://{{ remote_mirror_data_dir }}
+        {% endif %}
+    when: oc_mirror_config.changed or force_mirror_update|bool
 
-  - name: Download mirror content on connected host
-    include_tasks: connected/mirror-on-host.yml
-    when: mirror_directly_to_registry|bool == false
-
-  - name: Identify results directory
+  - name: Identify results directories
     find:
-      paths: '{{ mirror_directory }}/oc-mirror-workspace'
+      paths: '{{ remote_mirror_data_dir }}/oc-mirror-workspace'
       file_type: directory
       patterns: "results-*"
     register: results
 
-  - name: Identify results ICSPs and CatalogSources
+  - name: Identify results bundles
     find:
-      paths: '{{ (results.files|last).path }}'
+      paths: '{{ remote_mirror_data_dir }}'
       file_type: file
-      patterns: '*.yaml'
-    when: results.files|length > 0
-    register: sources
+      patterns: "mirror_seq*.tar"
+    register: results_bundles
 
-  - name: Recover ICSPs and CatalogSources
+  - name: Recover lastest results directories
+    ansible.posix.synchronize:
+      src: '{{ results.files|json_query("[].path")|sort|last }}'
+      dest: '{{ controller_mirror_data_dir }}/'
+      mode: pull
+    when: results.files|length > 0
+
+  - name: Recover latest results bundles
     fetch:
-      src: '{{ item.path }}'
-      dest: '{{ mirror_data_recovery_dir }}/'
+      src: '{{ results_bundles.files|json_query("[].path")|sort|last }}'
+      dest: '{{ controller_mirror_data_dir }}/'
       flat: yes
       mode: '0644'
-    when: results.files|length > 0
-    loop: '{{ sources.files }}'
+    when: results_bundles.files|length > 0
 
   always: # Recover logs even if anything else fails
   - name: Recover oc-mirror log
     fetch:
-      src: '{{ mirror_directory }}/.oc-mirror.log'
+      src: '{{ remote_mirror_data_dir }}/.oc-mirror.log'
       dest: '{{ output_dir }}/oc-mirror-{{ ansible_date_time.iso8601_basic_short }}.log'
       flat: yes
       mode: '0644'

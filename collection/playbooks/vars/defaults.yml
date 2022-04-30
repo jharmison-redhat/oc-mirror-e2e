@@ -1,5 +1,10 @@
 ---
 output_dir: /output
+
+# Directories for pushing and pulling mirrors
+controller_mirror_data_dir: '{{ output_dir }}/mirror-data'
+remote_mirror_data_dir: '{{ ansible_env["HOME"] }}/mirror-data'
+
 registry_admin:
   username: admin
   password: '{{ lookup("password", output_dir + "/registry_admin_password") }}'

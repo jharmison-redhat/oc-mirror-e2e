@@ -5,19 +5,13 @@ oc_mirror_source:
 
 mirror_directly_to_registry: true
 
-# Connected path variables
-# where to clone to
+# where the repository will be cloned to
 oc_mirror_clone_location: '{{ ansible_env["HOME"] }}/oc-mirror'
 # where the binary will be built
 oc_mirror_binary_location: '{{ oc_mirror_clone_location }}/bin/oc-mirror'
 
-# Shared path variables
-# This is where the mirror content will be generated (connected) or hauled (disconnected)
-mirror_directory: '{{ ansible_env["HOME"] }}/mirror-content'
-
 # Where to save artifacts on the controller while sneakernetting - you can leave these alone if you like
 bin_recovery_dir: '{{ output_dir }}/clients'
-mirror_data_recovery_dir: '{{ output_dir }}/mirror-data'
 
 # Always rerun during initial connected workflow, even if it's not been run before
 force_mirror_update: false

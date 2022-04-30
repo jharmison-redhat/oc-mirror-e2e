@@ -1,24 +1,25 @@
 ---
 - name: Identify the latest results
   find:
-    paths: '{{ ansible_env["HOME"] }}/oc-mirror-workspace'
+    paths: '{{ remote_mirror_data_dir }}'
     file_type: directory
     patterns: 'results-*'
+    recurse: true
   register: oc_mirror_results
 
 - name: Identify the CatalogSources and ICSPs from the latest results
   find:
-    paths: '{{ (oc_mirror_results.files|last).path }}'
+    paths: '{{ oc_mirror_results.files|json_query("[].path")|sort|last }}'
     file_type: file
     patterns: '*.yaml'
   register: oc_mirror_manifests
   when: oc_mirror_results.files|length > 0
 
-- name: Copy oc_mirror manifests into place
+- name: Copy oc_mirror manifests into root of the data dir
   copy:
     remote_src: true
     src: '{{ item.path }}'
-    dest: '{{ mirror_directory }}/'
+    dest: '{{ remote_mirror_data_dir }}/'
   loop: '{{ oc_mirror_manifests.files }}'
   when:
   - oc_mirror_results.files|length > 0

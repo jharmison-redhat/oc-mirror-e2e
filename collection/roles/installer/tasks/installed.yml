@@ -26,7 +26,7 @@
 
 - name: Identify all catalogSources
   find:
-    paths: '{{ mirror_directory }}'
+    paths: '{{ remote_mirror_data_dir }}'
     file_type: file
     patterns: "catalogSource-*.yaml"
   register: catalog_sources

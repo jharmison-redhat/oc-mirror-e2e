@@ -27,7 +27,7 @@
 
 - name: Recover iscp yaml
   slurp:
-    src: '{{ mirror_directory }}/imageContentSourcePolicy.yaml'
+    src: '{{ remote_mirror_data_dir }}/imageContentSourcePolicy.yaml'
   register: icsps
 
 - name: Save off icsp mirrors
@@ -39,15 +39,15 @@
       {%- endif %}
       {% endfor %}
 
-- name: Template install-config-orig.yaml
-  template:
-    src: install-config.yaml.j2
-    dest: '{{ install_directory|dirname }}/install-config-orig.yaml'
-
 - name: Ensure install directory exists
   file:
     path: '{{ install_directory }}'
     state: directory
+
+- name: Template install-config-orig.yaml
+  template:
+    src: install-config.yaml.j2
+    dest: '{{ install_directory|dirname }}/install-config-orig.yaml'
 
 - name: Ensure OpenShift is installed
   import_tasks: installed.yml
