@@ -40,12 +40,11 @@
     when: mirror_directly_to_registry|bool == false
 
   - name: Publish the latest mirror data into disconnected registry
-    command: oc-mirror --from "{{ item.path }}" docker://{{ registry_hostname }}/{{ toplevel_namespace }}
+    command: oc-mirror --from "{{ mirrored_content.files|json_query("[].path")|sort|last }}" docker://{{ registry_hostname }}/{{ toplevel_namespace }}
     async: 1800  # wait up to half an hour for publishing
     poll: 5
     args:
       chdir: '{{ remote_mirror_data_dir }}'
-    loop: '{{ [mirrored_content.files|default([])|last] }}'
     when: mirror_directly_to_registry|bool == false
 
   always: # Recover logs even if publishing fails
