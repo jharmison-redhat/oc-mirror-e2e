@@ -87,7 +87,8 @@ exec: .ee-built
 clean:
 	rm -rf jharmison_redhat-oc_mirror_e2e-*.tar.gz collection/galaxy.yml
 realclean: clean clean-prereqs
-	rm -rf example/output/* example/artifacts/* .pip-prereqs .collection-published .ee-built .ee-published
+	podman unshare rm -rf example/output/*
+	rm -rf example/artifacts/* .pip-prereqs .collection-published .ee-built .ee-published
 	-$(RUNTIME) rmi extended-builder-image
 	-$(RUNTIME) rmi extended-base-image
 	-$(RUNTIME) rmi oc-mirror-e2e:$(VERSION)
