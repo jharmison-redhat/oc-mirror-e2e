@@ -15,8 +15,8 @@
 
 - name: Drop all oc-mirror data
   copy:
-    src: '{{ controller_mirror_data_dir }}'
-    dest: '{{ remote_mirror_data_dir }}'
+    src: '{{ controller_mirror_data_dir }}/'
+    dest: '{{ remote_mirror_data_dir }}/'
 
 - name: Ensure pull secret location exists
   file:
