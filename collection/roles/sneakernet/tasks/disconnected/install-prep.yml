@@ -1,9 +1,10 @@
 ---
 - name: Identify the latest results
   find:
-    paths: '{{ remote_mirror_data_dir }}/oc-mirror-workspace'
+    paths: '{{ remote_mirror_data_dir }}'
     file_type: directory
     patterns: 'results-*'
+    recurse: true
   register: oc_mirror_results
 
 - name: Identify the CatalogSources and ICSPs from the latest results
