@@ -1,6 +1,6 @@
 ---
 - block:
-  - name: Mirror content to disk
+  - name: Mirror content to {{ "registry" if mirror_directly_to_registry|bool else "disk" }}
     command: '{{ oc_mirror_binary_location }} --config {{ ansible_env["HOME"] }}/imageset-config.yml {{ mirror_dest }}'
     async: 3600  # wait up to an hour for mirroring
     poll: 5

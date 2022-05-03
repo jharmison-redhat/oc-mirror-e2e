@@ -1,0 +1,46 @@
+---
+- name: Prepare download directory
+  file:
+    state: directory
+    path: '{{ controller_mirror_registry_download_dir }}'
+  delegate_to: controller
+
+- name: Download the Mirror registry sums
+  get_url:
+    url: '{{ mirror_registry_download_url }}/sha256sum.txt.sig'
+    dest: '{{ controller_mirror_registry_download_dir }}/sha256sum.txt.sig'
+  delegate_to: controller
+
+- name: Decrypt the Mirror registry sums
+  shell: >
+    gpg --import /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release &&
+    gpg --output ./sha256sum.txt --decrypt sha256sum.txt.sig
+  args:
+    chdir: '{{ controller_mirror_registry_download_dir }}'
+    creates: '{{ controller_mirror_registry_download_dir }}/sha256sum.txt'
+  changed_when: false
+  delegate_to: controller
+
+- name: Download the Mirror Registry installer and signature
+  get_url:
+    url: '{{ mirror_registry_download_url }}/{{ item }}'
+    dest: '{{ controller_mirror_registry_download_dir }}/{{ item }}'
+    checksum: sha256:{{ lookup("file", controller_mirror_registry_download_dir + "/sha256sum.txt")|regex_search("[0-9a-f]+ +" + item|regex_escape)|split(" ")|list|first }}
+  delegate_to: controller
+  loop:
+  - mirror-registry.tar.gz
+  - mirror-registry.tar.gz.asc
+
+- name: Validate the signature on the Mirror Registry installer
+  shell: >
+    gpg --import /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release &&
+    gpg --verify mirror-registry.tar.gz.asc mirror-registry.tar.gz
+  args:
+    chdir: '{{ controller_mirror_registry_download_dir }}'
+  changed_when: false
+  delegate_to: controller
+
+- name: Unpack the Mirror Registry installer on the registry node
+  unarchive:
+    src: '{{ controller_mirror_registry_download_dir }}/mirror-registry.tar.gz'
+    dest: '{{ ansible_env["HOME"] }}'
