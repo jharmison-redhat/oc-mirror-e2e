@@ -40,7 +40,75 @@
   changed_when: false
   delegate_to: controller
 
+- name: Ensure directories exist
+  become: true
+  file:
+    path: '{{ item }}'
+    state: directory
+  loop:
+  - /etc/quay/pki
+  - /etc/quay/data
+
 - name: Unpack the Mirror Registry installer on the registry node
   unarchive:
     src: '{{ controller_mirror_registry_download_dir }}/mirror-registry.tar.gz'
     dest: '{{ ansible_env["HOME"] }}'
+
+
+- name: Create registry certificates
+  include_role:
+    name: registry_certs
+  vars:
+    cert_directory: /etc/quay/pki
+
+- name: Create Mirror Registry instance
+  shell: >
+    ./mirror-registry install
+    --initUser '{{ registry_admin.username }}'
+    --initPassword '{{ registry_admin.password }}'
+    --quayHostname '{{ private_hostname }}'
+    --quayRoot /etc/quay/data
+    --sslCert /etc/quay/pki/ssl.cert
+    --sslKey /etc/quay/pki/ssl.key
+    --sslCheckSkip
+  args:
+    chdir: '{{ ansible_env["HOME"] }}'
+    creates: /etc/systemd/system/quay-pod.service
+  register: mirror_registry_install
+
+- name: Immediately stop Mirror Registry instance
+  become: yes
+  systemd:
+    name: quay-pod
+    state: stopped
+  when: mirror_registry_install.changed|default(false)
+
+- name: Update Mirror Registry unit with port 443 also
+  become: yes
+  lineinfile:
+    path: /etc/systemd/system/quay-pod.service
+    line: '    --publish 443:8443 \'
+    insertafter: '--publish 8443:8443'
+  register: quay_pod_port
+
+- name: Reload systemd if necessary
+  become: yes
+  systemd:
+    daemon_reload: yes
+  when: quay_pod_port.changed
+
+- name: Ensure Mirror Registry is running
+  become: yes
+  systemd:
+    name: quay-pod
+    state: started
+    enabled: yes
+
+- name: Wait for Mirror Registry to report ready
+  shell: >
+    curl -k https://localhost/api/v1/superuser/registrystatus |
+    python3 -c 'import json, sys; print(json.loads(sys.stdin.read())["status"])'
+  register: quay_status
+  until: '"ready" in quay_status.stdout'
+  retries: 60
+  delay: 5
