@@ -16,7 +16,10 @@
     pull: false
     push: true
     auth_file: '{{ ansible_env["HOME"] }}/.docker/config.json'
-  retries: 2
+  register: catalog_publish
+  until: not catalog_publish.failed
+  retries: 5
+  delay: 1
 
 - name: Merge foo index {{ foo_catalog_version }} into operator catalogs
   catalog_merge:
