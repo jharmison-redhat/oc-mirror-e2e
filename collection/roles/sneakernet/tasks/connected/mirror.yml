@@ -47,7 +47,11 @@
   always: # Recover logs even if anything else fails
   - name: Recover oc-mirror log
     fetch:
-      src: '{{ remote_mirror_data_dir }}/.oc-mirror.log'
+      src: '{{ remote_mirror_data_dir }}/{{ item }}'
       dest: '{{ output_dir }}/oc-mirror-{{ ansible_date_time.iso8601_basic_short }}.log'
       flat: yes
       mode: '0644'
+    ignore_errors: yes
+    loop:
+    - .oc-mirror.log
+    - .openshift_bundle.log
