@@ -100,9 +100,14 @@
 - name: Ensure Mirror Registry is running
   become: yes
   systemd:
-    name: quay-pod
+    name: '{{ item }}'
     state: started
     enabled: yes
+  loop:
+  - quay-pod
+  - quay-postgres
+  - quay-redis
+  - quay-app
 
 - name: Wait for Mirror Registry to report ready
   shell: >
