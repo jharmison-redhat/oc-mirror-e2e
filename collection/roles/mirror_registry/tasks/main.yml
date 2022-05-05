@@ -66,7 +66,7 @@
     ./mirror-registry install
     --initUser '{{ registry_admin.username }}'
     --initPassword '{{ registry_admin.password }}'
-    --quayHostname '{{ private_hostname }}'
+    --quayHostname '{{ private_hostname }}:443'
     --quayRoot /etc/quay/data
     --sslCert /etc/quay/pki/ssl.cert
     --sslKey /etc/quay/pki/ssl.key
@@ -75,27 +75,6 @@
     chdir: '{{ ansible_env["HOME"] }}'
     creates: /etc/systemd/system/quay-pod.service
   register: mirror_registry_install
-
-- name: Immediately stop Mirror Registry instance
-  become: yes
-  systemd:
-    name: quay-pod
-    state: stopped
-  when: mirror_registry_install.changed|default(false)
-
-- name: Update Mirror Registry unit with port 443 also
-  become: yes
-  lineinfile:
-    path: /etc/systemd/system/quay-pod.service
-    line: '    --publish 443:8443 \'
-    insertafter: '--publish 8443:8443'
-  register: quay_pod_port
-
-- name: Reload systemd if necessary
-  become: yes
-  systemd:
-    daemon_reload: yes
-  when: quay_pod_port.changed
 
 - name: Ensure Mirror Registry is running
   become: yes

@@ -3,6 +3,9 @@ local_registry_pull_secret: |-
     {{ registry_hostname }}:
       auth: {{ (registry_admin.username + ":" + registry_admin.password)|b64encode }}
       email: {{ registry_admin.email }}
+    "{{ registry_hostname }}:443":
+      auth: {{ (registry_admin.username + ":" + registry_admin.password)|b64encode }}
+      email: {{ registry_admin.email }}
 
 # Backend config for registry backend
 oc_mirror_metadata_image: '{{ registry_hostname }}/{{ toplevel_namespace }}/imageset-metadata:latest'
