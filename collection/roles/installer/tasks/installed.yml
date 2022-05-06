@@ -50,7 +50,7 @@
     async: 3600  # wait up to an hour for cluster installation
     poll: 5
     environment:
-      OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE: '{{ registry_hostname }}/{{ toplevel_namespace }}/openshift/release-images:{{ mirrored_versions.stdout_lines|last }}-x86_64'
+      OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE: '{{ release_image_override }}'
     args:
       chdir: '{{ install_directory }}'
     register: openshift_install

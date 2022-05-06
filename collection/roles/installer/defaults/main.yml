@@ -22,3 +22,5 @@ install_directory: '{{ ansible_env["HOME"] }}/install'
 
 openshift_modules_packages:
 - python38-pip
+
+release_image_name: release-images
