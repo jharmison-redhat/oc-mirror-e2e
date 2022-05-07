@@ -66,6 +66,7 @@
 
 - name: Record the version of oc-mirror on the connected host
   shell: '{{ oc_mirror_binary_location }} version'
+  changed_when: false
   register: oc_mirror_version
 
 - name: Output the oc-mirror version for the logs
