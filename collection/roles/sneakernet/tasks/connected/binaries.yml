@@ -5,6 +5,16 @@
     state: directory
   delegate_to: controller
 
+- name: Ensure destination bin directory exists
+  file:
+    path: '{{ oc_mirror_binary_location|dirname }}'
+    state: directory
+
+# Where does the oc-mirror binary come from?
+# If binary doesn't exist on controller and no download link specified, compile it using the toolset image
+# If binary doesn't exist on controller and a download link is specified, download and maybe unarchive it
+# If binary does exist on the controller, copy it into place directly from the controller
+
 - name: Check for existing oc-mirror binary
   find:
     paths: '{{ bin_recovery_dir }}'
@@ -15,20 +25,44 @@
 
 - name: Compile oc-mirror from source if needed
   include_tasks: connected/compile.yml
-  when: oc_mirror_binary.files|length == 0
+  when:
+  - oc_mirror_binary.files|length == 0
+  - oc_mirror_download_link == ""
 
-- name: Bring oc-mirror into connected host
+- name: Download oc-mirror
   block:
-  - name: Ensure directories exist
-    file:
-      path: '{{ oc_mirror_binary_location|dirname }}'
-      state: directory
-  - name: Drop oc-mirror in place
-    copy:
-      src: '{{ bin_recovery_dir }}/oc-mirror'
+  - name: Download oc-mirror to binary location
+    get_url:
+      url: '{{ oc_mirror_download_link }}'
       dest: '{{ oc_mirror_binary_location }}'
       mode: '0755'
+    when: not oc_mirror_download_link.endswith(".tar.gz")
+  - name: Download and untar oc-mirrar archive to binary location
+    unarchive:
+      remote_src: yes
+      src: '{{ oc_mirror_download_link }}'
+      dest: '{{ oc_mirror_binary_location|dirname }}/'
+      creates: '{{ oc_mirror_binary_location }}/oc-mirror'
+      mode: '0755'
+    when: oc_mirror_download_link.endswith(".tar.gz")
+  when:
+  - oc_mirror_binary.files|length == 0
+  - oc_mirror_download_link != ""
+
+- name: Copy oc-mirror directly to the connected host
+  copy:
+    src: '{{ bin_recovery_dir }}/oc-mirror'
+    dest: '{{ oc_mirror_binary_location }}'
+    mode: '0755'
   when: oc_mirror_binary.files|length > 0
+
+- name: Record the version of oc-mirror on the connected host
+  shell: '{{ oc_mirror_binary_location }} version'
+  register: oc_mirror_version
+
+- name: Output the oc-mirror version for the logs
+  debug:
+    var: oc_mirror_version
 
 - name: Ensure mirror data directory exists
   file:
