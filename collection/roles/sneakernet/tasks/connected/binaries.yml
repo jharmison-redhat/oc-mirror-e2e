@@ -56,6 +56,14 @@
     mode: '0755'
   when: oc_mirror_binary.files|length > 0
 
+- name: Recover oc-mirror from the connected node
+  fetch:
+    src: '{{ oc_mirror_binary_location }}'
+    dest: '{{ bin_recovery_dir }}/'
+    flat: yes
+    mode: '0755'
+  when: oc_mirror_binary.files|length == 0
+
 - name: Record the version of oc-mirror on the connected host
   shell: '{{ oc_mirror_binary_location }} version'
   register: oc_mirror_version
