@@ -1,18 +1,19 @@
 ---
 - block:
+  - name: Output mirror command
+    debug:
+      var: oc_mirror_command
+
+  - name: Output ImageSetConfiguration
+    debug:
+      var: lookup("template", "imageset-config.yml.j2")
+
   - name: Mirror content to {{ "registry" if mirror_directly_to_registry|bool else "disk" }}
-    command: '{{ oc_mirror_binary_location }} --config {{ ansible_env["HOME"] }}/imageset-config.yml {{ mirror_dest }}'
+    command: '{{ oc_mirror_command }}'
     async: 3600  # wait up to an hour for mirroring
     poll: 5
     args:
       chdir: '{{ remote_mirror_data_dir }}'
-    vars:
-      mirror_dest: >-
-        {% if mirror_directly_to_registry|bool %}
-        docker://{{ registry_hostname }}/{{ toplevel_namespace }}
-        {% else %}
-        file://{{ remote_mirror_data_dir }}
-        {% endif %}
     when: oc_mirror_config.changed or force_mirror_update|bool
 
   - name: Identify results directories
