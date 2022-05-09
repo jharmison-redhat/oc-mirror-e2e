@@ -1,0 +1,2 @@
+---
+release_image_override: '{{ registry_hostname }}/{{ toplevel_namespace }}/openshift/{{ release_image_name }}:{{ mirrored_versions.stdout_lines|last }}-x86_64'

@@ -28,7 +28,8 @@ mirror_directly_to_registry: true
 # Options:
 #   - docker_registry
 #   - redhat_quay
-registry_type: docker_registry
+#   - mirror_registry
+registry_type: mirror_registry
 
 # operators_to_mirror
 # Determines which operators should be mirrored, installed, and tested

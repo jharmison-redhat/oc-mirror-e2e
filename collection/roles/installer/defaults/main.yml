@@ -5,6 +5,10 @@ local_registry_pull_secret: |-
     {{ registry_hostname }}:
       auth: {{ (registry_admin.username + ":" + registry_admin.password)|b64encode }}
       email: {{ registry_admin.email }}
+    "{{ registry_hostname }}:443":
+      auth: {{ (registry_admin.username + ":" + registry_admin.password)|b64encode }}
+      email: {{ registry_admin.email }}
+
 additional_trust_bundle: ""
 
 cluster_subnets: '{{ hostvars.controller.terraform.outputs.vpc.value.private_subnets }}'
@@ -18,3 +22,5 @@ install_directory: '{{ ansible_env["HOME"] }}/install'
 
 openshift_modules_packages:
 - python38-pip
+
+release_image_name: release-images

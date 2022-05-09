@@ -1,0 +1,4 @@
+---
+mirror_registry_version: latest
+mirror_registry_download_url: https://mirror.openshift.com/pub/openshift-v4/clients/mirror-registry/{{ mirror_registry_version }}
+controller_mirror_registry_download_dir: '{{ output_dir }}/mirror_registry'

@@ -25,7 +25,7 @@
   - name: registry
     groups:
     - connected
-    ansible_host: '{{ terraform.outputs.registry_instance.value.hostname }}'
+    ansible_host: '{{ terraform.outputs.registry_instance.value.ip }}'
     public_hostname: '{{ terraform.outputs.registry_instance.value.hostname }}'
     private_hostname: '{{ terraform.outputs.registry_instance.value.private_hostname }}'
     user: '{{ terraform.outputs.registry_instance.value.username }}'
@@ -34,7 +34,7 @@
   - name: proxy
     groups:
     - connected
-    ansible_host: '{{ terraform.outputs.proxy_instance.value.hostname }}'
+    ansible_host: '{{ terraform.outputs.proxy_instance.value.ip }}'
     public_hostname: '{{ terraform.outputs.proxy_instance.value.hostname }}'
     private_hostname: '{{ terraform.outputs.proxy_instance.value.private_hostname }}'
     user: '{{ terraform.outputs.proxy_instance.value.username }}'
