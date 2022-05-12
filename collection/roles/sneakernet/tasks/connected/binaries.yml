@@ -5,11 +5,6 @@
     state: directory
   delegate_to: controller
 
-- name: Ensure destination bin directory exists
-  file:
-    path: '{{ oc_mirror_binary_location|dirname }}'
-    state: directory
-
 # Where does the oc-mirror binary come from?
 # If binary doesn't exist on controller and no download link specified, compile it using the toolset image
 # If binary doesn't exist on controller and a download link is specified, download and maybe unarchive it
@@ -22,6 +17,13 @@
     patterns: oc-mirror
   delegate_to: controller
   register: oc_mirror_binary
+
+- name: Ensure destination bin directory exists
+  file:
+    path: '{{ oc_mirror_binary_location|dirname }}'
+    state: directory
+  when:
+  - oc_mirror_binary.files|length != 0 or oc_mirror_download_link != ""
 
 - name: Compile oc-mirror from source if needed
   include_tasks: connected/compile.yml
