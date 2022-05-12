@@ -94,6 +94,7 @@
   shell: >
     curl -k https://localhost/api/v1/superuser/registrystatus |
     python3 -c 'import json, sys; print(json.loads(sys.stdin.read())["status"])'
+  changed_when: false
   register: quay_status
   until: '"ready" in quay_status.stdout'
   retries: 60
