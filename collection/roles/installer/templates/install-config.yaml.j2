@@ -8,13 +8,23 @@ compute:
 - architecture: amd64
   hyperthreading: Enabled
   name: worker
-  platform: {}
+  platform:
+    aws:
+      zones:
+{% for subnet in cluster_subnets %}
+      - {{ subnet.availability_zone }}
+{% endfor %}
   replicas: 3
 controlPlane:
   architecture: amd64
   hyperthreading: Enabled
   name: master
-  platform: {}
+  platform:
+    aws:
+      zones:
+{% for subnet in cluster_subnets %}
+      - {{ subnet.availability_zone }}
+{% endfor %}
   replicas: 3
 metadata:
   creationTimestamp: null
@@ -33,10 +43,6 @@ networking:
 platform:
   aws:
     region: {{ aws_region }}
-    zones:
-{% for subnet in cluster_subnets %}
-    - {{ subnet.availability_zone }}
-{% endfor %}
     subnets:
 {% for subnet in cluster_subnets %}
     - {{ subnet.id }}
