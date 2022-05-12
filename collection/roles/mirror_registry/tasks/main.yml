@@ -74,6 +74,8 @@
   args:
     chdir: '{{ ansible_env["HOME"] }}'
     creates: /etc/systemd/system/quay-pod.service
+  async: 1800  # wait up to half an hour for installation of the mirror registry
+  poll: 5
   register: mirror_registry_install
 
 - name: Ensure Mirror Registry is running
