@@ -10,6 +10,7 @@
     name: foo-operator
   register: operator_log
   until:
+  - operator_log.log is defined
   - foo_expected_versions[foo_catalog_version] in operator_log.log
   retries: 6
   delay: 10
