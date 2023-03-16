@@ -10,7 +10,7 @@
     repo: '{{ oc_mirror_source.repo }}'
     dest: '{{ oc_mirror_clone_location }}'
     version: '{{ oc_mirror_source.version }}'
-    force: yes
+    force: true
   register: repo_download
 
 - name: Notify of the build commit

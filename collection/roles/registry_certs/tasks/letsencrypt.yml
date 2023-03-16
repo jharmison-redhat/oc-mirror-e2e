@@ -15,7 +15,7 @@
     acme_version: 2
     account_key_src: '{{ cert_directory }}/account.key'
     state: present
-    terms_agreed: yes
+    terms_agreed: true
     contact:
     - mailto:{{ registry_admin.email|default("admin@" + registry_hostname) }}
 
@@ -100,7 +100,7 @@
 - name: Migrate the fullchain into place
   become: true
   copy:
-    remote_src: yes
+    remote_src: true
     src: '{{ cert_directory }}/ssl.cert.fullchain'
     dest: '{{ cert_directory }}/ssl.cert'
     owner: '{{ cert_owner|default(omit) }}'

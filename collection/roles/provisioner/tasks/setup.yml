@@ -3,7 +3,7 @@
   copy:
     src: '{{ role_path }}/files/terraform'
     dest: '{{ output_dir }}/'
-    remote_src: yes
+    remote_src: true
 
 - name: Generate the backend config
   template:

@@ -62,6 +62,7 @@
     cert_directory: /etc/quay/pki
 
 - name: Create Mirror Registry instance
+  become: true
   shell: >
     ./mirror-registry install
     --initUser '{{ registry_admin.username }}'
@@ -79,11 +80,11 @@
   register: mirror_registry_install
 
 - name: Ensure Mirror Registry is running
-  become: yes
+  become: true
   systemd:
     name: '{{ item }}'
     state: started
-    enabled: yes
+    enabled: true
   loop:
   - quay-pod
   - quay-postgres

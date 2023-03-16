@@ -25,7 +25,7 @@
 - name: Copy certificate to the CA anchors folder
   become: true
   copy:
-    remote_src: yes
+    remote_src: true
     src: '{{ cert_directory }}/ssl.cert'
     dest: /etc/pki/ca-trust/source/anchors/registry.crt
   register: cert_in_anchors
