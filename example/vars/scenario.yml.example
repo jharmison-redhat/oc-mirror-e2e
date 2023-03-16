@@ -2,7 +2,7 @@
 # The metadata.name for install-config.yaml, and where all other resources are subdomained
 cluster_name: disco
 # The version of OpenShift to mirror and install
-openshift_version: "4.9"
+openshift_version: "4.12"
 
 # The following determine the testing scenario that is run, and can mostly be selected
 # independently of each other.
