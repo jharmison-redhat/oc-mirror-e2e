@@ -28,6 +28,7 @@ all: collection
 
 clean-prereqs:
 	rm -rf .venv
+	rm .pip-prereqs
 
 prereqs: clean-prereqs .venv/bin/yasha .venv/bin/ansible-galaxy .venv/bin/ansible-builder
 
@@ -88,7 +89,7 @@ clean:
 	rm -rf jharmison_redhat-oc_mirror_e2e-*.tar.gz collection/galaxy.yml
 realclean: clean clean-prereqs
 	podman unshare rm -rf example/output/*
-	rm -rf example/artifacts/* .pip-prereqs .collection-published .ee-built .ee-published
+	rm -rf example/artifacts/* .collection-published .ee-built .ee-published
 	-$(RUNTIME) rmi extended-builder-image
 	-$(RUNTIME) rmi extended-base-image
 	-$(RUNTIME) rmi oc-mirror-e2e:$(VERSION)
