@@ -36,7 +36,7 @@
 
 - name: Bring in catalogSources
   copy:
-    remote_src: yes
+    remote_src: true
     src: '{{ item.path }}'
     dest: '{{ install_directory }}/manifests/'
   loop: '{{ catalog_sources.files }}'
@@ -73,7 +73,7 @@
 
   always:
   - name: Recover OpenShift installer directory
-    become: yes
+    become: true
     ansible.posix.synchronize:
       mode: pull
       src: '{{ install_directory }}'

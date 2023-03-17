@@ -23,7 +23,7 @@
   fetch:
     src: '{{ ansible_env["HOME"] }}/.aws/credentials'
     dest: '{{ output_dir }}/aws_credentials'
-    flat: yes
+    flat: true
 
 - name: Recover iscp yaml
   slurp:
@@ -81,7 +81,7 @@
   fetch:
     src: '{{ item.path }}'
     dest: '{{ output_dir }}/pip-haul/'
-    flat: yes
+    flat: true
   loop: '{{ pip_files.files }}'
   delegate_to: registry
 

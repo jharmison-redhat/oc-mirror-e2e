@@ -41,7 +41,7 @@
     when: not oc_mirror_download_link.endswith(".tar.gz")
   - name: Download and untar oc-mirrar archive to binary location
     unarchive:
-      remote_src: yes
+      remote_src: true
       src: '{{ oc_mirror_download_link }}'
       dest: '{{ oc_mirror_binary_location|dirname }}/'
       creates: '{{ oc_mirror_binary_location }}/oc-mirror'
@@ -62,7 +62,7 @@
   fetch:
     src: '{{ oc_mirror_binary_location }}'
     dest: '{{ bin_recovery_dir }}/'
-    flat: yes
+    flat: true
     mode: '0755'
   when: oc_mirror_binary.files|length == 0
 

@@ -41,7 +41,7 @@
     fetch:
       src: '{{ results_bundles.files|json_query("[].path")|sort|last }}'
       dest: '{{ controller_mirror_data_dir }}/'
-      flat: yes
+      flat: true
       mode: '0644'
     when: results_bundles.files|length > 0
 
@@ -50,9 +50,9 @@
     fetch:
       src: '{{ remote_mirror_data_dir }}/{{ item }}'
       dest: '{{ output_dir }}/oc-mirror-{{ ansible_date_time.iso8601_basic_short }}.log'
-      flat: yes
+      flat: true
       mode: '0644'
-    ignore_errors: yes
+    ignore_errors: true
     loop:
     - .oc-mirror.log
     - .openshift_bundle.log

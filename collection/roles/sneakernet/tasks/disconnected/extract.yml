@@ -52,6 +52,6 @@
   fetch:
     src: '{{ ansible_env["HOME"] }}/bin/openshift-install'
     dest: '{{ bin_recovery_dir }}/'
-    flat: yes
+    flat: true
     mode: '0755'
   when: false in client_binary|json_query('results[*].stat.exists')

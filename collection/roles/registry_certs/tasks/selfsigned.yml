@@ -39,13 +39,13 @@
     group: '{{ cert_group|default(omit) }}'
     setype: '{{ cert_setype|default("container_file_t") }}'
     mode: '{{ cert_mode|default(omit) }}'
-    return_content: yes
+    return_content: true
   register: selfsigned_certificate
 
 - name: Copy certificate to the CA anchors folder
   become: true
   copy:
-    remote_src: yes
+    remote_src: true
     src: '{{ cert_directory }}/ssl.cert'
     dest: /etc/pki/ca-trust/source/anchors/registry.crt
   register: cert_in_anchors
