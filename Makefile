@@ -28,7 +28,7 @@ all: collection
 
 clean-prereqs:
 	rm -rf .venv
-	rm .pip-prereqs
+	rm -f .pip-prereqs
 
 prereqs: clean-prereqs .venv/bin/yasha .venv/bin/ansible-galaxy .venv/bin/ansible-builder
 
